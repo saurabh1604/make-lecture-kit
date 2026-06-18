@@ -138,6 +138,7 @@ make-lecture-kit/
 │  ├─ companion.tex             LaTeX study-companion template (→ PDF)
 │  └─ lecture.html              complete interactive lecture template
 ├─ references/
+│  ├─ plain_language.md         the easy-English rulebook (both linters enforce it)
 │  ├─ quality_rubric.md         the quality bar + ship checklist (both)
 │  ├─ companion_style.md        how to expand slides into the companion
 │  ├─ lecture_style.md          how to build the complete interactive lecture
@@ -147,6 +148,7 @@ make-lecture-kit/
 ├─ scripts/
 │  ├─ figstyle.py               matplotlib house style + reusable plotters
 │  ├─ build_pdf.py              run figures + compile companion.tex → PDF
+│  ├─ _plain_language.py        shared word lists used by both linters
 │  ├─ lint.py                   lecture HTML quality gate (readability, no-overflow, keyless)
 │  ├─ lint_tex.py               companion PDF-source language + layout gate
 │  ├─ selfcheck.py              verify the whole kit is healthy

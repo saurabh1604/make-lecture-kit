@@ -6,6 +6,16 @@ every upgrade bumps `VERSION`, adds an entry here, and must pass
 
 Format follows *Keep a Changelog*; versions follow semantic versioning.
 
+## [2.2.2] — 2026-06-18
+
+### Fixed
+- **`README.md` "What's inside" map now lists every shipped file.** Two required
+  files (verified present by `selfcheck.py`) were missing from the tree:
+  `references/plain_language.md` — the easy-English rulebook that `SKILL.md` calls
+  "read first" and that both linters enforce — and `scripts/_plain_language.py`,
+  the shared word-list module those linters import. Docs-only change; no behaviour
+  change.
+
 ## [2.2.1] — 2026-06-15
 
 ### Fixed
