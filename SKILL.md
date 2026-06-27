@@ -69,7 +69,7 @@ The input is usually a **slide deck** (PDF/PPTX) — but may be notes or just a 
 Choose a short kebab slug (e.g. `session6-distributions`, `eigenvectors`) and create `output/<slug>/` and `output/<slug>/figures/`.
 
 ### 4. Author the companion → `output/<slug>/companion.pdf`
-1. Copy `templates/companion.tex` to `output/<slug>/companion.tex`. Fill the banner/header placeholders (`{{COURSE_SHORT}}`, `{{SESSION}}`, `{{LECTURE_TITLE}}`).
+1. Copy `templates/companion.tex` to `output/<slug>/companion.tex`. Fill the banner/header placeholders (`{{COURSE_SHORT}}`, `{{SESSION}}`, `{{LECTURE_TITLE}}`). **Keep the BITS brand as shipped:** the "WILP, BITS Pilani" banner wordmark, the footer line, the credit line under the banner, and the optional `assets/bits-logo.png` logo slot are fixed institute branding — only the course/session/title fields change.
 2. For **each** concept, walk the full teaching spine in plain words, using the colour-coded callout boxes:
    > **Hook** (real-life) → **`\begin{intuition}`** (analogy + mental model) → **the math, step by step** → **`\begin{worked}` fully-solved example(s)** with real numbers → **`\begin{everyday}`** real-world picture → ML/AI connection → a **figure** (visual intuition) → **`\begin{watchout}`** pitfalls → **`\begin{keytake}`** recap.
    Work out **every example from the slides** in full.
@@ -86,7 +86,7 @@ Start from `templates/lecture.html` (a working 3-chapter demo — its chapters s
 ```bash
 python3 scripts/lint.py output/<slug>/lecture.html
 ```
-`lint.py` fails on template-hygiene leaks (broken comments, leftover `{{placeholders}}`), possible overflow, long sentences, fancy-word / banned hand-waving prose, prose that reads above ~grade 9, blocked math, missing interactivity, any non-CDN dependency, or leaked secrets. Fix every FAIL and re-run until it passes. Also replace the `<title>` tag and every demo-chapter remnant — the shipped page must be entirely about the student's lecture.
+`lint.py` fails on template-hygiene leaks (broken comments, leftover `{{placeholders}}`), possible overflow, long sentences, fancy-word / banned hand-waving prose, prose that reads above ~grade 9, blocked math, missing interactivity, any non-CDN dependency, or leaked secrets. Fix every FAIL and re-run until it passes. Also replace the `<title>` tag and every demo-chapter remnant — the shipped page must be entirely about the student's lecture. **Keep the BITS brand:** the sidebar "WILP, BITS Pilani" wordmark + logo slot and the hero credit line stay; set `<title>` to "WILP, BITS Pilani · &lt;lecture title&gt;".
 
 ### 6. Finish honestly
 Tell the learner what landed in `output/<slug>/` and which checks passed. If `build_pdf.py` couldn't compile here (no TeX engine in this environment), say so plainly and give the exact next step — **don't claim a `companion.pdf` exists if it doesn't.** Then self-score against `references/quality_rubric.md`.

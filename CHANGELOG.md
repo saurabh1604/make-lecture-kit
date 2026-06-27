@@ -6,6 +6,34 @@ every upgrade bumps `VERSION`, adds an entry here, and must pass
 
 Format follows *Keep a Changelog*; versions follow semantic versioning.
 
+## [2.3.0] — 2026-06-27
+
+### Added
+- **BITS Pilani branding on every generated kit**, so both deliverables look
+  right for BITS WILP courses:
+  - *Companion PDF* (`templates/companion.tex`): a white **"WILP, BITS Pilani"**
+    wordmark in the navy title banner, an optional logo shown in a white chip
+    beside it, a "Prepared for the Work Integrated Learning Programmes (WILP),
+    BITS Pilani." credit line under the banner, and "WILP, BITS Pilani" in the
+    running footer.
+  - *Interactive lecture* (`templates/lecture.html`): the same wordmark + logo
+    slot in the sidebar brand, a hero credit line, and the institute name in the
+    `<title>`.
+- **`templates/assets/bits-logo.png` — the BITS Pilani logo is bundled** (the
+  transparent emblem extracted from the course slides) and shown in a white chip
+  on the PDF banner and in the HTML sidebar. Replace that single file to change
+  it; if it is removed, both templates fall back to the text wordmark
+  automatically — an `\IfFileExists` guard in the template and an `onerror` hide
+  in the HTML.
+
+### Changed
+- **`SKILL.md`** now instructs the agent to keep the BITS brand block intact
+  while filling the per-lecture course/session/title fields.
+
+### Notes
+- Verified: the branded template compiles to a clean 3-page sample (no overfull
+  boxes); `lint.py`, `lint_tex.py`, and `selfcheck.py` show no new failures.
+
 ## [2.2.2] — 2026-06-18
 
 ### Fixed

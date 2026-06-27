@@ -137,6 +137,7 @@
 \fancyhf{}
 \fancyhead[L]{\footnotesize\color{mutedtext}\textsf{\CourseShort}}
 \fancyhead[R]{\footnotesize\color{mutedtext}\textsf{Session \SessionNo\ \textperiodcentered\ \LectureTitle}}
+\fancyfoot[L]{\footnotesize\color{mutedtext}\textsf{WILP, BITS Pilani}}
 \fancyfoot[C]{\footnotesize\color{mutedtext}\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0pt}
@@ -223,6 +224,25 @@
   title={\raisebox{-0.05ex}{\ding{51}}\,\ Key takeaway}}
 
 % =============================================================================
+%  BITS BRAND  —  "WILP, BITS Pilani" wordmark + optional logo file
+%  The institute brand is fixed on every kit. The white wordmark ALWAYS renders
+%  (legible on the navy banner). If a logo image is present it is shown in a small
+%  WHITE chip, so any logo colour stays readable on navy. To enable the logo, drop
+%  a PNG at templates/assets/bits-logo.png (or output/<slug>/assets/bits-logo.png).
+%  No file => wordmark only; nothing breaks. See templates/assets/README.md.
+% =============================================================================
+\newif\ifbitslogo \bitslogofalse
+\IfFileExists{assets/bits-logo.png}%
+  {\bitslogotrue \def\bitslogopath{assets/bits-logo.png}}%
+  {\IfFileExists{../../templates/assets/bits-logo.png}%
+     {\bitslogotrue \def\bitslogopath{../../templates/assets/bits-logo.png}}%
+     {}}
+% White wordmark — always shown.
+\newcommand{\bitswordmark}{{\sffamily\bfseries\color{white}\fontsize{12.5}{15}\selectfont WILP, BITS Pilani}}
+% Logo inside a white chip — only when a logo file was found (any colour stays legible).
+\newcommand{\bitslogochip}{\ifbitslogo\colorbox{white}{\,\raisebox{-0.2ex}{\includegraphics[height=26pt]{\bitslogopath}}\,}\fi}
+
+% =============================================================================
 %  TITLE BANNER  —  full-width dark navy tcolorbox on page 1
 %  \titlebanner{LABEL}{BIG TITLE}{SUBTITLE}{META LINE}
 %    #1 small uppercase tracked label
@@ -243,6 +263,12 @@
     left=16pt, right=16pt, top=16pt, bottom=16pt,
     before skip=2pt, after skip=14pt,
     width=\linewidth ]
+    % --- BITS brand row: wordmark left, optional logo chip right ---
+    \noindent
+    \begin{minipage}[c]{0.72\linewidth}\bitswordmark\end{minipage}%
+    \hfill
+    \begin{minipage}[c]{0.26\linewidth}\raggedleft\bitslogochip\end{minipage}\par
+    \vspace{9pt}
     {\sffamily\footnotesize\bfseries\color{white!85}%
       \MakeUppercase{\addfontfeatureslike{#1}}}\par
     \vspace{6pt}
@@ -309,6 +335,14 @@
   {{{LECTURE_TITLE}}}                                                        % BIG TITLE
   {{{ONE_LINE_SUBTITLE}}}                                                    % SUBTITLE
   {Session \SessionNo\ ({{SESSION_DATES}}) \textperiodcentered\ Read alongside the lecture slides \textperiodcentered\ Every slide example worked out in full} % META
+
+% ----------------------------------------------------------------------------
+%  BITS credit line (institute brand — kept on every kit)
+% ----------------------------------------------------------------------------
+\smallskip
+\noindent{\small\color{mutedtext}%
+Prepared for the Work Integrated Learning Programmes (WILP), BITS Pilani.}
+\smallskip
 
 % ----------------------------------------------------------------------------
 %  HOW TO USE THIS COMPANION  (intro paragraph right after the banner)

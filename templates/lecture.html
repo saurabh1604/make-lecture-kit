@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Interactive Lecture Template — Three Ideas, Three Labs</title>
+<title>WILP, BITS Pilani · Interactive Lecture Template — Three Ideas, Three Labs</title>
 
 <script>
 window.MathJax = {
@@ -55,6 +55,9 @@ a{color:var(--cyan2);text-decoration:none}
 .brand{font-weight:800;letter-spacing:.3px;font-size:15px;color:#fff;display:flex;align-items:center;gap:10px;margin-bottom:4px}
 .brand .dot{width:11px;height:11px;border-radius:50%;background:var(--cyan);box-shadow:var(--glow)}
 .brand small{display:block;color:var(--dim);font-weight:600;font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-top:2px}
+.bits-logo{height:30px;width:auto;border-radius:4px;background:#fff;padding:2px 4px;flex:0 0 auto}
+.bits-credit{color:var(--muted);font-size:13.5px;margin:6px 0 0}
+.bits-credit strong{color:var(--ink)}
 .toc{margin-top:18px;display:flex;flex-direction:column;gap:1px}
 .toc a{color:var(--muted);font-size:13.5px;padding:7px 12px;border-radius:9px;display:flex;gap:9px;align-items:center;border:1px solid transparent;transition:.15s}
 .toc a .n{font-family:var(--mono);font-size:11px;color:var(--dim);min-width:20px}
@@ -236,7 +239,7 @@ body{transition:background .35s ease,color .35s ease}
 <div class="shell">
 
 <aside class="sidebar">
-  <div class="brand"><span class="dot"></span><div>Interactive Lecture<small>Template &middot; Three Labs</small></div></div>
+  <div class="brand"><span class="dot"></span><img class="bits-logo" src="assets/bits-logo.png" alt="BITS Pilani logo" onerror="this.style.display='none'"><div>WILP, BITS Pilani<small>Companion &middot; Interactive Lecture</small></div></div>
   <nav class="toc" id="toc">
     <div class="grp">Start here</div>
     <a href="#intro"><span class="n">00</span> Overview</a>
@@ -255,6 +258,7 @@ body{transition:background .35s ease,color .35s ease}
  <div class="wrap">
   <div class="kicker">Interactive Edition &middot; Template</div>
   <h1>Three Ideas,<br>Three Live Labs</h1>
+  <p class="bits-credit">Prepared for the <strong>Work Integrated Learning Programmes (WILP), BITS Pilani</strong>.</p>
   <p class="lead">A reusable lecture template, built the honest way: <strong>analogy first, then the algebra</strong>, every symbol named, every example worked with real numbers. Three foundational ideas &mdash; how machines <em>learn</em>, the <em>unit</em> they learn with, and the <em>bell curve</em> behind their uncertainty &mdash; each with its own hand-drawn canvas you can drag and watch change.</p>
   <div class="hero-net">
     <canvas id="heroCanvas" width="900" height="220" style="width:100%;height:auto"></canvas>
