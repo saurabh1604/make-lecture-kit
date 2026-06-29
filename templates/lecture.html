@@ -323,6 +323,23 @@ body{transition:background .35s ease,color .35s ease}
     </div>
   </div>
 
+  <div class="lab">
+    <h4 style="margin-top:4px">&#127956; The same idea in 3D &mdash; roll the ball into the bowl</h4>
+    <p class="muted" style="font-size:14px">Real models have many weights, so the loss is a <strong>surface</strong>, not a curve. Here the loss over two weights \((x,y)\) is a bowl. Press <strong>step</strong> to take one downhill step; the trail shows the path to the bottom (green dot). <strong>Drag the surface to rotate it</strong> and see the valley from any angle. This is drawn with plain canvas &mdash; no 3D library.</p>
+    <div class="grid2" style="align-items:start">
+      <div>
+        <div id="bowlSliders"></div>
+        <div class="chips" style="margin-top:10px">
+          <button class="btn" id="bowlStep">step &#9656;</button>
+          <button class="btn" id="bowlRun">run &times;24</button>
+          <button class="btn" id="bowlReset">&#8634; reset</button>
+        </div>
+        <div class="readout" id="bowlOut"></div>
+      </div>
+      <div><canvas id="bowlCanvas" width="440" height="360" style="width:100%;height:auto;touch-action:none;cursor:grab"></canvas></div>
+    </div>
+  </div>
+
   <h4>Where this shows up in ML</h4>
   <p>Real models do not have one knob &mdash; they have millions. But the rule is identical: the loss measures prediction error, the gradient is computed for <em>every</em> weight at once (by backpropagation), and each weight takes the same downhill step. Training a neural network is this loop, repeated billions of times.</p>
 
@@ -688,6 +705,58 @@ window.__demos.push(function(){
   $('#gdStep').addEventListener('click',step);
   $('#gdRun').addEventListener('click',()=>{let n=0;const t=setInterval(()=>{step();if(++n>=20)clearInterval(t);},60);});
   $('#gdReset').addEventListener('click',()=>{w=1;trail=[w];steps=0;render();});
+  render();
+});
+
+/* 01b GRADIENT DESCENT IN 3D — pure-canvas surface, NO 3D library.
+   REUSABLE 3D PATTERN (copy this for any loss-landscape / bowl / saddle lab):
+     1. sample a grid of z=f(x,y);
+     2. proj() rotates each point by azimuth+elevation and drops the depth
+        (a plain orthographic projection -> screen x,y + a depth for sorting);
+     3. fill the quads far-to-near (painter's algorithm) with the house colour
+        ramp so height reads as colour; then draw the descent trail on top.
+   Drag the canvas to rotate. Only the 2D canvas API is used. */
+window.__demos.push(function(){
+  const c=$('#bowlCanvas'); if(!c) return;
+  const host=$('#bowlSliders'); host.innerHTML='';
+  const f=(x,y)=>0.42*x*x+0.16*y*y;          // the loss surface (a gentle bowl)
+  const gx=x=>0.84*x, gy=y=>0.32*y;          // its gradient (slope in x and y)
+  const R=3.2, N=20;                          // domain half-width, grid cells
+  let az=0.9, el=0.6;                         // view angles (radians)
+  let p={x:2.7,y:2.8}, trail=[{x:p.x,y:p.y}], steps=0;
+  const getLr=makeSlider(host,{id:'bowlLr',label:'η (rate)',min:'0.02',max:'1.15',step:'0.02',value:'0.18'},()=>render());
+  const STOPS=[[33,53,94],[44,90,160],[62,142,156],[159,191,143],[200,136,30]];
+  function houseColor(t){t=t<0?0:t>1?1:t;const s=t*4,i=Math.floor(s),fr=s-i,a=STOPS[i],b=STOPS[Math.min(i+1,4)];return Math.round(a[0]+(b[0]-a[0])*fr)+','+Math.round(a[1]+(b[1]-a[1])*fr)+','+Math.round(a[2]+(b[2]-a[2])*fr);}
+  let proj;
+  const cv=setupCanvas(c,function(ctx,W,H){
+    ctx.clearRect(0,0,W,H);
+    const cx=W*0.5, cy=H*0.62, scale=Math.min(W,H)/(R*2.7), zmax=f(R,R)||1;
+    const ca=Math.cos(az),sa=Math.sin(az),ce=Math.cos(el),se=Math.sin(el);
+    proj=function(x,y,z){const zc=z-zmax*0.5,X=x*ca-y*sa,Y=x*sa+y*ca,Y2=Y*ce-zc*se,Z2=Y*se+zc*ce;return{sx:cx+X*scale,sy:cy-Z2*scale*0.92,depth:Y2};};
+    const cells=[];
+    for(let i=0;i<N;i++)for(let j=0;j<N;j++){
+      const x0=-R+i/N*2*R,x1=-R+(i+1)/N*2*R,y0=-R+j/N*2*R,y1=-R+(j+1)/N*2*R;
+      const z00=f(x0,y0),z10=f(x1,y0),z11=f(x1,y1),z01=f(x0,y1);
+      const P=[proj(x0,y0,z00),proj(x1,y0,z10),proj(x1,y1,z11),proj(x0,y1,z01)];
+      cells.push({P,t:((z00+z10+z11+z01)/4)/zmax,depth:(P[0].depth+P[1].depth+P[2].depth+P[3].depth)/4});
+    }
+    cells.sort((a,b)=>b.depth-a.depth);       // far cells first
+    cells.forEach(cl=>{ctx.fillStyle='rgba('+houseColor(cl.t)+',0.97)';ctx.strokeStyle='rgba(255,255,255,0.10)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(cl.P[0].sx,cl.P[0].sy);for(let k=1;k<4;k++)ctx.lineTo(cl.P[k].sx,cl.P[k].sy);ctx.closePath();ctx.fill();ctx.stroke();});
+    const lift=zmax*0.02;
+    function trace(col,wd){ctx.strokeStyle=col;ctx.lineWidth=wd;ctx.beginPath();trail.forEach((tp,i)=>{const P=proj(tp.x,tp.y,f(tp.x,tp.y)+lift);i?ctx.lineTo(P.sx,P.sy):ctx.moveTo(P.sx,P.sy);});ctx.stroke();}
+    trace('rgba(255,255,255,.9)',3.2); trace('rgba(255,203,107,.98)',1.7);
+    const Pm=proj(0,0,f(0,0)+lift);ctx.fillStyle='#62e88a';ctx.beginPath();ctx.arc(Pm.sx,Pm.sy,5,0,7);ctx.fill();
+    const Pb=proj(p.x,p.y,f(p.x,p.y)+lift);ctx.fillStyle='#38f0d8';ctx.shadowColor='#38f0d8';ctx.shadowBlur=12;ctx.beginPath();ctx.arc(Pb.sx,Pb.sy,7,0,7);ctx.fill();ctx.shadowBlur=0;
+  });
+  function render(){cv.redraw();$('#bowlOut').innerHTML='step '+steps+':  (x,y) = ('+fmt(p.x,2)+', '+fmt(p.y,2)+')   loss = '+fmt(f(p.x,p.y),3)+'\n'+'gradient (0.84x, 0.32y) = ('+fmt(gx(p.x),2)+', '+fmt(gy(p.y),2)+')\n'+'(x,y) ← (x,y) − η·gradient   ·   <span class="muted">drag to rotate</span>';}
+  function step(){p={x:p.x-getLr()*gx(p.x),y:p.y-getLr()*gy(p.y)};trail.push({x:p.x,y:p.y});if(trail.length>60)trail.shift();steps++;render();}
+  $('#bowlStep').addEventListener('click',step);
+  $('#bowlRun').addEventListener('click',()=>{let n=0;const t=setInterval(()=>{step();if(++n>=24)clearInterval(t);},55);});
+  $('#bowlReset').addEventListener('click',()=>{p={x:2.7,y:2.8};trail=[{x:p.x,y:p.y}];steps=0;render();});
+  let drag=false,lx=0,ly=0;
+  c.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;try{c.setPointerCapture(e.pointerId);}catch(_){}});
+  c.addEventListener('pointermove',e=>{if(!drag)return;az+=(e.clientX-lx)*0.01;el=clamp(el+(e.clientY-ly)*0.01,0.12,1.45);lx=e.clientX;ly=e.clientY;cv.redraw();});
+  c.addEventListener('pointerup',()=>{drag=false;});
   render();
 });
 

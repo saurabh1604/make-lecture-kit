@@ -136,7 +136,9 @@ make-lecture-kit/
 ├─ update_source.txt            where scripts/update.py pulls updates from
 ├─ templates/
 │  ├─ companion.tex             LaTeX study-companion template (→ PDF)
-│  └─ lecture.html              complete interactive lecture template
+│  ├─ lecture.html              complete interactive lecture template
+│  └─ assets/
+│     └─ bits-logo.png          BITS Pilani logo (PDF banner + HTML sidebar; optional)
 ├─ references/
 │  ├─ plain_language.md         the easy-English rulebook (both linters enforce it)
 │  ├─ quality_rubric.md         the quality bar + ship checklist (both)

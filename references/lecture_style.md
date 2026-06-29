@@ -13,6 +13,10 @@ The output is **ONE self-contained `.html`** that opens by double-click from `fi
 dependency is MathJax from cdnjs.** No Plotly, no D3, no Tailwind, no Google Fonts, no API keys, no backend.
 **Every visual is hand-drawn on a plain 2D `<canvas>`.** That is not a limitation — it is the whole point:
 hand-drawn canvas is what lets each interactive *reveal its specific idea* instead of being a generic chart.
+Canvas is not limited to 2-D: for a **loss landscape / bowl / saddle**, the template ships a tiny
+pure-canvas **3-D** pattern (the "roll the ball into the bowl" lab — `bowlCanvas`): sample `z=f(x,y)`,
+project each point by azimuth+elevation, depth-sort the quads (painter's algorithm), colour by height,
+then drag to rotate. Copy that block for any 3-D surface — still no chart/3-D library, still one file.
 
 ---
 
@@ -407,6 +411,80 @@ Some ideas read better as styled DOM than as canvas: the XOR bit-switches (§06)
 `<span>`s that recolor as the window slides, a `<table>` whose current row gets `.cur`. Drive them the same
 way: a `render(state)` that rewrites the DOM and a `.readout` that prints the computation.
 
+### Recipe G — a clickable "big-picture" journey map (canvas navigation)
+*For: the overview up top.* Lay the lecture's bands as numbered nodes along a downhill path; hover
+highlights a node, clicking jumps to that band. It shows the *shape* before the details and doubles as
+navigation. *Uncovers:* how the whole lecture hangs together. Store the node centres **inside** `draw`
+(in CSS px) so the hit-test always matches the current size; map the mouse with `getBoundingClientRect()`;
+colour each node from a CSS var so it follows the theme.
+
+```js
+window.__demos.push(function(){
+  const c=$('#mapCanvas'); if(!c) return;
+  const css=getComputedStyle(document.documentElement);
+  const col=v=>(css.getPropertyValue(v)||'').trim()||'#38f0d8';
+  const stops=[{t:'The problem',hash:'#opt',c:'--cyan2'} /* …one per band… */];
+  let hover=-1, nodes=[];
+  const cv=setupCanvas(c,(ctx,W,H)=>{
+    const padX=64, top=54, bot=H-44;
+    nodes=stops.map((s,i)=>{const fx=i/(stops.length-1);
+      return {x:padX+fx*(W-2*padX), y:top+(bot-top)*(0.16*fx+0.84*fx*fx), s};});
+    /* draw the path, then each node: circle + number + label; ring nodes[hover] */
+  });
+  const pick=ev=>{const r=c.getBoundingClientRect(), mx=ev.clientX-r.left, my=ev.clientY-r.top;
+    let b=-1,bd=1e9; nodes.forEach((n,i)=>{const d=(n.x-mx)**2+(n.y-my)**2; if(d<bd){bd=d;b=i;}});
+    return bd<1100?b:-1;};
+  c.addEventListener('mousemove',ev=>{const h=pick(ev); if(h!==hover){hover=h; c.style.cursor=h>=0?'pointer':'default'; cv.redraw();}});
+  c.addEventListener('click',ev=>{const h=pick(ev); if(h>=0) location.hash=nodes[h].s.hash;});
+  cv.redraw();
+});
+```
+
+### Recipe H — pure-canvas 3-D surface, and making it NON-CONVEX
+*For: any `z=f(x,y)` surface — a loss landscape, a 2-var function, a probability or attention surface, in any subject — and especially the "local minima — the start matters" idea.* Sample
+`z=f(x,y)`, project each point by azimuth+elevation, depth-sort the quads (painter's algorithm), colour by
+height, then **drag to rotate** — all with the 2-D canvas API (the `bowlCanvas` block in
+`templates/lecture.html` is the full projector). The teaching win is to ship **two** surfaces behind a
+toggle: a **convex** bowl (one minimum) and a **non-convex** one with **two valleys**, plus two start
+presets so nearly identical starts roll into *different* valleys. *Uncovers:* why initialisation matters and
+what a "local minimum" really is. Only `f`, its gradient, and the markers change between modes:
+
+```js
+let mode='convex';
+const SURF={
+  convex:{ f:(x,y)=>0.42*x*x+0.16*y*y, gx:(x,y)=>0.84*x, gy:(x,y)=>0.32*y,
+           mins:[[0,0]], hill:null, A:{x:2.7,y:2.8}, B:{x:-2.6,y:-2.5} },
+  bumpy:{  f:(x,y)=>0.06*(x*x-4)*(x*x-4)+0.18*y*y,      // double well: minima at x = ±2
+           gx:(x,y)=>0.24*x*(x*x-4), gy:(x,y)=>0.36*y,
+           mins:[[-2,0],[2,0]], hill:[0,0], A:{x:-0.7,y:2.7}, B:{x:0.7,y:2.7} }
+};
+const S=()=>SURF[mode];
+const f=(x,y)=>S().f(x,y), gx=(x,y)=>S().gx(x,y), gy=(x,y)=>S().gy(x,y);
+// clamp the ball to the domain so a big rate can't fling it off the grid:
+function step(){p={x:clamp(p.x-lr*gx(p.x,p.y),-R,R), y:clamp(p.y-lr*gy(p.x,p.y),-R,R)}; /* … */}
+```
+
+Draw every `S().mins` as a green dot and `S().hill` (if any) as a red dot; the readout names which valley
+the ball settled in (a `nearestMin()` helper). The PDF twin is `figstyle.surface3d(f, xlim, ylim, title,
+path=[...])`, which lifts a descent path onto the surface for the companion.
+
+### Recipe I — annotate & animate a lab (arrows, labels, auto-play)
+*For: turning a correct-but-static plot into one that explains itself.* Three cheap moves add most of the
+"intuitive":
+- **A direction arrow at the moving point.** On a curve, draw a short arrow in the downhill direction
+  (`dir = slope>0 ? -1 : +1`) with a "downhill" label, so the student sees *which way* the next step goes.
+- **On-canvas labels for landmarks** (each minimum, the target) so the picture is legible without the prose.
+- **An `auto ▶` toggle** that animates the loop and **stops itself at convergence** — keep manual
+  `step`/`run` too, and never autostart (respect reduced motion):
+
+```js
+let auto=null;
+function setAuto(on){const b=$('#xAuto');
+  if(on){ if(auto) return; b.textContent='⏸ stop'; b.classList.add('active');
+    auto=setInterval(()=>{ if(Math.abs(df(x))<0.08){ setAuto(false); return; } step(); },320); }
+  else { clearInterval(auto); auto=null; b.textContent='auto ▶'; b.classList.remove('active'); }}
+```
+
 ### Wiring rules for every recipe
 - **One `draw(state)` / `render(state)`** does *all* painting; controls only mutate state then call it.
 - **Smoothness:** for continuous inputs use the natural `input` event and keep `draw()` cheap; for
@@ -589,6 +667,39 @@ The page must be clean and unbroken from **360px to 1440px**, and ship without a
   If you inject math from JS, you must call `typesetPromise()` (§7.3).
 - **Opens from `file://` by double-click.** No `type="module"`, no `fetch`, no localhost, no keys, one file.
 
+### 10.1 Verify every demo actually RUNS — a syntax check is not enough
+
+The registry pattern (§8) wraps each demo in `try/catch`, so a demo that throws does **not** crash the
+page — it silently leaves a **blank panel** (empty canvas + empty `.readout`). A real bug we shipped once:
+a shared curve-drawer called `X.inv(px)`, but three demos defined `X` without an `.inv`. They parsed fine
+(`node --check` passed) yet drew nothing. Lesson: **execute every demo before shipping, don't just lint the
+syntax.** Two cheap ways:
+
+- Open the file, watch the console, and click through every lab — no errors, no blank panels.
+- Run a head-less harness: stub `document` / `window` / `canvas.getContext` (a `Proxy` of no-ops), plus
+  `getComputedStyle`, `localStorage`, `requestAnimationFrame`, `location`, `matchMedia`; `eval` the page's
+  main `<script>`; fire the saved `load` handler so `runDemos()` runs; then assert no `console.error` fired.
+  A ~60-line Node script does this and catches exactly the class of bug above.
+
+```js
+// harness.js (sketch): node harness.js lecture.html  ->  "ALL DEMOS RAN WITH NO ERRORS"
+const errs=[]; console.error=(...a)=>errs.push(a.join(' '));
+const ctx=new Proxy({},{get:(t,p)=>p in t?t[p]:()=>{}, set:(t,p,v)=>{t[p]=v;return true;}});
+const el=()=>({style:{},dataset:{},classList:{add(){},remove(){},toggle(){return false;}},
+  getContext:()=>ctx, getBoundingClientRect:()=>({width:440,height:330,left:0,top:0}),
+  addEventListener(){}, appendChild(c)=>c, querySelectorAll:()=>[], closest:()=>null,
+  width:440,height:330, set innerHTML(_){}, set textContent(_){}});
+global.window={addEventListener:(e,cb)=>{if(e==='load')global.__load=cb;}, devicePixelRatio:1,
+  requestAnimationFrame:()=>0, setInterval:()=>0, clearInterval(){}, localStorage:{getItem:()=>null,setItem(){}},
+  matchMedia:()=>({matches:false})};
+Object.assign(global,{document:{querySelector:el,querySelectorAll:()=>[],createElement:el,addEventListener(){},
+  documentElement:el(),body:{scrollHeight:2000}}, getComputedStyle:()=>({getPropertyValue:()=>'#38f0d8'}),
+  location:{hash:''}, requestAnimationFrame:window.requestAnimationFrame, setInterval:window.setInterval,
+  clearInterval:window.clearInterval, localStorage:window.localStorage, matchMedia:window.matchMedia});
+eval(BIG_SCRIPT); global.__load && global.__load();   // runs runDemos()
+console.log(errs.length? 'DEMO ERRORS: '+errs.join(' | ') : 'ALL DEMOS RAN WITH NO ERRORS');
+```
+
 ---
 
 ## 11. Ship checklist (final gate — mirrors quality_rubric.md)
@@ -617,6 +728,11 @@ Tick every box; any red-list item is an automatic fail regardless of polish. The
       grids collapse; sidebar collapses; no horizontal page scroll.
 - [ ] **Cleanliness:** no nested `-->`/`<!--` inside any comment; zero surviving `{{...}}`; every helper
       defined before use; MathJax renders; nothing throws in the console.
+- [ ] **Demos verified, not just parsed:** every `window.__demos` entry actually *runs* — a syntax check is
+      not enough. A missing method, a typo'd id, or a helper used before it is defined throws only at runtime
+      and leaves a blank panel. Click through every lab (console clean) or run the head-less harness (§10.1).
+- [ ] **Colour legend + consistent accents:** a `.legendbar` near the top fixes the meaning of each accent,
+      and every canvas obeys those same meanings (§9). Colour itself should carry information.
 - [ ] **Self-contained:** ONE `.html`, opens by double-click, MathJax-from-cdnjs as the **only** external
       dependency, every other visual hand-drawn on canvas. No Plotly/D3/Tailwind/Google-Fonts/keys/fetch.
 
@@ -650,6 +766,32 @@ All are hand-built — **no new dependency** (MathJax stays the only external sc
    give buttons/sliders visible `:focus-visible` outlines; make the guided tour reachable by keyboard;
    keep tap targets ≥ 40px on mobile. None of this is decoration — it is the difference between "a
    page" and "a tool".
+6. **A non-convex 3-D landscape.** Beyond the convex bowl, ship a bumpy surface with two valleys and two
+   start presets, so the student *feels* that the starting point decides which local minimum you reach
+   (**Recipe H**). It is the single most effective way to make "local minima" real.
+7. **Animated, annotated labs.** A direction arrow at the moving point, on-canvas landmark labels, and an
+   `auto ▶` that animates a run and stops at convergence (**Recipe I**). Motion plus a labelled "which way"
+   turns a static plot into an explanation.
+8. **A persistent colour legend.** One `.legendbar` near the top fixes the meaning of each accent (cyan =
+   step/input, amber = the key number, green = converged/minimum, red = diverges/error, violet =
+   direction/hidden). Keep those meanings identical in every canvas so colour carries information.
+
+**Concrete patterns for the above** (proven in Session 9 — *Gradient Descent*): the journey map is
+**Recipe G**, the convex↔bumpy 3-D toggle is **Recipe H**, the arrows / labels / `auto ▶` are **Recipe I**.
+The "check yourself" card (item 1) is pure DOM with one delegated handler:
+
+```html
+<div class="recall"><div class="q">A question?</div>
+  <button class="btn" data-recall>Reveal answer</button>
+  <div class="ans">The answer, plus the one-line why.</div></div>
+```
+```js
+function initRecall(){ $$('[data-recall]').forEach(b=>b.addEventListener('click',function(){
+  const open=this.closest('.recall').classList.toggle('open');
+  this.textContent=open?'Hide answer':'Reveal answer'; })); }   // call in the load handler
+```
+CSS: `.recall .ans{display:none}` and `.recall.open .ans{display:block}`. MathJax still typesets a hidden
+answer, so it renders correctly the moment it is revealed.
 
 Keep every addition honest by the same test as every interaction (§0): *name the one thing the student
 gains.* If an upgrade does not help them learn or navigate, cut it.

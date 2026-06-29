@@ -208,8 +208,8 @@ concept is genuinely non-visual (a definition, a naming convention).
 |---|---|---|
 | a 1-D function, derivative, **Taylor** approx | curve, with the **tangent** at a point | `function_plot(f, xlim, ..., tangent_at=x0)` |
 | a **loss landscape / Hessian / 2-var function** | a filled **contour** map, critical points marked | `contour(f, xlim, ylim, points=[(x,y,"saddle","X")])` |
-| the **shape** near a min/max/saddle | a **3-D surface** | `surface3d(f, xlim, ylim)` |
-| **gradient descent / optimization dynamics** | the descent **path** on a contour | `gradient_descent(f, grad, start, lr, steps, xlim, ylim)` |
+| the **shape** near a min/max/saddle, or **descent in 3-D** | a **3-D surface** (lit + wireframe; optional descent **path** lifted onto it + a floor "shadow" contour) | `surface3d(f, xlim, ylim, path=[(x,y), ...])` |
+| **gradient descent / optimization dynamics** | the descent **path** on a contour (white-halo trail, start ring, min star); add `noise=` for an **SGD** wander | `gradient_descent(f, grad, start, lr, steps, xlim, ylim, noise=0.0, mark_min=(x,y))` |
 | a **probability distribution** (discrete) | a PMF **bar** chart (bars sum to 1) | `pmf_bar(xs, ps, ...)` |
 | a **Gaussian / area = probability** | a bell curve with the slice **shaded** | `shaded_normal(mu, sigma, lo, hi, ...)` |
 | **embeddings / vectors / dot product** | **arrows** from the origin | `vectors2d([(x,y,"king",col), ...])` |
@@ -222,6 +222,42 @@ concept is genuinely non-visual (a definition, a naming convention).
 Every helper bakes in the house look (muted palette, the navy `HOUSE_CMAP` for
 contours/surfaces/heatmaps, thin spines, a bold ink title) and writes a PNG when
 you pass `out=`. **Keyless, offline, no network at author time.**
+
+### 5.1 Make the figure TEACH its one idea (legibility recipes)
+
+Picking the right helper is half the job; the figure must actually *show* the
+intuition its caption claims. If the caption says "SGD wanders" but the path looks
+straight, or "the gaps" but no gap is visible, the figure failed — redraw it.
+These reusable moves turn a correct-but-flat plot into one that teaches, and they
+apply in **any** subject:
+
+- **Name the quantity on the picture.** Label the thing the caption is about — each
+  residual "gap", the slope, the shaded area, the step size — don't make the reader
+  infer it. A short on-plot label beats a sentence underneath.
+- **Tie every annotation to the curve.** An interval, a bracket, a band: draw a thin
+  drop-line from it up to the point on the curve it refers to, and shade the region
+  it covers, so it reads as *part of* the picture, not a floating bar.
+- **Shade meaning.** Colour the regions that carry the idea (uphill vs downhill, the
+  probability slice, the chosen half) so colour itself does teaching work.
+- **Make any path legible.** Draw a trajectory with a white "halo" under the coloured
+  trail, a start ring, and a goal star, so it reads on any background —
+  `gradient_descent(...)` already does this.
+- **If the real effect is too small to see, magnify it honestly.** When good data
+  makes the point tiny (a near-perfect fit → invisible gaps) or the variance is
+  small, add a zoomed **inset** on one instance, or **state the size** ("gap = 0.18").
+  Never fake a bigger effect — show the small one at a scale where it reads.
+- **Show stochasticity as stochasticity.** When a "noisy" method barely wanders on
+  this particular data, render its noise honestly with `gradient_descent(noise=...)`
+  (a visibly jagged walk that still drifts to the minimum); note in the caption that
+  the noise is stylised.
+- **Go 3-D for shape.** For a landscape / bowl / saddle use
+  `surface3d(f, xlim, ylim, path=[...])`: the lit surface + floor-shadow shows the
+  *shape* and the lifted path shows the *dynamics* (the "ball rolling into the bowl").
+  3-D suits any `z=f(x,y)` — a loss surface, a 2-var function, a probability
+  surface — not just optimization.
+
+The test for every figure: cover the caption and ask a beginner what the picture
+says. If their answer isn't the caption's idea, fix the figure, not the caption.
 
 ### Per-lecture figure script (the real API)
 

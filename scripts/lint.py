@@ -41,7 +41,6 @@ ALLOWED_CDN_HOSTS = (
     "cdnjs.cloudflare.com",
     "unpkg.com",
     "cdn.plot.ly",
-    "polyfill.io",
 )
 
 # Tunables for the readability heuristic. The ceiling matches plain_language.md

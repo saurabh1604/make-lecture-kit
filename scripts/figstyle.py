@@ -99,12 +99,15 @@ def use_house_style() -> None:
     plt.rcParams.update({
         # --- canvas / output ---
         "figure.figsize": (7.0, 3.2),   # full A4 textwidth, slide-friendly aspect
-        "figure.dpi": 150,              # crisp without bloating the PDF
-        "savefig.dpi": 150,
+        "figure.dpi": 220,              # high-res: crisp text + lines in the PDF
+        "savefig.dpi": 220,
         "savefig.bbox": "tight",        # belt-and-braces against clipped labels
-        "savefig.pad_inches": 0.04,
+        "savefig.pad_inches": 0.05,
         "figure.facecolor": "white",
+        "savefig.facecolor": "white",
         "axes.facecolor": "white",
+        "path.simplify": True,
+        "agg.path.chunksize": 10000,
 
         # --- typography (readable, neutral sans; degrades gracefully) ---
         "font.family": "sans-serif",
@@ -147,8 +150,14 @@ def use_house_style() -> None:
         "legend.borderaxespad": 0.4,
 
         # --- lines ---
-        "lines.linewidth": 2.0,
+        "lines.linewidth": 2.4,
         "lines.solid_capstyle": "round",
+        "lines.solid_joinstyle": "round",
+        "lines.antialiased": True,
+        "patch.antialiased": True,
+        # --- figure title (suptitle) weight, if used ---
+        "figure.titlesize": 13,
+        "figure.titleweight": "bold",
     })
 
 
@@ -497,19 +506,65 @@ def contour(f, xlim, ylim, title, *, n=160, levels=18, points=None,
     return fig
 
 
-def surface3d(f, xlim, ylim, title, *, n=60, xlabel="x", ylabel="y",
-              zlabel="f(x, y)", view=(28, -52), out=None):
-    """3-D surface of f(x, y) — shows the SHAPE: a bowl, a saddle, a ridge."""
+def surface3d(f, xlim, ylim, title, *, n=80, xlabel="x", ylabel="y",
+              zlabel="f(x, y)", view=(30, -54), path=None, project_floor=True,
+              cmap=None, out=None):
+    """3-D surface of f(x, y) — shows the SHAPE: a bowl, a saddle, a ridge.
+
+    The surface is sculpted with a faint white wireframe for depth, and (by
+    default) a soft filled-contour "shadow" is projected on the floor so the
+    landscape reads from above and below at once.
+
+    path : optional list/array of (x, y) points — e.g. a gradient-descent run.
+           It is lifted onto the surface and drawn as a glowing red/amber trail
+           (start ring + minimum star), so the descent is visible in 3-D. This
+           is the iconic "ball rolling into the bowl" picture.
+    project_floor : drop a faint contour map onto the base plane under the surface.
+    """
     use_house_style()
     from mpl_toolkits.mplot3d import Axes3D  # noqa: F401  (registers the 3d projection)
-    fig = plt.figure(figsize=(5.8, 4.1))
+    cmap = cmap or HOUSE_CMAP
+    fig = plt.figure(figsize=(6.6, 4.6))
     ax = fig.add_subplot(111, projection="3d")
     xs = np.linspace(xlim[0], xlim[1], n)
     ys = np.linspace(ylim[0], ylim[1], n)
     X, Y = np.meshgrid(xs, ys)
     Z = f(X, Y)
-    ax.plot_surface(X, Y, Z, cmap=HOUSE_CMAP, linewidth=0,
-                    antialiased=True, alpha=0.97)
+    zmin, zmax = float(np.min(Z)), float(np.max(Z))
+    zspan = (zmax - zmin) or 1.0
+
+    ax.plot_surface(X, Y, Z, cmap=cmap, rcount=n, ccount=n, linewidth=0,
+                    antialiased=True, alpha=0.92, zorder=2)
+    # faint mesh for sculpted depth
+    ax.plot_wireframe(X, Y, Z, rcount=16, ccount=16, color="white",
+                      linewidth=0.35, alpha=0.22, zorder=3)
+
+    base = zmin - 0.28 * zspan
+    if project_floor:
+        ax.contourf(X, Y, Z, levels=18, cmap=cmap, alpha=0.32,
+                    offset=base, zdir="z")
+
+    if path is not None:
+        P = np.asarray(path, dtype=float)
+        zp = np.array([float(f(px, py)) for px, py in P]) + 0.015 * zspan
+        ax.plot(P[:, 0], P[:, 1], zp, color="white", lw=4.2, zorder=10)
+        ax.plot(P[:, 0], P[:, 1], zp, "-o", color=PALETTE["red"],
+                mfc=PALETTE["amber"], mec="white", lw=2.0, ms=4.5, zorder=11)
+        ax.scatter([P[0, 0]], [P[0, 1]], [zp[0]], color="white",
+                   edgecolor=PALETTE["red"], s=70, lw=1.8, zorder=12)
+        ax.scatter([P[-1, 0]], [P[-1, 1]], [zp[-1]], marker="*", s=200,
+                   color="white", edgecolor=PALETTE["green"], lw=1.6, zorder=12)
+
+    ax.set_zlim(base, zmax)
+    # clean, light panes + faint 3-D grid
+    for axis in (ax.xaxis, ax.yaxis, ax.zaxis):
+        axis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+        axis.pane.set_edgecolor((0, 0, 0, 0.08))
+        try:
+            axis._axinfo["grid"]["color"] = (0, 0, 0, 0.07)
+            axis._axinfo["grid"]["linewidth"] = 0.6
+        except Exception:  # noqa: BLE001
+            pass
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.set_zlabel(zlabel)
@@ -523,32 +578,52 @@ def surface3d(f, xlim, ylim, title, *, n=60, xlabel="x", ylabel="y",
 
 
 def gradient_descent(f, grad, start, lr, steps, xlim, ylim, title, *,
-                     n=160, levels=18, xlabel="x", ylabel="y", out=None):
+                     n=200, levels=20, xlabel="x", ylabel="y", noise=0.0,
+                     seed=0, mark_min=None, label=None, out=None):
     """Contour map + the path a gradient-descent run takes (dots joined up).
 
     grad : function (x, y) -> (gx, gy). Slide ``lr`` to feel convergence vs
     overshoot. The breadcrumb trail makes the dynamics visible.
+    noise : if > 0, add Gaussian jitter (this fraction of the gradient's size)
+            to each step — turns batch GD into a wandering SGD-style walk.
+    mark_min : optional (x, y) of the true minimum to star.
+    The path is drawn with a white "halo" underneath so it reads on any colour.
     """
     use_house_style()
-    fig, ax = plt.subplots(figsize=(6.0, 3.9))
+    rng = np.random.default_rng(seed)
+    fig, ax = plt.subplots(figsize=(6.2, 4.0))
     xs = np.linspace(xlim[0], xlim[1], n)
     ys = np.linspace(ylim[0], ylim[1], n)
     X, Y = np.meshgrid(xs, ys)
-    ax.contourf(X, Y, f(X, Y), levels=levels, cmap=HOUSE_CMAP, alpha=0.92)
+    Z = f(X, Y)
+    ax.contourf(X, Y, Z, levels=levels, cmap=HOUSE_CMAP, alpha=0.92)
+    ax.contour(X, Y, Z, levels=levels, colors="white", linewidths=0.35,
+               alpha=0.40)
     p = np.array(start, dtype=float)
     path = [p.copy()]
     for _ in range(int(steps)):
         g = np.array(grad(p[0], p[1]), dtype=float)
+        if noise:
+            g = g + noise * (np.linalg.norm(g) + 1e-9) * rng.standard_normal(2)
         p = p - lr * g
         path.append(p.copy())
     path = np.array(path)
-    ax.plot(path[:, 0], path[:, 1], "-o", color="white", mec=PALETTE["ink"],
-            mfc=PALETTE["amber"], lw=1.8, ms=5, zorder=5)
+    # white halo first, coloured trail on top -> always legible
+    ax.plot(path[:, 0], path[:, 1], color="white", lw=4.4, alpha=0.95, zorder=4,
+            solid_capstyle="round")
+    ax.plot(path[:, 0], path[:, 1], "-o", color=PALETTE["red"], mec="white",
+            mfc=PALETTE["amber"], lw=2.0, ms=5, zorder=5, label=label)
     ax.scatter([path[0, 0]], [path[0, 1]], color="white",
-               edgecolor=PALETTE["red"], linewidth=1.8, s=80, zorder=6)
+               edgecolor=PALETTE["red"], linewidth=1.8, s=85, zorder=6)
+    if mark_min is not None:
+        ax.scatter([mark_min[0]], [mark_min[1]], marker="*", s=190,
+                   color="white", edgecolor=PALETTE["green"], linewidth=1.6,
+                   zorder=7)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.grid(False)
+    if label:
+        ax.legend(loc="best")
     ax.set_title(title, color=PALETTE["ink"], fontweight="bold")
     fig.tight_layout()
     if out:
