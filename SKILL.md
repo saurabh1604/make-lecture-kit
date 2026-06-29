@@ -1,20 +1,17 @@
 ---
 name: make-lecture-kit
 description: >-
-  Turn ANY lecture — a slide deck (PDF/PPTX), notes, or just a topic — into two
-  beautiful, beginner-friendly study artifacts written to an output/ folder: a
-  real, professionally typeset companion PDF (LaTeX: navy title banner, colour-
-  coded callout boxes, matplotlib figures — "every slide example worked out in
-  full"), and a complete, very detailed, very interactive HTML lecture — the
-  whole lecture rebuilt as an interactive experience. Plain easy English,
-  relatable analogies, math intuition built step by step, generous fully-solved
-  examples, and interactions that uncover the intuition. No API keys. The student
-  installs nothing — your agent session (Claude, Codex, Jules, Cursor, or any
-  agentic coding assistant) writes the .tex, generates the figures, compiles the
-  PDF, and builds the lecture page. Trigger on: "turn this
-  lecture/these slides into a companion PDF and an interactive lecture", "make a
-  study PDF for <topic>", "explain <hard topic> simply with worked examples",
-  "build a complete interactive lecture for <topic>", "make-lecture-kit <file-or-topic>".
+  Turn ANY lecture (a slide deck in PDF or PPTX, notes, or just a topic) into two
+  beginner-friendly study artifacts in an output/ folder: a professionally typeset
+  companion PDF (LaTeX, navy banner, colour-coded callout boxes, matplotlib figures,
+  every slide example worked in full) and a complete, very interactive HTML lecture
+  you can play with. Plain easy English, analogies before the math, step-by-step
+  intuition, worked examples, and interactions (including 3-D plots) that uncover
+  each idea. No API keys and the student installs nothing: your agent session
+  (Claude, Codex, Jules, Cursor, or any coding assistant) writes the .tex, makes the
+  figures, compiles the PDF, and builds the page. Trigger on requests like: turn a
+  lecture or slides into a companion PDF and an interactive lecture; make a study PDF
+  for a topic; or explain a hard topic simply with worked examples.
 ---
 
 # make-lecture-kit (student edition)

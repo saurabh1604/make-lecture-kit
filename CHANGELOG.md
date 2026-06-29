@@ -6,6 +6,15 @@ every upgrade bumps `VERSION`, adds an entry here, and must pass
 
 Format follows *Keep a Changelog*; versions follow semantic versioning.
 
+## [2.6.1] — 2026-06-29
+
+### Fixed
+- **`SKILL.md` frontmatter now passes skill-install validation.** The
+  `description` exceeded the 1024-character limit and contained `<topic>`-style
+  angle brackets that installers reject as XML tags. Rewrote it shorter (~870
+  chars) and bracket-free, with the trigger phrases as plain text. No workflow or
+  behaviour change.
+
 ## [2.6.0] — 2026-06-29
 
 ### Changed
