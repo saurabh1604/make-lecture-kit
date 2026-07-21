@@ -35,15 +35,16 @@ it runs the same on every platform. No API keys, no secrets, ever.
 
 ---
 
-## The five non-negotiable rules (this is what makes it good)
+## The six non-negotiable rules (this is what makes it good)
 
 Read `references/quality_rubric.md` fully first; self-score against it before you finish.
 
 1. **Easy language.** Simple, common words. Short sentences (aim 15 words, ceiling 22). Define every new term the first time; spell out every symbol and acronym. Write for a smart person meeting this topic for the *first* time. No academic fog, no literary flourishes, no hand-waving. The binding rulebook is `references/plain_language.md`; the linters enforce it.
-2. **Analogies that stick.** Every tricky idea gets a relatable, real-life analogy in plain language *before* the math (the "Everyday picture" box).
-3. **Math intuition, simply detailed.** Build every formula up step by step — nothing skipped, every symbol named. Explain *why*, not just *what*.
-4. **Fully solved examples, generously.** Wherever an example helps a concept land, include one (often more than one). Work **every slide example out in full**, every step, real numbers. Never "it can be shown that".
-5. **Interaction uncovers intuition (visualizer).** Each control must *reveal* something — move a slider and watch the idea change, step through and see the derivation build, toggle and expose the picture. Not decoration.
+2. **Simple things stay simple.** Match the size of the explanation to the size of the idea. Before writing any concept, find the **single most intuitive way in** — the best everyday example, the clearest picture — and lead with it. If an idea is easy, say it in two or three short sentences and move on: no stacked analogies, no ceremony, no five-step build-up for a one-step idea. Save the depth for where the difficulty really lives. Never make a simple thing look hard to seem thorough. (The right-sizing rules live in `references/plain_language.md` §8.)
+3. **Analogies that stick.** Every tricky idea gets a relatable, real-life analogy in plain language *before* the math (the "Everyday picture" box). One analogy — the best one — not a pile.
+4. **Math intuition, simply detailed.** Build every formula up step by step — nothing skipped, every symbol named. Explain *why*, not just *what*.
+5. **Fully solved examples, generously.** Wherever an example helps a concept land, include one (often more than one). Work **every slide example out in full**, every step, real numbers. Never "it can be shown that".
+6. **Interaction uncovers intuition (visualizer).** Each control must *reveal* something — move a slider and watch the idea change, step through and see the derivation build, toggle and expose the picture. Not decoration.
 
 Plus the **no-clutter / no-overflow contract**: nothing overlaps, no text runs off the page (no Overfull `\hbox`; wrap long math in `align`/`split`; wide tables via `adjustbox`/`booktabs`), worked examples stay coherent, the HTML is fully responsive.
 
@@ -60,7 +61,7 @@ Plus the **no-clutter / no-overflow contract**: nothing overlaps, no text runs o
 - `references/intuition_playbook.md` — analogies, mental models, ML/AI connections
 
 ### 2. Read the input lecture
-The input is usually a **slide deck** (PDF/PPTX) — but may be notes or just a topic. Read it with your own document ability (or a PDF/PPTX skill). List **every concept** to teach and **every slide example** to work out in full, in a sensible order (simple → hard, prerequisites first).
+The input is usually a **slide deck** (PDF/PPTX) — but may be notes or just a topic. Read it with your own document ability (or a PDF/PPTX skill). List **every concept** to teach and **every slide example** to work out in full, in a sensible order (simple → hard, prerequisites first). While listing, mark each concept **easy** or **hard** and note the most intuitive way into it — an easy concept gets a short, direct treatment (rule 2); a hard one gets the full spine with room to breathe.
 
 ### 3. Pick a slug and make the output folder
 Choose a short kebab slug (e.g. `session6-distributions`, `eigenvectors`) and create `output/<slug>/` and `output/<slug>/figures/`.

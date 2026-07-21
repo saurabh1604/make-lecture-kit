@@ -100,6 +100,11 @@ but the order never changes:
 Do not stack two boxes of the same colour back to back. Do not put math
 derivations inside the intuition or everyday boxes — those stay word-only.
 
+**Right-size every concept** (`plain_language.md` §8): an easy concept may need only a
+two-sentence open, one small worked example, and a key takeaway — skip boxes that would
+only add ceremony. One analogy at most; the everyday box is for genuinely tricky ideas.
+Save the full spine, and the reader's attention, for the hard parts.
+
 ---
 
 ## 3. The EASY-LANGUAGE mandate
@@ -118,6 +123,8 @@ target, and `scripts/lint_tex.py` enforces them on your `.tex`. The essentials:
   reader" are banned (full list in `plain_language.md` §4) — show the line instead.
 - **No literary fog.** This is a study aid; say the plain mechanism, not "the job dissolved
   into the machinery of…".
+- **Right-size it.** Simple ideas get short, direct treatment (`plain_language.md` §8);
+  never inflate an easy concept to look thorough.
 - Prefer "average" to "expectation" on first contact, then add the technical word in
   parentheses.
 

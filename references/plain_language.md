@@ -36,6 +36,10 @@ ship.**
    labelled picture*, make the table/list/picture (see §6).
 10. **Target reading level: US grade 9 or below** (Flesch Reading Ease ≥ 60). The linters
     estimate this and flag prose that drifts above it.
+11. **Right-size it — simple things stay simple.** Match the length of an explanation to
+    the size of the idea. An easy idea gets two or three short sentences, one picture at
+    most, and no ceremony. Find the most intuitive way in, lead with it once, and move on.
+    Depth belongs where the difficulty really is. (Full rules in §8.)
 
 ---
 
@@ -173,3 +177,32 @@ paragraph is really comparing things, make it a table.*
 
 Run them, read the report, fix every FAIL, and re-run until clean. Boring-but-clear always
 beats clever-but-dense.
+
+---
+
+## 8. Simple things stay simple (right-sizing)
+
+Plain words are half the job. The other half is **not over-explaining**. A simple idea
+buried under three analogies and a five-step build-up stops being simple — length is its
+own kind of fog. So: match the size of the explanation to the size of the idea.
+
+The right-sizing rules:
+
+1. **Find the most intuitive way in first.** Before writing a concept, ask: *what is the
+   one example, picture, or sentence that makes this click?* Write that first. Everything
+   else supports it. If you can't name the best way in, you're not ready to write.
+2. **One analogy — the best one.** Never stack analogies. And if the idea is already an
+   everyday thing (a table of numbers, adding two shopping lists), skip the analogy:
+   the thing is its own picture.
+3. **If two sentences cover it, stop at two.** The teaching spine (hook → intuition →
+   math → example → …) is a *maximum* scaffold, not a minimum word count. For an easy
+   concept every part shrinks: a one-line hook, a two-line intuition, straight to the
+   example.
+4. **No ceremony.** No long wind-ups, no "before we begin", no re-deriving what the
+   reader just saw one section ago. Get to the idea, land it, bridge on.
+5. **Spend depth where the difficulty lives.** The reader's attention is a budget. A
+   lecture has two or three genuinely hard ideas; give *those* the full treatment, and
+   keep the easy ideas quick so the hard ones stand out.
+
+The test for every explanation: *would a good teacher say this across a kitchen table,
+or is it performing thoroughness?* Cut until it sounds like the teacher.

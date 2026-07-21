@@ -6,6 +6,29 @@ every upgrade bumps `VERSION`, adds an entry here, and must pass
 
 Format follows *Keep a Changelog*; versions follow semantic versioning.
 
+## [2.7.0] — 2026-07-21
+
+### Added
+- **New non-negotiable rule 2: "Simple things stay simple."** The kit now
+  right-sizes every explanation: find the single most intuitive way into a
+  concept and lead with it; easy ideas get two or three plain sentences, one
+  analogy at most, and no ceremony; depth is spent where the difficulty really
+  lives. Never make a simple thing look hard to seem thorough. Docs-only change,
+  enforced editorially through the rubric:
+  - `SKILL.md`: the five rules become **six** (new rule 2), and step 2 now marks
+    each concept easy/hard so it gets space in proportion.
+  - `references/plain_language.md`: new hard rule 11 + new **§8 "Simple things
+    stay simple (right-sizing)"** — the five right-sizing rules and the
+    kitchen-table test.
+  - `references/quality_rubric.md`: category #3 and the Section D language audit
+    now check right-sizing.
+  - `references/intuition_playbook.md`: the five-part shape is a ceiling, not a
+    floor; one analogy per idea, skippable when the idea is already everyday.
+  - `references/lecture_style.md` + `references/companion_style.md`: right-size
+    chapters/sections; expand for clarity, never for bulk.
+  - `README.md`, `AGENTS.md`, `references/upgrading.md`: rule count and guardrails
+    updated.
+
 ## [2.6.1] — 2026-06-29
 
 ### Fixed

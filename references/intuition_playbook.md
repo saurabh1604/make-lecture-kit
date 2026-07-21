@@ -25,6 +25,12 @@ Author each concept in this fixed order. It is the skeleton for one chapter/sect
 
 If a section is missing any of 1–5, it is not done.
 
+**Right-size every part** (`plain_language.md` §8): the five-part shape is a *ceiling*,
+not a floor. For a genuinely easy concept each part shrinks — a one-line hook, a two-line
+intuition, one small example — and the analogy may be skipped when the idea is already an
+everyday thing. Always enter through the most intuitive door you can find, and spend the
+depth where the difficulty really lives.
+
 ---
 
 ## A. Generating sticky real-life analogies
@@ -32,6 +38,10 @@ If a section is missing any of 1–5, it is not done.
 A good analogy maps **structure**, not surface. Pick an everyday system whose *relationships*
 mirror the math's relationships. Then state the mapping explicitly, then state where it
 breaks (analogies that overstay their welcome cause bugs in the student's head).
+
+**One analogy per idea — the best one.** Two analogies for the same idea compete and
+confuse. And when the idea is already everyday (a table of numbers, adding two lists),
+skip the analogy entirely: the thing is its own picture (`plain_language.md` §8).
 
 ### The analogy bank (patterns you can reuse)
 

@@ -172,7 +172,8 @@ nothing needs an API key.
 
 ## The promise
 
-Built around five rules: **easy words**, **relatable analogies**,
+Built around six rules: **easy words**, **simple things kept simple** (the most
+intuitive way in, right-sized — never complicated), **relatable analogies**,
 **step-by-step math intuition**, **generous fully-solved examples**, and
 **interactions that uncover the intuition** — with a hard no-clutter,
 no-overflow guarantee so text never runs off the page or screen.

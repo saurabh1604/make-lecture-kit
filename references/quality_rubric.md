@@ -19,7 +19,7 @@ page; **(PDF)** only to the companion; unmarked rows apply to both.
 |---|----------|:------:|----------------------------|
 | 1 | **Completeness / coverage** | 16 | Every concept in the lecture is present, one section/chapter each, in teaching order. Every slide example is worked in full. Nothing dropped, nothing merged away. |
 | 2 | **Teaching spine (9 steps)** | 12 | Every concept has all 9 steps: Hook → Intuition → Formalize → Worked Example → Real-World → ML/AI → Visual → Pitfalls → Recap+Bridge. Right callout per step. |
-| 3 | **Easy language** | 12 | Short sentences (aim 15, ceiling 22 words). Plain words — no fancy-word offenders or literary fog (`plain_language.md` §3). No banned hand-waving (§4). Each term defined on first use; every symbol/acronym spelled out. Analogy before algebra. Reads at ~grade 9. A smart beginner never gets lost. |
+| 3 | **Easy language** | 12 | Short sentences (aim 15, ceiling 22 words). Plain words — no fancy-word offenders or literary fog (`plain_language.md` §3). No banned hand-waving (§4). Each term defined on first use; every symbol/acronym spelled out. Analogy before algebra. Reads at ~grade 9. A smart beginner never gets lost. **Right-sized** (`plain_language.md` §8): simple ideas told simply and briefly, via the most intuitive way in — no manufactured complexity. |
 | 4 | **Relatable analogies** | 8 | Every tricky idea has one concrete, plain-language analogy that actually maps to the math (not a vibe). |
 | 5 | **Step-by-step math intuition** | 12 | Every formula built up from scratch; every symbol named the moment it appears; no leaps. Wide math contained (HTML: `.eqbox`; PDF: `align`/`split`), never overflowing. |
 | 6 | **Generous worked examples** | 14 | At least one fully-solved example per concept, with **real numbers** and **every step shown**. Final numbers highlighted. Zero "it can be shown that". |
@@ -108,6 +108,9 @@ must be true:
       acronym is spelled out the first time.
 - [ ] An analogy or plain restatement appears before the first formula of the concept.
 - [ ] A smart beginner with no prior exposure could follow it cold; it reads at ~grade 9.
+- [ ] The explanation is **right-sized** (`plain_language.md` §8): an easy idea is told in a
+      few short sentences with at most one analogy — no stacked analogies, no ceremony,
+      no padded build-up that makes a simple thing look hard.
 
 If 2+ sampled paragraphs fail, category #3 cannot exceed half. Any banned hand-waving phrase
 is also a red-list item (Section H).

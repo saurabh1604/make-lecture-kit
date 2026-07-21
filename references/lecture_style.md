@@ -34,6 +34,10 @@ then drag to rotate. Copy that block for any 3-D surface — still no chart/3-D 
   bowl with a rolling ball, a sliding window over a sentence. A generic line plot teaches almost nothing.
 - **Easy language is law.** Smart-beginner audience. Short sentences (under ~20 words). Define each term the
   first time you use it. Analogy before algebra.
+- **Simple things stay simple.** Right-size every chapter (`plain_language.md` §8). An easy concept gets a
+  tight chapter — short hook, two-line intuition, quick worked example, one clean lab — and earns no padding.
+  Find the most intuitive way in and lead with it. Depth goes where the difficulty is; a padded easy chapter
+  reads as fog, not rigor.
 - **Nothing overflows, nothing overlaps, ever** — from a 360px phone to a 1440px monitor.
 - **Cleanliness is non-negotiable.** A leaked HTML comment once embarrassed us. No comment may contain a
   nested `-->`. No `{{PLACEHOLDER}}` may survive into the shipped file. Every JS helper is defined before
@@ -141,6 +145,8 @@ plain teaching prose, then make it pass the gate.
 - Lead with the analogy; the gold standard calls a hidden neuron an *"at least one is on" detector* before it shows \(h_1=\text{ReLU}(x_1+x_2)\).
 - **Show, don't pile up prose** (`plain_language.md` §6): a comparison becomes a table; a
   pipeline becomes a labelled canvas; a sequence of stages becomes a short numbered list.
+- **Right-size** (`plain_language.md` §8): an easy slide line needs two or three plain
+  sentences, not a paragraph. Expand for clarity, never for bulk.
 
 **Before / after** (the right column is the gold-standard register):
 

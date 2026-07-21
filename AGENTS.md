@@ -48,6 +48,9 @@ is no TeX engine, `build_pdf.py` says so plainly and leaves the ready-to-compile
 - Write in plain, easy English; explain the intuition before you formalize it;
   work examples out in full. The linters enforce sentence length, plain words,
   and reading level.
+- Explain simple things simply. Right-size every explanation (see
+  `references/plain_language.md` §8): lead with the most intuitive way in, use at
+  most one analogy, and never inflate an easy idea to look thorough.
 - Never let text overflow a page, box, or screen — the gates hard-fail this.
 - Generate into `output/` only. **Never edit `output/` by hand**, and never
   overwrite a student's existing work there.

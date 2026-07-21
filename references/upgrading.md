@@ -56,7 +56,7 @@ fearlessly: if it stays green, the kit still works everywhere.
   external dependency. No API keys, no `fetch` to private hosts, no `type="module"`.
 - **Cross-platform.** Standard LaTeX + standard-library Python only. No proprietary
   tools, nothing that ties the kit to one assistant.
-- **The five non-negotiable rules** and the **no-overflow contract**
+- **The six non-negotiable rules** (incl. "simple things stay simple") and the **no-overflow contract**
   (`references/quality_rubric.md`).
 - **Worked-example steps use the `steps` environment** so labels stay inside boxes.
 - **Plain language** stays enforced (`plain_language.md` + the two linters).
