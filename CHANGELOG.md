@@ -6,6 +6,64 @@ every upgrade bumps `VERSION`, adds an entry here, and must pass
 
 Format follows *Keep a Changelog*; versions follow semantic versioning.
 
+## [2.8.0] — 2026-07-22
+
+Learnings folded back in from a side-by-side comparison of a kit-built lecture
+kit against an independently designed one on the same lecture (ZC416 Topic 1).
+Everything the free-form versions did better is now the kit's default.
+
+### Added
+- **New non-negotiable rule 7: "Lead with the whole idea — and open by doing."**
+  Every section opens with its **one-liner** (the whole idea in one or two plain
+  sentences); titles are **headlines** ("The undo button — and how it breaks"),
+  never labels ("The Inverse"); the artifact opens by letting the student DO the
+  central thing in miniature before any definitions — never agenda-first; and it
+  closes like a coach (self-test → pocket card).
+  - `templates/companion.tex`: new `\secsub{...}` one-liner macro (demoed in the
+    specimen) + `\flipanswer{...}` upside-down self-test answers; the AGENT:FILL
+    skeleton now opens by doing and headlines every section.
+  - `references/companion_style.md`: spine step 0 (the one-liner), headline-title
+    rule, and §8 rewritten as the **closing arc** — self-test with hidden answers
+    → one-page **pocket card** → glossary with nickname decoder → symbol sheet.
+  - `references/lecture_style.md`: open-by-doing + headline-titles mindset, band
+    one-line promises (§1), the lead's first sentence = the chapter one-liner
+    (§2), and §12.9 the **final-boss quiz + the one card to keep**.
+- **The `waitwhat` box — the honest surprise.** A sixth companion callout (teal
+  `#0F766E`, `\ding{93}`, "Wait --- really?") for the one consequence per lecture
+  that sounds impossible but is true ("change every dial, land in the same
+  place"). Earned, never scheduled; forced surprises are called out as a fault.
+  Defined in `templates/companion.tex`, taxonomy + placement in
+  `companion_style.md`, and a "hunt the honest surprise" guide in
+  `intuition_playbook.md`.
+- **One story-world + a friendly lexicon** (rule 3 extended). Pick a single
+  everyday world per lecture and draw analogies from inside it; coin 5–10 plain
+  nicknames (clues, silent moves, the staircase), introduce each once beside the
+  formal term, use them identically in PDF, HTML, figures and readouts, and
+  decode them in a closing `friendly → textbook` table. New
+  `plain_language.md` **§9**, story-world guidance in `intuition_playbook.md`
+  §A, ingest step 6 in `companion_style.md`.
+- **Recipe J — the goal game** (`lecture_style.md` §6). When the lecture's heart
+  is a procedure (Gaussian elimination, backprop by hand), ship a playable
+  board: the algorithm's legal moves as the only buttons, a win detector that
+  reads the answer off the winning position, a computed `hint`, `reset`, and
+  fate-preset puzzles. Sliders show; games teach doing.
+- **Zero-dependency math option** (`lecture_style.md` §7.3). When a lecture's
+  notation is genuinely one-dimensional, hand-style the math in HTML/CSS (incl.
+  the CSS-bracket matrix pattern) and ship with **zero** external dependencies —
+  instant load, fully offline, no raw-TeX flash. MathJax stays the default for
+  real 2-D notation; never mix the two in one page.
+- **Experience before vocabulary** (`intuition_playbook.md` §0): do/see first,
+  then name it — "What you just did, in official words."
+
+### Changed
+- `SKILL.md`: six rules become **seven**; companion spine gains `\secsub` +
+  `waitwhat` + the closing arc; HTML step points at recipes A–**J**, the new
+  §12 upgrades, and the zero-dependency math option.
+- `references/quality_rubric.md`: spine gains step 0 (one-liner + headline
+  title); ship checklist now checks open-by-doing, the story-world/lexicon, and
+  both closing arcs.
+- `README.md` / `references/upgrading.md`: rule count + promise updated.
+
 ## [2.7.0] — 2026-07-21
 
 ### Added

@@ -15,7 +15,8 @@ clever-but-confusing.
 
 Author each concept in this fixed order. It is the skeleton for one chapter/section.
 
-1. **Hook** — a one-line question or surprise that the concept answers.
+1. **Hook** — the section's **one-liner first** (the whole idea in one plain sentence),
+   then a one-line question or surprise that the concept answers.
 2. **Plain intuition + analogy** — what it *is*, in kitchen-table words, then one sticky
    real-life analogy.
 3. **Math, built step by step** — every symbol named on first use, nothing skipped.
@@ -24,6 +25,12 @@ Author each concept in this fixed order. It is the skeleton for one chapter/sect
    Then: **ML/AI connection**, **watch-out (pitfall)**, **one-line bridge** to the next.
 
 If a section is missing any of 1–5, it is not done.
+
+**Experience before vocabulary, wherever possible.** The strongest order is: the learner
+*does or sees the thing* → then gets its official name ("What you just did, in official
+words"). A term attached to a memory needs no memorising; a term introduced cold is one
+more thing to hold. This is why a lecture's very first chapter should hand the student
+the central skill in miniature before any definitions appear.
 
 **Right-size every part** (`plain_language.md` §8): the five-part shape is a *ceiling*,
 not a floor. For a genuinely easy concept each part shrinks — a one-line hook, a two-line
@@ -42,6 +49,28 @@ breaks (analogies that overstay their welcome cause bugs in the student's head).
 **One analogy per idea — the best one.** Two analogies for the same idea compete and
 confuse. And when the idea is already everyday (a table of numbers, adding two lists),
 skip the analogy entirely: the thing is its own picture (`plain_language.md` §8).
+
+**One STORY-WORLD per lecture — a recurring cast, not a parade of strangers.** Before
+authoring, pick a single everyday world whose relationships mirror the whole lecture's
+relationships, and draw the per-concept analogies from *inside* it wherever they fit.
+A linear-systems lecture can live entirely in a detective case: equations are *clues*,
+unknowns are *hidden numbers*, a redundant equation is an *echo*, an impossible one is a
+*lying witness*, and the running example (the factory order) is *the case* being solved.
+Each new concept then arrives as a new scene in a familiar story instead of a cold start —
+the reader reuses everything they already know about the world. Give the recurring
+objects the short plain nicknames from `plain_language.md` §9 and keep them identical in
+the PDF, the HTML, the figures, and the demos. Reach outside the story-world only when a
+concept genuinely doesn't fit it — a strained in-world analogy is worse than a fresh one.
+
+**Hunt the honest surprise.** Somewhere in most lectures hides a consequence that sounds
+impossible but is true — *change every dial and land in the same place* (null vectors),
+*the same clue heard twice adds nothing* (rank), *a tiny wobble in one number flips the
+answer completely* (conditioning). Find it by asking: "which fact here would make a
+newcomer say 'wait — really?'" Give that fact a loud, dedicated moment (the companion's
+`waitwhat` box; a highlighted beat in the HTML), state it concretely with the lecture's
+own numbers, and then show why it's true. One real surprise per lecture, well landed,
+does more for memory than ten "interestingly"s — and if a concept has no honest
+surprise, never manufacture one.
 
 ### The analogy bank (patterns you can reuse)
 

@@ -34,6 +34,16 @@ then drag to rotate. Copy that block for any 3-D surface — still no chart/3-D 
   bowl with a rolling ball, a sliding window over a sentence. A generic line plot teaches almost nothing.
 - **Easy language is law.** Smart-beginner audience. Short sentences (under ~20 words). Define each term the
   first time you use it. Analogy before algebra.
+- **Open by DOING.** The first chapter is not "what this lecture covers" — it puts the lecture's central
+  skill in the student's hands in miniature, before any definitions ("Solve a system right now", "Train a
+  tiny neuron by hand"), then names what they just did ("What you just did, in official words"). Experience
+  first, vocabulary second — a term attached to something the student already did needs no memorising.
+- **Titles are headlines.** Every chapter and band title states the claim, action, or payoff in plain
+  words — "The undo button — and how it breaks" beats "The Inverse"; "Three moves that never change the
+  answer" beats "Elementary row operations". Scanning the sidebar should already teach the skeleton.
+- **One story-world, one lexicon.** Pick a single everyday world for the whole page and give recurring
+  objects short plain nicknames (`plain_language.md` §9), used consistently in prose, canvas labels, and
+  readouts alike. A recurring cast the student gets to know beats a parade of unrelated analogies.
 - **Simple things stay simple.** Right-size every chapter (`plain_language.md` §8). An easy concept gets a
   tight chapter — short hook, two-line intuition, quick worked example, one clean lab — and earns no padding.
   Find the most intuitive way in and lead with it. Depth goes where the difficulty is; a padded easy chapter
@@ -68,6 +78,11 @@ a one-line example). Your first action is **mechanical enumeration** — coverag
    | **Training** | how the thing learns / is solved / is computed | "Solving it", "Estimation", "Algorithms" |
    | **Beyond** | scaling up, history, what's next | "Extensions", "Frontier", "Wrap-up" |
 
+5b. **Give every band a one-line promise.** Under each band's header on the page (not in the sidebar), one
+   plain sentence saying what the band delivers — the band's whole idea: *"One tiny equation to hold any
+   system, three safe moves to clean it, one staircase to read every answer off."* Reading only the band
+   promises should give the lecture's skeleton. Style it as a muted lede line under the band title.
+
 6. Produce a **coverage checklist** before coding: `concept → chapter id → band → its slide example →
    bespoke interactive`. Tick it off at the end. If a concept is on a slide and not in the checklist, you
    missed it. A 12–18-slide deck → **12–20 chapters** across 4–6 bands. Merging two slides that teach the
@@ -97,7 +112,7 @@ chapters so the page reads as one lecture; only the topic differs. Map each step
 
 | # | Step | What it does | Component |
 |---|------|--------------|-----------|
-| 1 | **Hook** | `.kicker` + `<h2>` + a `.lead` paragraph: a scene that makes the student *want* the idea. No math yet. | `.kicker`, `h2`, `p.lead` |
+| 1 | **Hook** | `.kicker` + `<h2>` (a headline title) + a `.lead` paragraph whose **first sentence states the chapter's whole idea in plain words** — the one-liner — then a scene that makes the student *want* it. No math yet. | `.kicker`, `h2`, `p.lead` |
 | 2 | **Intuition + analogy** | the idea in plain words; one concrete analogy *before* any symbol. | `.note` (violet) for the analogy aside |
 | 3 | **Math, step by step** | build the formula one symbol at a time; name every symbol; headline equations in scrollable plates. | `<p>` build-up + `.eqbox` per equation |
 | 4 | **Fully worked example** | the slide's example, real numbers, every step — often a step-through interactive. | `.card` "setup" + `.card` "walk it" with a `.readout` |
@@ -491,6 +506,28 @@ function setAuto(on){const b=$('#xAuto');
   else { clearInterval(auto); auto=null; b.textContent='auto ▶'; b.classList.remove('active'); }}
 ```
 
+### Recipe J — the GOAL GAME (when the heart of the lecture is a procedure)
+*For: any lecture whose core skill is a **procedure the student must learn to do** — Gaussian elimination,
+backprop by hand, a parsing algorithm, long division of polynomials.* Sliders show; **games teach doing.**
+When the student is supposed to *perform* the moves, don't animate the algorithm at them — hand them the
+board and let them play it, with a win state:
+
+- **The board** shows the live object (the augmented matrix, the parse stack, the network weights).
+- **The move buttons are exactly the algorithm's legal moves** and nothing else (swap two rows, scale a
+  row, add a multiple of one row to another) — pickers/inputs for the parameters, one button per move.
+  Doing the moves *is* the lesson: the student discovers the strategy the algorithm automates.
+- **A win detector** checks after every move ("is this a staircase?") and celebrates concretely: name what
+  was reached and read the answer off the winning position.
+- **A `hint` button** suggests the single best next move (compute it — e.g. the elimination step targeting
+  the leftmost nonzero below the staircase edge) so nobody gets stuck; a **`reset`** restores the start,
+  and 2–3 preset puzzles (one per solution-fate: unique / none / infinite) make it replayable.
+- **A move counter + history line** in the `.readout` so the student sees the trail they took.
+
+*Uncovers:* the algorithm as strategy rather than incantation — after winning once by hand, the formal
+recipe reads as "what you already did, written down". One goal game per lecture, on the central procedure,
+counts for more than three more slider labs. Wire it like every recipe: one `state`, one `draw(state)`,
+buttons mutate state and redraw.
+
 ### Wiring rules for every recipe
 - **One `draw(state)` / `render(state)`** does *all* painting; controls only mutate state then call it.
 - **Smoothness:** for continuous inputs use the natural `input` event and keep `draw()` cheap; for
@@ -553,6 +590,27 @@ window.addEventListener('load',()=>{
 > If any chapter injects math into the page from JS, use `typeset:false` + a manual `typesetPromise()` as
 > above (the gold-standard pattern), and re-typeset only the changed node after dynamic updates:
 > `MathJax.typesetPromise([node])`.
+
+**The zero-dependency option — skip MathJax when the notation is one-dimensional.** First scan the
+lecture's actual notation. If it never rises above subscripts/superscripts, simple inline fractions, and
+small matrices — true for much of linear algebra, discrete math, and intro ML — hand-style the math in
+plain HTML/CSS instead and ship with **zero** external dependencies: `x<sub>1</sub>`, `<i>λ</i>u`,
+`a/b` as a styled span pair, and matrices as a CSS grid whose brackets are two thin bordered pseudo-elements:
+
+```css
+.mx{display:inline-grid;grid-auto-flow:row;gap:2px 10px;padding:4px 10px;position:relative;
+    font-family:ui-monospace,monospace}
+.mx::before,.mx::after{content:'';position:absolute;top:0;bottom:0;width:7px;
+    border:2px solid currentColor}
+.mx::before{left:0;border-right:0;border-radius:6px 0 0 6px}
+.mx::after{right:0;border-left:0;border-radius:0 6px 6px 0}
+```
+
+The page then loads instantly, works fully offline, and never flashes raw TeX — and `lint.py` passes with
+no MathJax tag because no `\(...\)`/`$$` remains. **Decide once, per lecture, before authoring — never mix
+the two systems in one page.** The moment the lecture needs real 2-D notation (integrals, aligned
+multi-line derivations, big built-up fractions), use MathJax as above — hand-styling those becomes its own
+complexity, which breaks rule 2.
 
 ### 7.4 Theme toggle (light/dark, persisted in localStorage)
 A pre-paint inline script reads the saved theme before first render (no flash); a top-right button flips
@@ -715,8 +773,15 @@ Tick every box; any red-list item is an automatic fail regardless of polish. The
 
 - [ ] **Coverage:** every concept/slide from the deck has its own chapter, in teaching order, grouped into
       4–6 named sidebar bands. ~12–20 chapters for a real lecture. **Nothing dropped.**
+- [ ] **Opens by doing:** chapter 1 puts the central skill in the student's hands in miniature before any
+      definitions, then names what they just did. No agenda-first opening.
+- [ ] **Headlines + one-liners:** every chapter title states its claim in plain words; every `.lead` opens
+      with the chapter's whole idea in one sentence; every band header carries its one-line promise.
+      Titles + one-liners alone give the lecture's skeleton.
 - [ ] **Spine:** every chapter runs hook → intuition+analogy → math step by step → fully worked example →
       bespoke interactive → ML/AI → pitfall/key → bridge, using the right component each step.
+- [ ] **Goal game (where earned):** if the lecture's heart is a procedure, its chapter has a Recipe J
+      playable — legal moves as buttons, win detector, hint, reset — not just watch-it demos.
 - [ ] **Easy language:** short sentences, each term defined on first use, analogy before algebra. A smart
       beginner never gets lost. (Sample 5 paragraphs.)
 - [ ] **Worked examples:** every slide example computed in full, every step shown, real numbers, final
@@ -726,8 +791,9 @@ Tick every box; any red-list item is an automatic fail regardless of polish. The
 - [ ] **Bespoke interactives:** every major concept has its own hand-drawn canvas (or bespoke DOM) demo that
       **reveals** the idea — name the one thing it uncovers. **No generic charts, no decoration.** Each pairs
       a canvas with a `.readout`, initializes on load, and runs from `file://`.
-- [ ] **Chrome:** grouped scroll-spy sidebar TOC, top progress bar, MathJax manual typeset, theme toggle
-      (persisted, page-chrome only), optional guided tour with one story line per chapter.
+- [ ] **Chrome:** grouped scroll-spy sidebar TOC, top progress bar, math renders (MathJax manual typeset,
+      or clean hand-styled HTML math per §7.3), theme toggle (persisted, page-chrome only), optional guided
+      tour with one story line per chapter.
 - [ ] **House idiom:** the `#070b16` dark palette + the gold-standard component classes (`.card/.lab/.note/
       .key/.eqbox/.readout/.ctrl/.btn/.chips/.grid2/3`), consistent accent meanings, OS fonts only.
 - [ ] **No overflow:** clean 360→1440px; canvases scale; `.eqbox` math scrolls in-box; `.ctrl`/`.chips` wrap;
@@ -740,7 +806,8 @@ Tick every box; any red-list item is an automatic fail regardless of polish. The
 - [ ] **Colour legend + consistent accents:** a `.legendbar` near the top fixes the meaning of each accent,
       and every canvas obeys those same meanings (§9). Colour itself should carry information.
 - [ ] **Self-contained:** ONE `.html`, opens by double-click, MathJax-from-cdnjs as the **only** external
-      dependency, every other visual hand-drawn on canvas. No Plotly/D3/Tailwind/Google-Fonts/keys/fetch.
+      dependency — or **zero** dependencies via the §7.3 hand-styled-math option when the notation is 1-D.
+      Every other visual hand-drawn on canvas. No Plotly/D3/Tailwind/Google-Fonts/keys/fetch.
 
 Coverage, worked-example completeness, and bespoke-revealing interactives are the three that fail most
 often — verify them first. **And before you call it done: open `nlp-lecture5-v2.html` beside your page. If
@@ -781,6 +848,18 @@ All are hand-built — **no new dependency** (MathJax stays the only external sc
 8. **A persistent colour legend.** One `.legendbar` near the top fixes the meaning of each accent (cyan =
    step/input, amber = the key number, green = converged/minimum, red = diverges/error, violet =
    direction/hidden). Keep those meanings identical in every canvas so colour carries information.
+9. **A "final boss" quiz + the one card to keep.** End the page with (a) a short 4–6-question quiz — one
+   question per band, click-to-reveal answers that include the one-line *why* (reuse the recall-card
+   pattern from item 1) — and (b) a single closing card that compresses the whole lecture onto one
+   screen: the band promises, the 2–3 headline formulas, and the central decision rule. The student
+   should be able to screenshot that one card the night before an exam. If you coined nicknames
+   (`plain_language.md` §9), the card or a small table beside it decodes them (`friendly → textbook`).
+10. **One "the picture builds itself" scroll moment.** Where the lecture has a genuinely cumulative
+    picture (clue 1 draws a line → clue 2 crosses it → the crossing point lights up), stage it with an
+    `IntersectionObserver`: as each explanatory paragraph scrolls into view, the shared canvas beside it
+    adds that layer (animate via a short rAF lerp; honour `prefers-reduced-motion` by jumping straight to
+    the final state). One such moment per lecture, on the central build-up — it turns reading into
+    watching the idea assemble. Keep a replay button so it can be seen again without re-scrolling.
 
 **Concrete patterns for the above** (proven in Session 9 — *Gradient Descent*): the journey map is
 **Recipe G**, the convex↔bumpy 3-D toggle is **Recipe H**, the arrows / labels / `auto ▶` are **Recipe I**.

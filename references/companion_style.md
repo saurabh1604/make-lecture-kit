@@ -7,7 +7,7 @@ full teaching treatment and works **every** slide example out in full, step by
 step, in easy English.
 
 The look is fixed and non-negotiable: a navy title banner, a `fancyhdr` running
-header, numbered ruled section headings, and **five** coloured callout boxes
+header, numbered ruled section headings, and **six** coloured callout boxes
 with pill tabs. The compilable specimen at `examples/sample_companion.tex` is the
 quality bar — when in doubt, match it. The figure helper is
 `scripts/figstyle.py`. The full template preamble lives in
@@ -27,7 +27,7 @@ quality bar — when in doubt, match it. The figure helper is
 | Body | justified serif (lmodern), `parskip` spacing, `microtype`, math via `amsmath`, tables via `booktabs` |
 | Figures | full-textwidth matplotlib PNGs, centred, **bold title baked into the plot** |
 
-### The FIVE callout boxes — exact taxonomy (quote it, don't improvise)
+### The SIX callout boxes — exact taxonomy (quote it, don't improvise)
 
 | Box | Pill label | Glyph | Frame hex | Tint | Use it for |
 |---|---|---|---|---|---|
@@ -35,7 +35,14 @@ quality bar — when in doubt, match it. The figure helper is
 | Everyday | `Everyday picture` | ★ `\ding{72}` | `#8A5A1E` amber | `orange!7` | the real-life analogy for a tricky idea |
 | Worked | `Worked example: <caption>` | ✎ `\ding{46}` | `#2E7D52` green | `green!5` | a problem solved with real numbers, every step |
 | Watch out | `Watch out` | ✗ `\ding{55}` | `#B23A48` red | `red!4` | the common mistake / trap |
+| Wait — really? | `Wait --- really?` | ❊ `\ding{93}` | `#0F766E` teal | `teal!5` | the honest surprise — a true consequence that sounds impossible |
 | Key takeaway | `Key takeaway` | ✓ `\ding{52}` | `#6A4C93` purple | `violet!6` | the one line to remember |
+
+The **wait — really? box is earned, never scheduled**: use it only where the
+material hands you a genuinely startling consequence ("change every dial and land
+on the same spot", "two lines can agree everywhere or nowhere, never twice").
+Word-only, one per concept at most, and skipping it is the right call for most
+concepts — a forced surprise reads as hype and cheapens the real ones.
 
 Box style (from the template): `enhanced, breakable`, rounded corners,
 `boxrule=0.6pt`, **pill tab** via `attach boxed title to top
@@ -63,6 +70,13 @@ You cannot expand what you have not catalogued. Before writing:
 5. **Write the spine.** For each concept, plan the order in §2. Confirm the
    count: *number of `worked` boxes ≥ number of slide examples.* If a slide has
    three examples, the companion has at least three worked boxes for it.
+6. **Pick ONE story-world and coin the lexicon.** Before writing, choose a
+   single everyday world the whole companion lives in (a detective case, a
+   kitchen, a factory…) and give the lecture's recurring objects short plain
+   nicknames inside it — 5–10 at most (equations = "clues", unknowns = "hidden
+   numbers", null vectors = "silent moves"). Write the list down now; §2 and
+   `plain_language.md` §9 say how to use it. One recurring cast the reader gets
+   to know beats a parade of unrelated analogies.
 
 Output of this step is a checklist. Do not start prose until the checklist is
 complete. A dropped slide example is a failed companion.
@@ -74,28 +88,46 @@ complete. A dropped slide example is a failed companion.
 Every concept follows the same gentle arc. Not every concept needs every box,
 but the order never changes:
 
+0. **The one-liner** — open the section with `\secsub{...}`: the WHOLE idea in
+   one or two plain sentences, right under the heading, before any prose. Write
+   it as the claim the section will prove ("Three safe moves clean any system;
+   the staircase then shows every answer"), never as an agenda ("In this section
+   we will…"). The test: a reader who reads *only* the title and the one-liner
+   of every section should walk away with the skeleton of the lecture.
 1. **Open in plain words** — one or two body sentences saying what this is and
-   why we care. No jargon yet.
+   why we care. No jargon yet. Where the concept allows it, let the reader DO
+   or SEE the thing first and attach the official term after ("You just solved
+   a system" beats "A system is defined as…").
 2. **The intuition box** (blue ☞) — the idea stated simply, the mental model.
 3. **The everyday picture box** (amber ★) — the analogy. **Mandatory for any
    tricky idea.** Put it *before* the math, so the reader meets the concept in
-   the world before meeting it in symbols.
+   the world before meeting it in symbols. Draw it from the companion's ONE
+   story-world (§1 step 6) whenever it fits.
 4. **Formalize** — introduce the formula in body text. Name **every** symbol
    the first time it appears (see §3). Build it up, never drop it whole.
 5. **The worked example box(es)** (green ✎) — solve the slide example(s) in
    full (see §4). One box per example; keep each box coherent.
-6. **The watch-out box** (red ✗) — the trap a beginner falls into here.
-7. **The ML/AI connection** (see §7) — a short body paragraph, `\textbf{Where
+6. **The wait — really? box** (teal ❊) — ONLY where this concept carries an
+   honest surprise (§0). Place it right after the fact that earns it.
+7. **The watch-out box** (red ✗) — the trap a beginner falls into here.
+8. **The ML/AI connection** (see §7) — a short body paragraph, `\textbf{Where
    this shows up in ML.}`, on how the idea appears in machine learning.
-8. **The key-takeaway box** (purple ✓) — the single line to remember. Always
+9. **The key-takeaway box** (purple ✓) — the single line to remember. Always
    last for the concept.
 
 **When to use which box** (decide fast):
 - Explaining *what something means*? → **intuition** (blue).
 - Reaching for "it's like…"? → **everyday** (amber).
 - Touching real numbers? → **worked** (green).
+- About to write "surprisingly" / "amazingly"? → put the *fact* in **wait — really?** (teal) and delete the adverb.
 - About to say "be careful" / "a common error is"? → **watch out** (red).
 - Compressing to one sentence? → **key takeaway** (purple).
+
+**Title every section as a headline, not a label.** The title itself should
+teach: state the claim, the action, or the payoff in plain words — "The undo
+button — and how it breaks" beats "The Inverse"; "All the answers, one formula"
+beats "General solutions". A reader scanning the table of contents should
+already be learning.
 
 Do not stack two boxes of the same colour back to back. Do not put math
 derivations inside the intuition or everyday boxes — those stay word-only.
@@ -370,16 +402,29 @@ forced one — but this is rare; most statistics concepts have a real connection
 
 ---
 
-## 8. Close with a glossary + symbol cheat-sheet
+## 8. Close like a coach: self-test → pocket card → glossary
 
-End every companion (right before *Further reading*) with a **quick-reference page**:
-two compact tables a student can scan the night before an exam. It costs little and
-turns the companion into a revision tool.
+End every companion with a **closing arc** (right before *Further reading*), in
+this order. It costs a page or two and turns the companion into a revision tool.
 
-- **Glossary** — every term you defined, one plain line each, alphabetical-ish or in
-  teaching order. Same plain wording as the body (`plain_language.md`).
-- **Symbol cheat-sheet** — every symbol that appeared, with its meaning and where it
-  came from. This is the table students reach for most.
+1. **A short self-test (4–6 questions) with hidden answers.** One question per
+   big idea, phrased so the reader must *think*, not re-read ("Can a system have
+   exactly two solutions?"). Print each answer upside-down with the template's
+   `\flipanswer{...}` so the reader has to try first; the answer includes the
+   one-line *why*, not just the verdict. Recall is what makes it stick.
+2. **The pocket card — the whole lecture on ONE page.** A single boxed page
+   (a `keytake`-styled `tcolorbox` is fine) a student could photograph before an
+   exam: the 5–8 one-liners from the sections (§2 step 0), the 2–3 headline
+   formulas, and the one decision rule or picture at the heart of the lecture.
+   If it doesn't fit on one page, it isn't a pocket card — compress.
+3. **Glossary** — every term you defined, one plain line each, alphabetical-ish
+   or in teaching order. Same plain wording as the body (`plain_language.md`).
+   If you coined nicknames (§1 step 6), add the **decoder**: a two-column
+   `friendly name → textbook name` table (silent move → null-space vector;
+   staircase → row-echelon form) so the reader can open any textbook and
+   recognise old friends.
+4. **Symbol cheat-sheet** — every symbol that appeared, with its meaning and
+   where it came from. This is the table students reach for most.
 
 Pattern (a starred section so it stays out of the numbering, plus two light tables):
 
@@ -422,11 +467,20 @@ Before you ship, confirm **every** line:
       full`).
 - [ ] **Header** every page: `ISM Companion` left, `Session N · <Title>` right,
       rule below; **footer** centred page number.
-- [ ] **"How to use this companion."** intro paragraph explains all five colours.
-- [ ] **Sections** numbered, sans, navy, ruled (`1  The big idea: …`).
-- [ ] **All five callout types** used at least once, with the **exact** labels,
+- [ ] **"How to use this companion."** intro paragraph explains all six colours.
+- [ ] **Opens by doing:** the first section gives the reader the central thing in
+      miniature before any definitions — never an agenda-first opening.
+- [ ] **Sections** numbered, sans, navy, ruled — and every title is a
+      **headline** (a claim/action/payoff), not a bare topic label.
+- [ ] **Every section opens with `\secsub{...}`** — the whole idea in one or two
+      plain sentences. Reading only titles + one-liners gives the lecture's skeleton.
+- [ ] **The five core callout types** used at least once, with the **exact** labels,
       glyphs, frames (`#2C5AA0 / #8A5A1E / #2E7D52 / #B23A48 / #6A4C93`) and
-      tints (`blue!4 / orange!7 / green!5 / red!4 / violet!6`).
+      tints (`blue!4 / orange!7 / green!5 / red!4 / violet!6`); the teal
+      `waitwhat` box (`#0F766E` / `teal!5`) appears **only** where the material
+      earns an honest surprise.
+- [ ] **One story-world** carries the analogies; nicknames from the §1 lexicon are
+      used consistently and decoded in the closing glossary.
 - [ ] **Every slide concept** expanded; **every slide example** worked in full,
       every step, real numbers, no "it can be shown that".
 - [ ] **Easy language** (per `plain_language.md`): sentences ≤ 22 words, plain
@@ -446,7 +500,8 @@ Before you ship, confirm **every** line:
       distribution/vector/matrix/process/sequence/comparison, and every worked
       example whose numbers can be drawn. `lint_tex.py` "figure coverage" is clean
       (or every flagged section is genuinely non-visual).
-- [ ] **Glossary + symbol cheat-sheet** closing section present (§8).
+- [ ] **Closing arc present (§8):** self-test with `\flipanswer` answers →
+      one-page pocket card → glossary (+ nickname decoder) → symbol cheat-sheet.
 - [ ] Compiles to a **real PDF**, keyless, twice through `pdflatex`.
 
 If any box is unchecked, the companion is not done. Boring beats brilliant: a

@@ -36,8 +36,13 @@ For the PDF, move category #7's 12 points to #5 (+6) and #6 (+6), since it has n
 
 ## B. Per-concept detailed spine (must hold for EVERY concept in BOTH artifacts)
 
-For each concept, verify all nine are present and pull their weight:
+For each concept, verify all are present and pull their weight:
 
+0. **One-liner + headline title** — the section/chapter opens with the whole idea in one
+   or two plain sentences (PDF: `\secsub{...}` under the heading; HTML: the `.lead`'s
+   first sentence), and the title is a **claim/action/payoff**, not a bare topic label
+   ("The undo button — and how it breaks", not "The Inverse"). Reading only titles +
+   one-liners should hand over the lecture's skeleton.
 1. **Hook** — 3–5 sentences, a scene/story, makes the reader want the idea. No math yet.
 2. **Intuition** — the idea in plain words + one analogy. PDF: `intuition` box. HTML: a `.note`.
 3. **Formalize** — math built step by step; **every symbol named**; headline equation set off
@@ -176,9 +181,17 @@ A single worked example with a skipped step fails category #6 below ship thresho
 
 - [ ] **Coverage:** every concept present, one section/chapter each, teaching order; every slide example
       worked in full.
-- [ ] **Spine:** all 9 steps in every concept, correct callout per step, ML/AI in every one.
+- [ ] **Spine:** all steps in every concept (incl. the opening one-liner), correct callout per step,
+      ML/AI in every one.
+- [ ] **Opens by doing:** the first section/chapter hands over the central skill in miniature before any
+      definitions — no agenda-first opening.
 - [ ] **Easy language:** sampled paragraphs pass Section D.
-- [ ] **Analogies:** every tricky idea has a concrete, mapping analogy.
+- [ ] **Analogies:** every tricky idea has a concrete, mapping analogy; one story-world carries them, and
+      the nickname lexicon (`plain_language.md` §9) is consistent across BOTH artifacts and decoded at
+      the end.
+- [ ] **Closing arc:** PDF ends self-test (hidden answers) → one-page pocket card → glossary + symbols;
+      HTML ends final-boss quiz → the one card to keep. The honest surprise (`waitwhat` / highlighted
+      beat) appears only where the material earns it.
 - [ ] **Math:** built step by step, every symbol named, wide math contained.
 - [ ] **Worked examples:** every one passes Section E.
 - [ ] **Interactivity (HTML):** every one passes Section F; 2+ per major concept.

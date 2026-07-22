@@ -206,3 +206,34 @@ The right-sizing rules:
 
 The test for every explanation: *would a good teacher say this across a kitchen table,
 or is it performing thoroughness?* Cut until it sounds like the teacher.
+
+## 9. Friendly names — the lexicon (name it once, use it everywhere)
+
+Formal terms are heavy to carry: "the null-space vector", "row-echelon form",
+"an inconsistent augmented system". Great teaching coins **one short plain
+nickname per recurring object** and then uses it everywhere, so the reader
+thinks in pictures while learning the official words on the side.
+
+The rules:
+
+1. **Coin 5–10 nicknames per lecture, before writing** (part of ingest). Each is
+   short, concrete, and honest about what the thing does: equations = *clues*,
+   unknowns = *hidden numbers* or *dials*, null vectors = *silent moves* (change
+   every dial, land in the same place), echelon form = *the staircase*, the
+   inverse = *the undo button*, a redundant equation = *an echo*.
+2. **Introduce each nickname exactly once, beside the formal term** — "this is
+   called the \vocab{null space}; we'll call these *silent moves*" — then use
+   the nickname in prose, figure labels, canvas labels, and readouts alike.
+   The formal term reappears at exam-relevant moments so it also sticks.
+3. **Be consistent.** One nickname per object, the same nickname in the PDF, the
+   HTML, every figure, and every demo. A lexicon that drifts is worse than none.
+4. **Decode at the end.** Close with a small `friendly → textbook` table so the
+   reader can open any textbook and recognise old friends. The nickname is a
+   ramp, not a replacement.
+5. **Don't force it.** A term that is already plain (a *row*, a *table*) needs
+   no nickname; and never coin a cute name that hides what the object really
+   is. The nickname must make the *behaviour* visible, or it earns no place.
+
+Nicknames work best inside **one story-world** (a detective case, a kitchen, a
+factory) chosen for the whole lecture — see `intuition_playbook.md` §A. The
+linters do not check this section; the rubric does.

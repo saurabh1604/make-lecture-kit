@@ -21,7 +21,7 @@
 %  running header live in the three \newcommand lines just below \begin{document}
 %  is set up in the preamble (see \CourseShort / \SessionLine / \LectureTitle).
 %  One specimen section ("Bernoulli: the atom of randomness") is fully written,
-%  using ALL FIVE callouts + a fully worked example, so the template renders
+%  using the callouts (incl. the new waitwhat) + a fully worked example, so the template renders
 %  meaningfully. Duplicate its structure per slide-concept, then delete it.
 % =============================================================================
 
@@ -119,6 +119,8 @@
 \definecolor{watchFrame}{HTML}{B23A48}  \definecolor{watchFill}{HTML}{FBF1F2}  % ~ red!4
 % Key takeaway — purple/violet
 \definecolor{keyFrame}{HTML}{6A4C93}    \definecolor{keyFill}{HTML}{F4F0F9}    % ~ violet!6
+% Wait, what? — teal (the honest surprise)
+\definecolor{waitFrame}{HTML}{0F766E}   \definecolor{waitFill}{HTML}{EEF7F5}   % ~ teal!5
 
 \color{inktext}
 \hypersetup{linkcolor=navy,urlcolor=navy,citecolor=navy}
@@ -167,8 +169,26 @@
 \newif\ifmlkfirstsec \mlkfirstsectrue
 \newcommand{\sectionbreak}{\ifmlkfirstsec\mlkfirstsecfalse\else\clearpage\fi}
 
+% -----------------------------------------------------------------------------
+%  \secsub{...} — the ONE-LINER under a section title.
+%  Every section opens with the WHOLE idea in one or two plain sentences,
+%  right under the heading, before any body prose. Write it as the claim the
+%  section will prove ("Three moves clean any system; the staircase shows every
+%  answer."), never as an agenda ("In this section we will...").
+% -----------------------------------------------------------------------------
+\newcommand{\secsub}[1]{%
+  \noindent{\sffamily\bfseries\itshape\color{navy!85}\large #1}\par\medskip}
+
+% -----------------------------------------------------------------------------
+%  \flipanswer{...} — an upside-down answer for self-test questions, so the
+%  reader must try before reading. Use inside the closing self-test:
+%  "Q3. Can a system have exactly two solutions?  \flipanswer{No — 0, 1 or
+%  infinity. Two crossing points would force a whole line of them.}"
+% -----------------------------------------------------------------------------
+\newcommand{\flipanswer}[1]{\rotatebox[origin=c]{180}{\parbox{0.92\linewidth}{\small #1}}}
+
 % =============================================================================
-%  PILL-TAB CALLOUTS  —  the FIVE taxonomy boxes
+%  PILL-TAB CALLOUTS  —  the SIX taxonomy boxes
 %  Shared look: enhanced + breakable, rounded corners, boxrule 0.6pt, very light
 %  tint fill, thin colour frame, and a ROUNDED PILL boxed-title tab attached to
 %  the top-left edge (xshift 6mm, yshift -3mm) in the frame colour with white
@@ -222,6 +242,14 @@
 \newtcolorbox{keytake}{%
   housecallout={keyFrame}{keyFill},
   title={\raisebox{-0.05ex}{\ding{51}}\,\ Key takeaway}}
+
+% --- Wait, what? (teal, glyph ❠) — the honest surprise ------------------------
+%  One per concept AT MOST, and only where a consequence is genuinely startling
+%  ("turn every dial, land on the same spot"). Never forced; an empty slot is
+%  better than a fake surprise. Word-only, like intuition/everyday.
+\newtcolorbox{waitwhat}{%
+  housecallout={waitFrame}{waitFill},
+  title={\raisebox{-0.05ex}{\ding{93}}\,\ Wait --- really?}}
 
 % =============================================================================
 %  BITS BRAND  —  "WILP, BITS Pilani" wordmark + optional logo file
@@ -356,27 +384,32 @@ in one breath; the \textcolor{everyFrame}{\textbf{amber}} ``everyday picture''
 box ties it to real life before any math; the \textcolor{workFrame}{\textbf{green}}
 ``worked example'' box solves a problem with real numbers and no skipped steps;
 the \textcolor{watchFrame}{\textbf{red}} ``watch out'' box flags the common
-mistake; and the \textcolor{keyFrame}{\textbf{purple}} ``key takeaway'' box is
-the one sentence to remember. Read it alongside the slides, in order.
+mistake; the \textcolor{waitFrame}{\textbf{teal}} ``wait --- really?'' box holds
+a consequence so surprising it sounds wrong (it isn't); and the
+\textcolor{keyFrame}{\textbf{purple}} ``key takeaway'' box is the one sentence to
+remember. Read it alongside the slides, in order.
 
 \medskip
 
 % ============================================================================
 %  AGENT:FILL — OPENING SECTION(S)
-%  Typically: an "agenda / what this session covers" section, then one
-%  \section per slide-concept. Use \vocab{...} on each term's first use, wrap
-%  display math in align/split, and add a \housefig per matplotlib plot.
+%  OPEN BY DOING, not with an agenda: the first section lets the reader DO the
+%  lecture's central thing in miniature, by feel, before any definitions
+%  ("Solve one right now"), then names what they just did. If a short map of
+%  the reader helps, it goes AFTER that first taste, never first. Then one
+%  \section per slide-concept, each opening with \secsub{the whole idea in one
+%  line}. Use \vocab{...} on each term's first use, wrap display math in
+%  align/split, and add a \housefig per matplotlib plot.
 %  Example skeleton (uncomment + fill, or duplicate the specimen below):
 %
-%  \section{What this session covers}
-%  {{AGENDA_PROSE_AND_BULLETS}}
-%
-%  \section{ {{CONCEPT_TITLE}} }
+%  \section{ {{HEADLINE_TITLE — a claim, not a label}} }
+%  \secsub{ {{THE_WHOLE_IDEA_IN_ONE_OR_TWO_PLAIN_SENTENCES}} }
 %  {{EXPANDED_PLAIN_ENGLISH_EXPLANATION — define every symbol}}
 %  \begin{intuition} {{...}} \end{intuition}
 %  \begin{everyday}  {{relatable real-life analogy BEFORE the math}} \end{everyday}
 %  {{build the formula step by step, every symbol named}}
 %  \begin{worked}{ {{caption}} } {{every step, real numbers}} \end{worked}
+%  \begin{waitwhat}  {{ONLY if a consequence is genuinely startling}} \end{waitwhat}
 %  \begin{watchout}  {{the classic mistake}} \end{watchout}
 %  \begin{keytake}   {{the one sentence to remember}} \end{keytake}
 %  \housefig{figs/{{plot}}.png}{ {{figure caption}} }
@@ -384,12 +417,14 @@ the one sentence to remember. Read it alongside the slides, in order.
 
 % ============================================================================
 %  SPECIMEN SECTION (fully written so the template renders meaningfully).
-%  Uses ALL FIVE callouts + one fully worked example. The figure here is an
+%  Uses the callouts + one fully worked example. The figure here is an
 %  INLINE tikzpicture (a tiny 2-bar PMF) so the TEMPLATE ALONE compiles with NO
 %  PNG present. In real companions, replace it with \housefig + a matplotlib PNG.
 %  Duplicate this \section per slide-concept, then DELETE the specimen.
 % ============================================================================
 \section{The big idea: Bernoulli, the atom of randomness}
+\secsub{One yes/no trial, one number $p$ for the chance of yes --- that is the
+whole distribution.}
 
 Many real questions have just two answers. A coin lands heads or tails. An email
 is spam or not spam. A patient tests positive or negative. The
