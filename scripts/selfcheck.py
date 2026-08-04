@@ -59,7 +59,8 @@ class Report:
 
 
 REQUIRED = [
-    "SKILL.md", "README.md", "START_HERE.md", "VERSION", "CHANGELOG.md",
+    "SKILL.md", "AGENTS.md", "README.md", "START_HERE.md", "VERSION",
+    "CHANGELOG.md",
     "references/plain_language.md", "references/companion_style.md",
     "references/lecture_style.md", "references/intuition_playbook.md",
     "references/quality_rubric.md", "references/prompts.md",

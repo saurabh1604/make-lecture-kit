@@ -6,6 +6,29 @@ every upgrade bumps `VERSION`, adds an entry here, and must pass
 
 Format follows *Keep a Changelog*; versions follow semantic versioning.
 
+## [2.8.1] — 2026-08-03
+
+Housekeeping release from the weekly review. No teaching content changed.
+
+### Fixed
+- **`publish.sh` could have pushed local scratch to the public repo.** The
+  release script runs `git add -A`, which stages *everything* untracked. A
+  `_to_delete/` folder of recovered git internals (a `rebase-apply/` directory,
+  stray `.lock` files, `probe.tmp`, `SKILL.md.same`) was sitting untracked in
+  the working copy and would have been committed and pushed on the next
+  release. `.gitignore` now excludes `_to_delete/`.
+- **Weekly-review notes are no longer publishable.** `.gitignore` covered
+  `output/*/` (subfolders) but not files written directly into `output/`, so
+  internal review notes like `output/weekly-review-2026-07-20.md` were staged
+  by `git add -A`. Added `output/*.md`.
+- **`README.md` "What's inside" tree now matches the repo.** Added the two
+  files it omitted: `publish.sh` and `templates/assets/README.md`.
+
+### Changed
+- **`scripts/selfcheck.py`: `AGENTS.md` is now a required file** (structure
+  check is 24 files, was 23). `AGENTS.md` has been load-bearing for
+  cross-platform agent discovery since v2.7.0, but nothing verified it shipped.
+
 ## [2.8.0] — 2026-07-22
 
 Learnings folded back in from a side-by-side comparison of a kit-built lecture

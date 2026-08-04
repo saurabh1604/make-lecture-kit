@@ -134,11 +134,13 @@ make-lecture-kit/
 ├─ VERSION                      current version (the updater compares this)
 ├─ CHANGELOG.md                 what changed in each version
 ├─ update_source.txt            where scripts/update.py pulls updates from
+├─ publish.sh                   instructors only: self-check, commit and push a release
 ├─ templates/
 │  ├─ companion.tex             LaTeX study-companion template (→ PDF)
 │  ├─ lecture.html              complete interactive lecture template
 │  └─ assets/
-│     └─ bits-logo.png          BITS Pilani logo (PDF banner + HTML sidebar; optional)
+│     ├─ bits-logo.png          BITS Pilani logo (PDF banner + HTML sidebar; optional)
+│     └─ README.md              how to swap the logo (placement, base64 embed, fallback)
 ├─ references/
 │  ├─ plain_language.md         the easy-English rulebook (both linters enforce it)
 │  ├─ quality_rubric.md         the quality bar + ship checklist (both)

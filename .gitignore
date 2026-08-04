@@ -1,6 +1,11 @@
 # Generated kits (students' own work) — keep the folder, ignore its contents
 output/*/
+output/*.md
 !output/.gitkeep
+
+# Local scratch / recovered git internals — never publish these
+# (publish.sh runs `git add -A`, so anything untracked here would be pushed)
+_to_delete/
 
 # LaTeX build artifacts
 *.aux
