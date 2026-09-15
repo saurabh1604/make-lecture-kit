@@ -52,34 +52,61 @@ the colours, labels, or glyphs — they are the reader's mental index.
 
 ---
 
-## 1. Ingest the slide deck (do this first, in full)
+## 1. Ingest the lecture material (do this first, in full)
 
 You cannot expand what you have not catalogued. Before writing:
 
-1. **Read the source.** Open the `.pdf` or `.pptx`. If it is `.pptx`, use the
-   `pptx` skill to extract text and notes; if `.pdf`, use the `pdf` skill. Read
-   **every** slide, including the agenda and any "example" one-liners.
-2. **List every concept.** One line each, in slide order. A concept is anything
-   that earns a definition, a formula, or a named idea. This becomes your
-   section list.
-3. **List every slide example.** Each terse "e.g. λ=3, find P(X=2)" is a
-   **promise** you must keep: it gets a full `worked` box with every step. Mark
-   which concept each example belongs to.
+0. **Identify your input(s).** You may be given a slide deck (`.pdf`/`.pptx`), a
+   full session transcript (`.doc`/`.docx`/`.pdf`/`.txt`), instructor notes, a
+   textbook excerpt, just a topic name, or **several of these together**. Open
+   `.pptx` with the `pptx` skill, `.pdf` with the `pdf` skill, `.doc`/`.docx`
+   with your own document ability; read a transcript or notes as plain text.
+   **Reconciliation rule when more than one source is given:** the most
+   structured source (a slide deck, or absent that a textbook excerpt/syllabus)
+   drives section order and the definitive list of examples to work in full. A
+   transcript or notes are mined for extra explanations, asides, analogies, and
+   worked examples the structured source doesn't show — fold these in as depth
+   inside the existing concept list, not as new top-level sections, *unless*
+   they introduce a concept the structured source omits entirely, in which case
+   add it in its correct teaching position. On a factual conflict (a different
+   formula, a different worked number), the structured source wins; say so
+   plainly in step 6 ("Finish honestly"). `SKILL.md`, `AGENTS.md`, and
+   `lecture_style.md` §1 all point back to this rule rather than restating it.
+1. **Read the source(s).** Read **every** slide (including the agenda and any
+   "example" one-liners) and/or the full transcript/notes text — nothing
+   skimmed.
+2. **List every concept.** One line each, in teaching order. A concept is
+   anything that earns a definition, a formula, or a named idea. This becomes
+   your section list. Mark each concept **easy** or **hard** (`plain_language.md`
+   §8) so it gets space in proportion.
+3. **List every worked example.** Each terse "e.g. λ=3, find P(X=2)" — from a
+   slide, or an example worked live in a transcript — is a **promise** you must
+   keep: it gets a full `worked` box with every step. Mark which concept each
+   example belongs to and how many examples that concept has.
 4. **List every formula and symbol.** You will name every symbol on first use,
    so collect them now.
-5. **Write the spine.** For each concept, plan the order in §2. Confirm the
-   count: *number of `worked` boxes ≥ number of slide examples.* If a slide has
-   three examples, the companion has at least three worked boxes for it.
+5. **Write the spine, and save it as a manifest.** For each concept, plan the
+   order in §2. Confirm the count: *number of `worked` boxes ≥ number of
+   examples catalogued.* If a concept has three examples, the companion has at
+   least three worked boxes for it. Write this list to
+   `output/<slug>/concepts.json` as a flat array of
+   `{"title": "...", "difficulty": "easy"|"hard", "n_examples": <int>}` objects,
+   one per concept, in teaching order — `scripts/check_coverage.py` (§9 gate)
+   checks the finished artifacts against this manifest, so keep it honest and
+   complete rather than shrinking it to match a thin draft.
 6. **Pick ONE story-world and coin the lexicon.** Before writing, choose a
    single everyday world the whole companion lives in (a detective case, a
    kitchen, a factory…) and give the lecture's recurring objects short plain
    nicknames inside it — 5–10 at most (equations = "clues", unknowns = "hidden
    numbers", null vectors = "silent moves"). Write the list down now; §2 and
    `plain_language.md` §9 say how to use it. One recurring cast the reader gets
-   to know beats a parade of unrelated analogies.
+   to know beats a parade of unrelated analogies. **For lectures with 8+
+   concepts:** re-skim this lexicon before starting each new section so
+   terminology stays identical from the first section to the last — never
+   silently rename a nickname partway through.
 
-Output of this step is a checklist. Do not start prose until the checklist is
-complete. A dropped slide example is a failed companion.
+Output of this step is a checklist plus `concepts.json`. Do not start prose
+until the checklist is complete. A dropped example is a failed companion.
 
 ---
 
@@ -223,6 +250,12 @@ Discipline for worked examples:
   bound. This teaches judgement, not just arithmetic.
 - Keep a single worked example **coherent** — it may break across pages
   (`breakable`), but do not interleave unrelated prose inside it.
+- **Before shipping, recompute each example's final number independently from
+  the stated inputs** — redo the arithmetic fresh, don't just re-read your own
+  derivation and nod along. A number that merely reads plausibly next to
+  correct-looking prose is not verified. The hand-waving linters (§9, both
+  gates) catch skipped-step *phrasing*; they cannot catch a wrong-but-fluent
+  number, so this check is on you.
 
 ---
 
@@ -486,6 +519,8 @@ Before you ship, confirm **every** line:
 - [ ] **Easy language** (per `plain_language.md`): sentences ≤ 22 words, plain
       words (no fancy-word offenders), no banned hand-waving, every term defined
       on first use, every Greek letter named. `lint_tex.py` clean.
+- [ ] **`concepts.json` written and `check_coverage.py` clean** — the manifest
+      from §1 step 5 matches the sections and worked boxes actually shipped.
 - [ ] **Every tricky idea** has an everyday-picture analogy **before** the math.
 - [ ] **Every formula** built up with **every symbol named**.
 - [ ] **Each concept** has an ML/AI connection.

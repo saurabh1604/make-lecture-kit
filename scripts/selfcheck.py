@@ -6,8 +6,9 @@ Run this after ANY change to confirm the kit still works, on any platform:
     python3 scripts/selfcheck.py
 
 It verifies: required files present, every script compiles, the shared word-list
-module imports, figstyle renders, both linters run and the bundled example passes,
-and VERSION is recorded in CHANGELOG. Exit code is non-zero if any hard check FAILs.
+module imports, figstyle renders, lint.py/lint_tex.py/check_coverage.py all run
+and the bundled examples pass, and VERSION is recorded in CHANGELOG. Exit code is
+non-zero if any hard check FAILs.
 
 Pure standard library + subprocess. No network, no third-party deps. This is the
 safety net that lets you keep upgrading the kit fearlessly (see
@@ -18,6 +19,7 @@ import ast
 import glob
 import importlib.util
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -61,15 +63,18 @@ class Report:
 REQUIRED = [
     "SKILL.md", "AGENTS.md", "README.md", "START_HERE.md", "VERSION",
     "CHANGELOG.md",
+    "references/cheatsheet.md",
     "references/plain_language.md", "references/companion_style.md",
     "references/lecture_style.md", "references/intuition_playbook.md",
     "references/quality_rubric.md", "references/prompts.md",
     "references/upgrading.md",
     "templates/companion.tex", "templates/lecture.html",
     "scripts/figstyle.py", "scripts/build_pdf.py", "scripts/lint.py",
-    "scripts/lint_tex.py", "scripts/_plain_language.py", "scripts/selfcheck.py",
+    "scripts/lint_tex.py", "scripts/check_coverage.py",
+    "scripts/_plain_language.py", "scripts/selfcheck.py",
     "scripts/update.py", "update_source.txt",
-    "examples/sample_companion.tex",
+    "examples/sample_companion.tex", "examples/sample_lecture.html",
+    "examples/sample_lecture_concepts.json", "examples/sample_companion_concepts.json",
 ]
 
 
@@ -134,7 +139,7 @@ def _run(script, target):
 
 
 def check_linters(r):
-    # lint_tex on the bundled example — it is the quality bar, so it must PASS.
+    # lint_tex on the bundled companion example — it is the quality bar, so it must PASS.
     res = _run("lint_tex.py", "examples/sample_companion.tex")
     last = res.stdout.strip().splitlines()[-1] if res.stdout.strip() else ""
     if "Result: PASS" in res.stdout:
@@ -143,15 +148,47 @@ def check_linters(r):
         r.failed("lint_tex (example)",
                  "the bundled example must pass lint_tex:\n" + res.stdout[-300:])
 
-    # lint.py just needs to RUN and produce a report (the only bundled HTML is the
-    # template, which intentionally carries scaffold placeholders).
+    # lint.py on the bundled HTML example — it is the quality bar, so it must PASS.
+    res = _run("lint.py", "examples/sample_lecture.html")
+    last = res.stdout.strip().splitlines()[-1] if res.stdout.strip() else ""
+    if "Result: PASS" in res.stdout:
+        r.passed("lint.py (example)", last or "example passes")
+    else:
+        r.failed("lint.py (example)",
+                 "the bundled example must pass lint.py:\n" + res.stdout[-300:])
+
+    # lint.py just needs to RUN and produce a report on the template (it
+    # intentionally carries scaffold {{placeholders}} and is not expected to pass).
     res = _run("lint.py", "templates/lecture.html")
     if "Summary:" in res.stdout:
-        r.passed("lint.py (runs)",
+        r.passed("lint.py (template runs)",
                  "HTML linter executes and reports "
                  "(template carries scaffold placeholders by design)")
     else:
-        r.failed("lint.py (runs)", "HTML linter did not produce a report")
+        r.failed("lint.py (template runs)", "HTML linter did not produce a report")
+
+
+def check_coverage_gate(r):
+    # Exercise check_coverage.py against constructed dirs pairing each bundled
+    # example with its own matching manifest (the two bundled examples cover
+    # different topics, so each needs its own manifest/tempdir pairing rather
+    # than one directory containing both).
+    cases = [
+        ("lecture.html", "sample_lecture.html", "sample_lecture_concepts.json"),
+        ("companion.tex", "sample_companion.tex", "sample_companion_concepts.json"),
+    ]
+    for artifact_name, example_file, manifest_file in cases:
+        with tempfile.TemporaryDirectory() as td:
+            shutil.copy(kp("examples", example_file), os.path.join(td, artifact_name))
+            shutil.copy(kp("examples", manifest_file), os.path.join(td, "concepts.json"))
+            res = subprocess.run(
+                [sys.executable, kp("scripts", "check_coverage.py"), td],
+                capture_output=True, text=True, timeout=60)
+            label = f"check_coverage ({example_file})"
+            if "Result: PASS" in res.stdout:
+                r.passed(label, res.stdout.strip().splitlines()[-1] if res.stdout.strip() else "")
+            else:
+                r.failed(label, f"the bundled example must pass check_coverage:\n" + res.stdout[-300:])
 
 
 def check_version(r):
@@ -181,6 +218,7 @@ def main():
     check_shared_module(r)
     check_figstyle(r)
     check_linters(r)
+    check_coverage_gate(r)
     check_version(r)
     r.print_all()
     print("-" * 68)

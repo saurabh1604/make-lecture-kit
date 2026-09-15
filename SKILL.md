@@ -1,17 +1,19 @@
 ---
 name: make-lecture-kit
 description: >-
-  Turn ANY lecture (a slide deck in PDF or PPTX, notes, or just a topic) into two
-  beginner-friendly study artifacts in an output/ folder: a professionally typeset
-  companion PDF (LaTeX, navy banner, colour-coded callout boxes, matplotlib figures,
-  every slide example worked in full) and a complete, very interactive HTML lecture
-  you can play with. Plain easy English, analogies before the math, step-by-step
-  intuition, worked examples, and interactions (including 3-D plots) that uncover
-  each idea. No API keys and the student installs nothing: your agent session
-  (Claude, Codex, Jules, Cursor, or any coding assistant) writes the .tex, makes the
-  figures, compiles the PDF, and builds the page. Trigger on requests like: turn a
-  lecture or slides into a companion PDF and an interactive lecture; make a study PDF
-  for a topic; or explain a hard topic simply with worked examples.
+  Turn ANY lecture material (slides in PDF/PPTX, a full session transcript in
+  doc/docx/pdf/txt, instructor notes, a textbook excerpt, or just a topic — one or
+  several together) into two beginner-friendly study artifacts in an output/
+  folder: a professionally typeset companion PDF (LaTeX, navy banner, colour-coded
+  callout boxes, matplotlib figures, every worked example done in full) and a
+  complete, very interactive HTML lecture you can play with. Plain easy English,
+  analogies before the math, step-by-step intuition, worked examples, and
+  interactions (including 3-D plots) that uncover each idea. No API keys and the
+  student installs nothing: your agent session (Claude, Codex, Jules, Cursor, or any
+  coding assistant) writes the .tex, makes the figures, compiles the PDF, and builds
+  the page. Trigger on requests like: turn a lecture, slides, or transcript into a
+  companion PDF and an interactive lecture; make a study PDF for a topic; or explain
+  a hard topic simply with worked examples.
 ---
 
 # make-lecture-kit (student edition)
@@ -53,16 +55,52 @@ Plus the **no-clutter / no-overflow contract**: nothing overlaps, no text runs o
 
 ## Workflow
 
-### 1. Read the references first
-- `references/plain_language.md` — **the easy-English rulebook (read first):** plain-word
-  swaps, banned hand-waving, sentence ceiling, reading-level target. The linters enforce it.
+### 1. Read the references first — a hard reading budget, not a suggestion
+Always read in full, every run — these are short and apply to every lecture:
+- `references/cheatsheet.md` — the fast-start reference: the seven rules in one line each, the
+  concept→figure/recipe lookup table, and how to fetch more detail on demand (read this first).
+- `references/plain_language.md` — **the easy-English rulebook:** plain-word swaps, banned
+  hand-waving, sentence ceiling, reading-level target. The linters enforce it.
 - `references/quality_rubric.md` — the bar + the ship checklist (both deliverables)
-- `references/companion_style.md` — how to expand slides into the LaTeX companion
-- `references/lecture_style.md` — how to build the complete interactive lecture
-- `references/intuition_playbook.md` — analogies, mental models, ML/AI connections
+
+For `companion_style.md` and `lecture_style.md`, the mandatory core is a **named, short list of
+sections** — not "most of the file." Read *only* these in full up front:
+- `references/companion_style.md`: **§0** (the six callout boxes), **§1** (ingest — you're already
+  doing this), **§2** (the per-concept spine order), **§4** (the worked-example skeleton —
+  `\begin{steps}`, the exact bug this prevents), **§6** (anti-overflow discipline).
+- `references/lecture_style.md`: **§0** (mindset), **§1** (enumerate concepts — already doing this),
+  **§2** (per-chapter spine + component palette), **§4** (math build-up), **§5** (worked-example
+  patterns), **§10.1** (a real shipped bug: a demo can parse fine and still draw nothing — read this
+  short subsection, skip the rest of §10).
+
+That's it — roughly 240–275 lines per file, not the whole 545–930. Everything else in those two files
+(§3, §5's figure sub-map beyond the row you need, §6 canvas recipes beyond the 2–4 letters this
+lecture uses, §7–9 chrome/script/palette — already correct in the template you're copying, §8's
+closing arc, §9/§11 checklists that duplicate `quality_rubric.md`, §12's optional upgrades) is
+**fetch-on-demand, not up-front reading**. Concretely: `grep -n '^## \|^### ' references/lecture_style.md`
+(or `companion_style.md`) to list every section with its line number, then open only the one you need
+right when you need it (the Read tool's `offset`/`limit`, or `sed -n 'START,ENDp' file`) — e.g. open
+§6 Recipe H only when you're actually about to build a 3-D surface lab, open §8's closing arc only once
+you're actually writing the closing arc. **If you catch yourself about to `Read` either file whole, with
+no offset/limit and no specific section in mind, stop — that is over-reading, not thoroughness, and it
+is the exact cost this structure exists to avoid.**
+- `references/intuition_playbook.md` — analogies, mental models, ML/AI connections; skim for the pattern
+  that fits, don't read every entry.
 
 ### 2. Read the input lecture
-The input is usually a **slide deck** (PDF/PPTX) — but may be notes or just a topic. Read it with your own document ability (or a PDF/PPTX skill). List **every concept** to teach and **every slide example** to work out in full, in a sensible order (simple → hard, prerequisites first). While listing, mark each concept **easy** or **hard** and note the most intuitive way into it — an easy concept gets a short, direct treatment (rule 2); a hard one gets the full spine with room to breathe.
+The input may be a **slide deck** (PDF/PPTX), a full **session transcript** (doc/docx/pdf/txt), instructor
+notes, a textbook excerpt, just a topic, or **several of these together**. Read each with your own document
+ability (or a PDF/PPTX skill). If more than one source is given, follow the reconciliation rule in
+`references/companion_style.md` §1 step 0 (the most structured source drives order and the definitive
+example list; other sources add depth). List **every concept** to teach and **every worked example** to
+work out in full, in a sensible order (simple → hard, prerequisites first). While listing, mark each concept
+**easy** or **hard** and note the most intuitive way into it — an easy concept gets a short, direct
+treatment (rule 2); a hard one gets the full spine with room to breathe. Save this catalogue as
+`output/<slug>/concepts.json` (format in `companion_style.md` §1 step 5) — the coverage gate in step 6 checks
+the finished artifacts against it.
+
+**Quick mode:** if the user explicitly asks for "quick," "just the highlights," or "companion only," see the
+note at the end of step 5 before you start — it changes what you build, never what you catalogue here.
 
 ### 3. Pick a slug and make the output folder
 Choose a short kebab slug (e.g. `session6-distributions`, `eigenvectors`) and create `output/<slug>/` and `output/<slug>/figures/`.
@@ -78,17 +116,50 @@ Choose a short kebab slug (e.g. `session6-distributions`, `eigenvectors`) and cr
    ```bash
    python3 scripts/build_pdf.py output/<slug>/companion.tex
    ```
-   `build_pdf.py` runs the figure scripts, compiles with `latexmk`/`pdflatex`, writes `output/<slug>/companion.pdf`, reports any Overfull-box / reference warnings, and then runs `scripts/lint_tex.py` on the source — the companion's language + layout gate (long sentences, fancy words, banned hand-waving, raw `Step`-label enumerates, un-resized wide tables). Fix every FAIL and rebuild. Use the `steps` environment for all worked-example steps so "Step N." never spills outside its box. If the environment has no TeX engine, `build_pdf.py` prints clear guidance (most agent sandboxes have TeX Live; otherwise install TinyTeX) and leaves the `.tex` + figures ready — it never fails silently. You can also run the language gate alone: `python3 scripts/lint_tex.py output/<slug>/companion.tex`.
+   `build_pdf.py` runs the figure scripts, compiles with `latexmk`/`pdflatex`, writes `output/<slug>/companion.pdf`, reports any Overfull-box / reference warnings, and then runs `scripts/lint_tex.py` on the source — the companion's language + layout gate (long sentences, fancy words, banned hand-waving, raw `Step`-label enumerates, un-resized wide tables). **On a fix iteration, don't rewrite the whole file:** both linters print the offending sentence/phrase (and, for layout checks, a line number) — grep for that text and `Edit` only that block. Fix every FAIL and rebuild. Use the `steps` environment for all worked-example steps so "Step N." never spills outside its box. Once figures are correct and only prose is changing, add `--changed-only` to skip re-running figure scripts that haven't changed: `python3 scripts/build_pdf.py output/<slug>/companion.tex --changed-only`. If the environment has no TeX engine, `build_pdf.py` prints clear guidance (most agent sandboxes have TeX Live; otherwise install TinyTeX) and leaves the `.tex` + figures ready — it never fails silently. You can also run the language gate alone: `python3 scripts/lint_tex.py output/<slug>/companion.tex`.
 
 ### 5. Author the complete lecture → `output/<slug>/lecture.html`
-Start from `templates/lecture.html` (a working 3-chapter demo — its chapters set the depth bar; replace them with the real lecture's chapters). Rebuild the **entire** lecture as a connected **story** — a grouped sidebar TOC, one chapter per concept, cover **everything**, drop nothing. Each concept gets the full detailed treatment *and* a **bespoke hand-drawn `<canvas>` lab** with 2+ working controls that *uncover* the intuition (slider→watch the idea change, step→build it up, toggle→reveal the structure) — use the template's `makeSlider`/`setupCanvas` helpers; don't reach for chart libraries. Match each lab to a recipe in `references/lecture_style.md` §6 (A–J) — including **Recipe H** for a rotatable pure-canvas **3-D surface** (any `z=f(x,y)`, no library), **Recipe G** for a clickable big-picture map, and **Recipe J**, the goal game, when the lecture's heart is a procedure — and, where the content earns it, layer on the **§12 signature upgrades** (a non-convex 3-D landscape that makes *local minima* real, animated/annotated labs, per-band recall cards, a persistent colour legend, the final-boss quiz + one-card-to-keep ending). Apply these where the *lecture* calls for them, never by rote. Math via MathJax (the only external dependency) — or, when the lecture's notation is genuinely one-dimensional, the zero-dependency hand-styled option in `lecture_style.md` §7.3. Dark, clean, responsive, nothing overlapping. Then gate it:
+Start from `templates/lecture.html` (a lean skeleton — chrome only, one placeholder chapter). For the depth
+and polish bar to hit, open `examples/sample_lecture.html` beside your work — that finished sample is the
+spec; `lecture_style.md` points to it throughout. Rebuild the **entire** lecture as a connected **story** —
+a grouped sidebar TOC, one chapter per concept, cover **everything**, drop nothing. Each concept gets the
+full detailed treatment *and* a **bespoke hand-drawn `<canvas>` lab** with 2+ working controls that *uncover*
+the intuition (slider→watch the idea change, step→build it up, toggle→reveal the structure) — use the
+template's `makeSlider`/`setupCanvas` helpers; don't reach for chart libraries. Match each lab to a recipe in
+`references/lecture_style.md` §6 (A–J) — including **Recipe H** for a rotatable pure-canvas **3-D surface**
+(any `z=f(x,y)`, no library), **Recipe G** for a clickable big-picture map, and **Recipe J**, the goal game,
+when the lecture's heart is a procedure — and, where the content earns it, layer on the **§12 signature
+upgrades** (a non-convex 3-D landscape that makes *local minima* real, animated/annotated labs, per-band
+recall cards, a persistent colour legend, the final-boss quiz + one-card-to-keep ending). Apply these where
+the *lecture* calls for them, never by rote. Math via MathJax (the only external dependency) — or, when the
+lecture's notation is genuinely one-dimensional, the zero-dependency hand-styled option in
+`lecture_style.md` §7.3. Dark, clean, responsive, nothing overlapping. Then gate it:
 ```bash
 python3 scripts/lint.py output/<slug>/lecture.html
 ```
-`lint.py` fails on template-hygiene leaks (broken comments, leftover `{{placeholders}}`), possible overflow, long sentences, fancy-word / banned hand-waving prose, prose that reads above ~grade 9, blocked math, missing interactivity, any non-CDN dependency, or leaked secrets. Fix every FAIL and re-run until it passes. Also replace the `<title>` tag and every demo-chapter remnant — the shipped page must be entirely about the student's lecture. **Keep the BITS brand:** the sidebar "WILP, BITS Pilani" wordmark + logo slot and the hero credit line stay; set `<title>` to "WILP, BITS Pilani · &lt;lecture title&gt;".
+`lint.py` fails on template-hygiene leaks (broken comments, leftover `{{placeholders}}`), possible overflow,
+long sentences, fancy-word / banned hand-waving prose, prose that reads above ~grade 9, blocked math, missing
+interactivity, a `<canvas>` no script ever references (`check_canvas_wiring` — the lab can't draw anything),
+any non-CDN dependency, or leaked secrets. **On a fix iteration, patch only the flagged block** (grep the
+printed snippet, `Edit` just that section) rather than rewriting the file. Fix every FAIL and re-run until it
+passes. Also replace the `<title>` tag and every scaffold remnant — the shipped page must be entirely about
+the student's lecture. **Keep the BITS brand:** the sidebar "WILP, BITS Pilani" wordmark + logo slot and the
+hero credit line stay; set `<title>` to "WILP, BITS Pilani · &lt;lecture title&gt;".
+
+**Quick mode** (only on an explicit "quick"/"companion only"/"just the highlights" request): either skip
+this step entirely (companion-only), or cap interactions at exactly one per chapter and skip the §12
+signature-upgrades layer. Quick mode never drops coverage or worked examples — every concept still gets its
+own section and every example is still fully worked; it only trims interaction depth and optional polish.
 
 ### 6. Finish honestly
-Tell the learner what landed in `output/<slug>/` and which checks passed. If `build_pdf.py` couldn't compile here (no TeX engine in this environment), say so plainly and give the exact next step — **don't claim a `companion.pdf` exists if it doesn't.** Then self-score against `references/quality_rubric.md`.
+Before reporting done, run the coverage gate: `python3 scripts/check_coverage.py output/<slug>` — it checks
+the `concepts.json` manifest from step 2 against the sections/worked-boxes actually shipped in both
+artifacts (self-consistency, not a truth check against the original material — fix every FAIL). If more than
+one input source was used, name in your report which source drove structure and flag any factual conflict
+you resolved (per the §1 step 0 reconciliation rule). Tell the learner what landed in `output/<slug>/` and
+which checks passed. If `build_pdf.py` couldn't compile here (no TeX engine in this environment), say so
+plainly and give the exact next step — **don't claim a `companion.pdf` exists if it doesn't.** Then self-score
+against `references/quality_rubric.md`.
 
 ---
 
@@ -99,8 +170,9 @@ should be able to pull the latest. Three pieces make that safe and easy:
 
 - **`VERSION` + `CHANGELOG.md`** — the current version and what changed each release.
 - **`scripts/selfcheck.py`** — one command that verifies the whole kit is healthy
-  (files present, scripts compile, figures render, both linters run, the bundled
-  example passes). Run it after any change; it must be green before you ship.
+  (files present, scripts compile, figures render, `lint.py`/`lint_tex.py`/
+  `check_coverage.py` all run, the bundled examples pass). Run it after any change;
+  it must be green before you ship.
 - **`scripts/update.py`** — how end users fetch the latest. It does `git pull` if the
   kit was cloned, otherwise downloads the published zip named in `update_source.txt`.
   Generating companions stays fully offline; only this command touches the network,

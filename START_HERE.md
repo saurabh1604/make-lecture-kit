@@ -43,7 +43,8 @@ Jules, or any agent and ask away.
 
 ## Use it
 
-Attach your lecture file (PDF or PPTX) if you have one — results are much
+Attach your lecture material if you have it — slides (PDF or PPTX), a session
+transcript, or notes; you can attach more than one at once — results are much
 better — then say something like:
 
 - "Use make-lecture-kit on the attached lecture slides."

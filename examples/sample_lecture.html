@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WILP, BITS Pilani · Three Ideas, Three Live Labs (sample lecture)</title>
+
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  svg: { fontCache: 'global' },
+  startup: { typeset: false }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-svg.min.js"></script>
+
+<style>
+:root{
+  --bg:#070b16;
+  --bg2:#0b1120;
+  --panel:#0e1729;
+  --panel2:#121d36;
+  --line:#1f2d4d;
+  --ink:#e7edf9;
+  --muted:#93a4c8;
+  --dim:#64759c;
+  --cyan:#38f0d8;
+  --cyan2:#19c4ff;
+  --violet:#9b8cff;
+  --pink:#ff6ec7;
+  --amber:#ffcb6b;
+  --green:#62e88a;
+  --red:#ff6b81;
+  --glow: 0 0 18px rgba(56,240,216,.45);
+  --r:16px;
+  --mono:'SFMono-Regular',ui-monospace,'JetBrains Mono',Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:
+    radial-gradient(1200px 600px at 80% -5%, rgba(25,196,255,.10), transparent 55%),
+    radial-gradient(1000px 500px at 0% 10%, rgba(155,140,255,.10), transparent 55%),
+    var(--bg);
+  color:var(--ink);
+  font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.65;font-size:16px;
+}
+a{color:var(--cyan2);text-decoration:none}
+
+/* layout */
+.shell{display:grid;grid-template-columns:288px 1fr;max-width:1500px;margin:0 auto}
+.sidebar{position:sticky;top:0;height:100vh;overflow-y:auto;padding:22px 16px 60px;
+  border-right:1px solid var(--line);background:linear-gradient(180deg,var(--bg2),transparent)}
+.brand{font-weight:800;letter-spacing:.3px;font-size:15px;color:#fff;display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.brand .dot{width:11px;height:11px;border-radius:50%;background:var(--cyan);box-shadow:var(--glow)}
+.brand small{display:block;color:var(--dim);font-weight:600;font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-top:2px}
+.bits-logo{height:30px;width:auto;border-radius:4px;background:#fff;padding:2px 4px;flex:0 0 auto}
+.bits-credit{color:var(--muted);font-size:13.5px;margin:6px 0 0}
+.bits-credit strong{color:var(--ink)}
+.toc{margin-top:18px;display:flex;flex-direction:column;gap:1px}
+.toc a{color:var(--muted);font-size:13.5px;padding:7px 12px;border-radius:9px;display:flex;gap:9px;align-items:center;border:1px solid transparent;transition:.15s}
+.toc a .n{font-family:var(--mono);font-size:11px;color:var(--dim);min-width:20px}
+.toc a:hover{background:var(--panel);color:var(--ink)}
+.toc a.active{background:linear-gradient(90deg,rgba(56,240,216,.16),rgba(56,240,216,.02));color:#fff;border-color:rgba(56,240,216,.35)}
+.toc a.active .n{color:var(--cyan)}
+.toc .grp{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding:14px 12px 5px;font-weight:700}
+
+main{padding:0 0 120px}
+.progress{position:fixed;top:0;left:288px;right:0;height:3px;background:transparent;z-index:50}
+.progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--violet),var(--cyan));box-shadow:var(--glow)}
+
+section{padding:64px 56px;border-bottom:1px solid var(--line);scroll-margin-top:10px}
+section:nth-child(even){background:linear-gradient(180deg,rgba(255,255,255,.012),transparent)}
+.wrap{max-width:920px;margin:0 auto}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:10px}
+.kicker::before{content:"";width:26px;height:2px;background:var(--cyan);display:inline-block;border-radius:2px}
+h1{font-size:clamp(30px,5vw,52px);line-height:1.08;margin:.35em 0 .2em;font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(24px,3.4vw,34px);margin:.25em 0 .5em;font-weight:800;letter-spacing:-.01em;color:#fff}
+h3{font-size:19px;margin:1.6em 0 .5em;color:#fff;font-weight:700}
+h4{font-size:15px;margin:1.2em 0 .4em;color:var(--cyan);font-weight:700;letter-spacing:.02em}
+p{color:var(--ink)}
+.lead{font-size:18.5px;color:var(--muted)}
+.muted{color:var(--muted)}
+strong{color:#fff}
+code{font-family:var(--mono);background:var(--panel2);padding:.12em .42em;border-radius:6px;font-size:.88em;color:var(--cyan)}
+ul.muted li{margin:4px 0}
+
+/* cards & callouts */
+.card{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:var(--r);padding:22px 24px;margin:22px 0}
+.lab{background:linear-gradient(180deg,#0c1830,#0a1322);border:1px solid rgba(56,240,216,.28);border-radius:var(--r);padding:22px 24px;margin:26px 0;position:relative;overflow:hidden}
+.lab::before{content:"\26A1 INTERACTIVE";position:absolute;top:0;right:0;font-family:var(--mono);font-size:10px;letter-spacing:.15em;color:#06241f;background:var(--cyan);padding:4px 12px;border-bottom-left-radius:10px;font-weight:800}
+.note{border-left:3px solid var(--violet);background:rgba(155,140,255,.07);padding:12px 18px;border-radius:0 10px 10px 0;margin:18px 0;color:var(--muted)}
+.note b,.note strong{color:#cdc4ff}
+.key{border-left:3px solid var(--amber);background:rgba(255,203,107,.07);padding:12px 18px;border-radius:0 10px 10px 0;margin:18px 0}
+.key b{color:var(--amber)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:880px){.grid2,.grid3{grid-template-columns:1fr}}
+
+/* controls */
+.ctrl{display:flex;align-items:center;gap:12px;margin:10px 0;font-size:14px}
+.ctrl label{min-width:62px;font-family:var(--mono);color:var(--muted)}
+input[type=range]{-webkit-appearance:none;appearance:none;height:5px;border-radius:4px;background:var(--line);flex:1;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--cyan);box-shadow:var(--glow);cursor:pointer;border:2px solid #06241f}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--cyan);cursor:pointer;border:2px solid #06241f}
+.val{font-family:var(--mono);color:var(--cyan);min-width:54px;text-align:right;font-size:13.5px}
+button.btn{font-family:var(--mono);background:var(--panel2);border:1px solid var(--line);color:var(--ink);padding:8px 14px;border-radius:9px;cursor:pointer;font-size:13px;transition:.15s}
+button.btn:hover{border-color:var(--cyan);color:#fff}
+button.btn.active{background:var(--cyan);color:#06241f;border-color:var(--cyan);font-weight:700}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;align-items:center}
+
+/* tables */
+table.tt{border-collapse:collapse;font-family:var(--mono);font-size:14px;margin:8px 0}
+table.tt th,table.tt td{border:1px solid var(--line);padding:8px 16px;text-align:center}
+table.tt th{background:var(--panel2);color:var(--muted)}
+table.tt td.one{color:var(--green);font-weight:700}
+table.tt td.zero{color:var(--dim)}
+.readout{font-family:var(--mono);font-size:14px;background:#06101f;border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-top:14px;white-space:pre-wrap;color:var(--cyan)}
+.readout .hl{color:var(--amber)}
+.readout .g{color:var(--green)}
+canvas{display:block;max-width:100%}
+.eqbox{background:#06101f;border:1px solid var(--line);border-radius:12px;padding:6px 18px;margin:16px 0;overflow-x:auto;color:#e7edf9}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 9px;border-radius:20px;border:1px solid var(--line);color:var(--muted);margin:2px 4px 2px 0}
+.foot{max-width:920px;margin:40px auto 0;color:var(--dim);font-size:13px;padding:0 56px}
+.pill{font-family:var(--mono);font-size:11px;background:var(--panel2);border:1px solid var(--line);border-radius:20px;padding:3px 10px;color:var(--muted)}
+.hero-net{margin:34px 0 6px}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);font-family:var(--mono);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ===== scroll-reveal ===== */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .65s ease, transform .65s cubic-bezier(.2,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){.reveal{opacity:1 !important;transform:none !important;transition:none}}
+body{transition:background .35s ease,color .35s ease}
+
+/* ===== top controls ===== */
+.topctl{position:fixed;top:14px;right:18px;z-index:60;display:flex;gap:9px}
+.topbtn{font-family:var(--mono);font-size:12.5px;background:rgba(18,29,54,.82);border:1px solid var(--line);color:var(--ink);
+  padding:9px 14px;border-radius:30px;cursor:pointer;display:flex;align-items:center;gap:7px;backdrop-filter:blur(8px);transition:.18s}
+.topbtn:hover{border-color:var(--cyan);color:#fff}
+.topbtn.primary{background:linear-gradient(90deg,var(--violet),var(--cyan));color:#06241f;border:none;font-weight:700}
+.topbtn.primary:hover{color:#06241f;filter:brightness(1.08)}
+[data-theme="light"] .topbtn{background:rgba(255,255,255,.9);border-color:#dde4f0;color:#16223d}
+[data-theme="light"] .topbtn:hover{color:#0a4a57}
+
+/* ===== guided story mode ===== */
+.spot{position:fixed;z-index:71;border:2px solid var(--cyan);border-radius:16px;
+  box-shadow:0 0 0 9999px rgba(2,5,12,.66), 0 0 28px rgba(56,240,216,.55);
+  transition:all .5s cubic-bezier(.3,.9,.3,1);pointer-events:none}
+.storycard{position:fixed;z-index:73;left:50%;bottom:28px;transform:translateX(-50%);width:min(640px,92vw);
+  background:linear-gradient(180deg,#0f1b33,#0a1322);border:1px solid rgba(56,240,216,.42);border-radius:18px;padding:20px 24px;
+  box-shadow:0 22px 64px rgba(0,0,0,.55);color:#e7edf9;animation:popcard .35s cubic-bezier(.2,.9,.3,1)}
+@keyframes popcard{from{opacity:0;transform:translate(-50%,16px)}to{opacity:1;transform:translate(-50%,0)}}
+.storycard .stp{font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--cyan)}
+.storycard h3{margin:6px 0 6px;color:#fff;font-size:21px}
+.storycard p{color:#aebbd6;font-size:14.5px;margin:0;line-height:1.6}
+.storynav{display:flex;align-items:center;gap:8px;margin-top:16px}
+.storynav .sp{flex:1}
+.storynav .btn{padding:7px 12px}
+.storydots{display:flex;gap:5px;flex-wrap:wrap;max-width:260px}
+.storydots i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:.2s;cursor:pointer}
+.storydots i.on{background:var(--cyan);transform:scale(1.35)}
+
+/* ===== LIGHT THEME (page chrome only — interactive consoles stay dark) ===== */
+[data-theme="light"] body{
+  background:
+    radial-gradient(1200px 600px at 82% -5%, rgba(25,196,255,.10), transparent 55%),
+    radial-gradient(1000px 500px at 0% 8%, rgba(155,140,255,.13), transparent 55%),
+    #eef2f8;
+  color:#16223d;
+}
+[data-theme="light"] h1,[data-theme="light"] h2{color:#0d1730}
+[data-theme="light"] h3{color:#16223d}
+[data-theme="light"] h4{color:#0a8198}
+[data-theme="light"] p{color:#28364f}
+[data-theme="light"] .lead{color:#46566f}
+[data-theme="light"] .muted{color:#586a8a}
+[data-theme="light"] strong{color:#0a1326}
+[data-theme="light"] .kicker{color:#0a8198}
+[data-theme="light"] .kicker::before{background:#0a8198}
+[data-theme="light"] a{color:#0a72b8}
+[data-theme="light"] section{border-bottom-color:#dde4f0}
+[data-theme="light"] section:nth-child(even){background:linear-gradient(180deg,rgba(13,23,48,.025),transparent)}
+[data-theme="light"] .card{background:linear-gradient(180deg,#ffffff,#f5f8fe);border-color:#dde4f0;box-shadow:0 1px 3px rgba(20,40,80,.05)}
+[data-theme="light"] .card h4{color:#0a8198}
+[data-theme="light"] .card .muted,[data-theme="light"] .card p{color:#43516e}
+[data-theme="light"] .note{background:rgba(124,108,255,.09);color:#3a3357}
+[data-theme="light"] .note b,[data-theme="light"] .note strong{color:#4b3bb0}
+[data-theme="light"] .key{background:rgba(214,158,46,.11)}
+[data-theme="light"] .key b{color:#946708}
+[data-theme="light"] .sidebar{background:linear-gradient(180deg,#ffffff,transparent);border-right-color:#dde4f0}
+[data-theme="light"] .brand{color:#0d1730}
+[data-theme="light"] .toc a{color:#46566f}
+[data-theme="light"] .toc a:hover{background:#eef2fb;color:#0d1730}
+[data-theme="light"] .toc a.active{background:linear-gradient(90deg,rgba(10,129,152,.14),transparent);color:#0a4a57;border-color:rgba(10,129,152,.4)}
+[data-theme="light"] .toc a.active .n{color:#0a8198}
+[data-theme="light"] .toc .grp{color:#8693b0}
+[data-theme="light"] table.tt th{background:#eef2f9;color:#46566f}
+[data-theme="light"] table.tt td{color:#16223d;border-color:#d8e0ee}
+[data-theme="light"] .foot{color:#7a89a8}
+[data-theme="light"] .tag{color:#43516e;border-color:#d2dcec}
+[data-theme="light"] .pill{color:#43516e;background:#eef2f9;border-color:#d8e0ee}
+[data-theme="light"] .legend{color:#586a8a}
+/* keep console text light inside dark interactive panels */
+[data-theme="light"] .lab h4{color:#38f0d8}
+[data-theme="light"] .lab p,[data-theme="light"] .lab .muted{color:#93a4c8}
+[data-theme="light"] .lab strong,[data-theme="light"] .lab b{color:#fff}
+</style>
+</head>
+<body>
+<script>(function(){try{var t=localStorage.getItem('lectheme');if(t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}})();</script>
+<div class="progress"><i id="progbar"></i></div>
+
+<div class="topctl">
+  <button class="topbtn primary" id="tourBtn">&#9654; Guided tour</button>
+  <button class="topbtn" id="themeBtn">&#9728; Light</button>
+</div>
+
+<div class="spot" id="storyspot" style="display:none"></div>
+<div class="storycard" id="storycard" style="display:none">
+  <div class="stp" id="storyStep"></div>
+  <h3 id="storyTitle"></h3>
+  <p id="storyText"></p>
+  <div class="storynav">
+    <div class="storydots" id="storyDots"></div>
+    <div class="sp"></div>
+    <button class="btn" id="storyPrev">&#9664; prev</button>
+    <button class="btn" id="storyPlay">&#9208; pause</button>
+    <button class="btn" id="storyNext">next &#9654;</button>
+    <button class="btn" id="storyExit">&#10005; exit</button>
+  </div>
+</div>
+
+<div class="shell">
+
+<aside class="sidebar">
+  <div class="brand"><span class="dot"></span><img class="bits-logo" src="assets/bits-logo.png" alt="BITS Pilani logo" onerror="this.style.display='none'"><div>WILP, BITS Pilani<small>Companion &middot; Interactive Lecture</small></div></div>
+  <nav class="toc" id="toc">
+    <div class="grp">Start here</div>
+    <a href="#intro"><span class="n">00</span> Overview</a>
+    <div class="grp">Three core ideas</div>
+    <a href="#gd"><span class="n">01</span> Gradient Descent</a>
+    <a href="#neuron"><span class="n">02</span> The Neuron</a>
+    <a href="#normal"><span class="n">03</span> The Normal Distribution</a>
+    <div class="grp">Wrap up</div>
+    <a href="#summary"><span class="n">04</span> Key Takeaways</a>
+  </nav>
+</aside>
+
+<main>
+
+<section id="intro">
+ <div class="wrap">
+  <div class="kicker">Interactive Edition &middot; Sample Lecture</div>
+  <h1>Three Ideas,<br>Three Live Labs</h1>
+  <p class="bits-credit">Prepared for the <strong>Work Integrated Learning Programmes (WILP), BITS Pilani</strong>.</p>
+  <p class="lead">A sample lecture, built the honest way: <strong>analogy first, then the algebra</strong>, every symbol named, every example worked with real numbers. Three foundational ideas &mdash; how machines <em>learn</em>, the <em>unit</em> they learn with, and the <em>bell curve</em> behind their uncertainty. Each idea gets its own hand-drawn canvas you can drag and watch change.</p>
+  <div class="hero-net">
+    <canvas id="heroCanvas" width="900" height="220" style="width:100%;height:auto"></canvas>
+    <div class="legend">
+      <span><i style="background:var(--cyan2)"></i> a loss landscape</span>
+      <span><i style="background:var(--violet)"></i> a learning step</span>
+      <span><i style="background:var(--pink)"></i> the goal: the minimum</span>
+    </div>
+  </div>
+  <div class="grid3">
+    <div class="card"><h4>What you'll learn</h4><p class="muted" style="font-size:14px">How gradient descent walks downhill, how a single neuron makes a decision, and how the Normal distribution shapes randomness into a bell.</p></div>
+    <div class="card"><h4>How to use it</h4><p class="muted" style="font-size:14px">Read top-to-bottom or jump via the sidebar. Every &#9889; panel is live. Try the <strong>&#9654; Guided tour</strong> (top-right) for a narrated walkthrough, or <strong>&#9728; / &#127769;</strong> to switch light/dark.</p></div>
+    <div class="card"><h4>The pattern</h4><p class="muted" style="font-size:14px">Every chapter follows the same rhythm: a hook, an analogy, the math step by step. Then a worked example, an ML link, a pitfall, and a hands-on lab.</p></div>
+  </div>
+  <div class="note" style="margin-top:24px"><b>A note on this page:</b> this is the kit's finished calibration example &mdash; the quality bar <code>references/lecture_style.md</code> points to throughout. It is not a template to edit. Build your own lecture from <code>templates/lecture.html</code> instead, matching this page's depth, chrome, and canvas-lab quality.</div>
+ </div>
+</section>
+
+<section id="gd">
+ <div class="wrap">
+  <div class="kicker">01 &middot; How machines learn</div>
+  <h2>Gradient Descent</h2>
+  <p class="lead">Nearly every model learns the same way. It has a knob, it measures how wrong it is, and it nudges the knob in the direction that reduces the wrongness. Repeat. That loop is <strong>gradient descent</strong>.</p>
+
+  <div class="note"><b>Analogy first.</b> Imagine you are on a foggy hillside and want to reach the lowest point in the valley. You cannot see far, but you can feel which way the ground slopes under your feet. So you take a small step <em>downhill</em>, feel again, and step again. The <strong>slope</strong> tells you the direction; the <strong>size of your step</strong> is up to you. Gradient descent is exactly this, on a curve called the <em>loss</em>.</div>
+
+  <h3>Step 1 &mdash; the loss curve</h3>
+  <p>The <strong>loss</strong> \(L(w)\) is a number that says how wrong the model is for a given setting of the knob \(w\). Lower is better. For this chapter we use a simple bowl-shaped loss so the arithmetic stays clean:</p>
+  <div class="eqbox">$$ L(w) \;=\; \tfrac{1}{2}\,(w - 3)^2 + 1 $$</div>
+  <p>Here \(w\) is the <strong>weight</strong> (our one knob), and the curve bottoms out at \(w=3\) &mdash; that lowest point is what we are hunting for.</p>
+
+  <h3>Step 2 &mdash; the slope (gradient)</h3>
+  <p>The <strong>gradient</strong> \(\frac{dL}{dw}\) is just the slope of the curve at the current \(w\): how fast the loss rises as you move right. Differentiating the bowl gives a tidy result:</p>
+  <div class="eqbox">$$ \frac{dL}{dw} \;=\; (w - 3) $$</div>
+  <p>If \(w\) is to the <em>right</em> of 3 the slope is positive (loss climbs going right, so go left); to the <em>left</em> it is negative (go right). The slope always points <em>uphill</em>, so we move the opposite way.</p>
+
+  <h3>Step 3 &mdash; the update rule</h3>
+  <p>We step in the downhill direction by a fraction \(\eta\) (the Greek letter <em>eta</em>) of the slope. \(\eta\) is the <strong>learning rate</strong> &mdash; the size of each step:</p>
+  <div class="eqbox">$$ w \;\leftarrow\; w \;-\; \eta\,\frac{dL}{dw} $$</div>
+  <p>The minus sign is the whole trick: it turns "uphill slope" into a "downhill step".</p>
+
+  <div class="key"><b>Worked example, real numbers.</b> Start at \(w=1\) with learning rate \(\eta=0.5\).<br>
+  Slope: \(\frac{dL}{dw}=(1-3)=-2\).<br>
+  Update: \(w \leftarrow 1 - 0.5\times(-2) = 1 + 1 = 2\).<br>
+  New loss: \(L(2)=\tfrac12(2-3)^2+1 = 0.5+1 = 1.5\) &mdash; down from \(L(1)=\tfrac12(1-3)^2+1 = 2+1 = 3\).<br>
+  Step again from \(w=2\): slope \(=(2-3)=-1\), so \(w \leftarrow 2-0.5(-1)=2.5\), loss \(L(2.5)=\tfrac12(0.5)^2+1=1.125\). Each step lands closer to \(w=3\). That is learning, one honest step at a time.</div>
+
+  <div class="lab">
+    <h4 style="margin-top:4px">&#9889; Roll the ball downhill</h4>
+    <p class="muted" style="font-size:14px">The cyan ball sits on the loss curve. Press <strong>step</strong> to apply one update; the yellow trail shows its path. Slide the learning rate \(\eta\) and watch the behaviour change: too small crawls, just right glides to the bottom. Too big overshoots &mdash; and above \(\eta=2\) it diverges and flies off.</p>
+    <div class="grid2" style="align-items:start">
+      <div>
+        <div id="gdSliders"></div>
+        <div class="chips" style="margin-top:10px">
+          <button class="btn" id="gdStep">step &#9656;</button>
+          <button class="btn" id="gdRun">run &times;20</button>
+          <button class="btn" id="gdReset">&#8634; reset</button>
+        </div>
+        <div class="readout" id="gdOut"></div>
+      </div>
+      <div><canvas id="gdCanvas" width="440" height="340" style="width:100%;height:auto"></canvas></div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <h4 style="margin-top:4px">&#127956; The same idea in 3D &mdash; roll the ball into the bowl</h4>
+    <p class="muted" style="font-size:14px">Real models have many weights, so the loss is a <strong>surface</strong>, not a curve. Here the loss over two weights \((x,y)\) is a bowl. Press <strong>step</strong> to take one downhill step; the trail shows the path to the bottom (green dot). <strong>Drag the surface to rotate it</strong> and see the valley from any angle. This is drawn with plain canvas &mdash; no 3D library.</p>
+    <div class="grid2" style="align-items:start">
+      <div>
+        <div id="bowlSliders"></div>
+        <div class="chips" style="margin-top:10px">
+          <button class="btn" id="bowlStep">step &#9656;</button>
+          <button class="btn" id="bowlRun">run &times;24</button>
+          <button class="btn" id="bowlReset">&#8634; reset</button>
+        </div>
+        <div class="readout" id="bowlOut"></div>
+      </div>
+      <div><canvas id="bowlCanvas" width="440" height="360" style="width:100%;height:auto;touch-action:none;cursor:grab"></canvas></div>
+    </div>
+  </div>
+
+  <h4>Where this shows up in ML</h4>
+  <p>Real models do not have one knob &mdash; they have millions. But the rule is identical: the loss measures prediction error, and the gradient is computed for <em>every</em> weight at once (by backpropagation). Each weight then takes the same downhill step. Training a neural network is this loop, repeated billions of times.</p>
+
+  <div class="key"><b>Pitfall &mdash; the learning rate is everything.</b> Too small and training takes forever. Too large and the steps overshoot the minimum, bouncing back and forth or even exploding to infinity. In the lab, push \(\eta\) past 2 and watch the loss diverge. Choosing \(\eta\) well is one of the most important practical skills in deep learning.</div>
+
+  <p class="muted"><b>Bridge &rarr;</b> Now that we can <em>learn</em> a weight, what does that weight actually <em>do</em> inside a model? Meet the smallest unit that uses one: the neuron.</p>
+ </div>
+</section>
+
+<section id="neuron">
+ <div class="wrap">
+  <div class="kicker">02 &middot; The building block</div>
+  <h2>The Neuron</h2>
+  <p class="lead">A neuron is a tiny decision-maker. It takes a few numbers in, weighs each by how much it cares, and adds a bias. Then it squashes the total into a yes/no-ish answer between 0 and 1. Stack thousands of them and you have a neural network.</p>
+
+  <div class="note"><b>Analogy first.</b> Think of deciding whether to go outside. You weigh a few signals: how sunny it is (you care a lot &mdash; big weight). You also weigh how windy it is (you mildly dislike it &mdash; small negative weight). You add a personal <em>bias</em>: some people just love being out. If the total feeling crosses a threshold, you go. A neuron does precisely this with numbers and a smooth threshold.</div>
+
+  <h3>Step 1 &mdash; the weighted sum</h3>
+  <p>Given two inputs \(x_1, x_2\), the neuron has matching <strong>weights</strong> \(w_1, w_2\) (how much each input matters) and a single <strong>bias</strong> \(b\) (a baseline nudge). It forms the weighted sum \(z\):</p>
+  <div class="eqbox">$$ z \;=\; w_1 x_1 + w_2 x_2 + b $$</div>
+
+  <h3>Step 2 &mdash; the activation</h3>
+  <p>The raw sum \(z\) can be any number. We pass it through the <strong>sigmoid</strong> function \(\sigma\), which gently squashes anything into the range \((0,1)\). That is perfect for reading as a probability or a soft "yes":</p>
+  <div class="eqbox">$$ y \;=\; \sigma(z) \;=\; \frac{1}{1 + e^{-z}} $$</div>
+  <p>When \(z\) is large and positive, \(y\) is near 1 (a confident yes). When \(z\) is very negative, \(y\) is near 0 (a no). At \(z=0\), \(y=0.5\) &mdash; perfectly undecided.</p>
+
+  <div class="key"><b>Worked example, real numbers.</b> Let \(w_1=1.5,\; w_2=-1,\; b=0.5\), and feed \(x_1=1,\; x_2=2\).<br>
+  Weighted sum: \(z = 1.5\times1 + (-1)\times2 + 0.5 = 1.5 - 2 + 0.5 = 0\).<br>
+  Activation: \(y = \sigma(0) = \dfrac{1}{1+e^{0}} = \dfrac{1}{2} = 0.5\).<br>
+  So this neuron is exactly on the fence. Nudge \(b\) up to \(1\) and \(z=1\), giving \(y=\sigma(1)=\dfrac{1}{1+e^{-1}}\approx 0.731\) &mdash; now it leans "yes".</div>
+
+  <h3>The decision boundary</h3>
+  <p>The neuron answers "yes" (\(y>0.5\)) exactly when \(z>0\). The line \(w_1x_1 + w_2x_2 + b = 0\) splits the input plane into a yes-side and a no-side. Moving the weights <em>tilts</em> that line; moving the bias <em>slides</em> it. The lab below draws this line live.</p>
+
+  <div class="lab">
+    <h4 style="margin-top:4px">&#9889; Feed the neuron, move its boundary</h4>
+    <p class="muted" style="font-size:14px">Drag the two weights and the bias. The left panel shows inputs flowing into the sum and out through the sigmoid. The right panel shows the <strong>decision boundary</strong> in input space: green region is "yes", grey is "no". The white dot is your current input — watch the line tilt and slide.</p>
+    <div class="grid2" style="align-items:start">
+      <div>
+        <div id="neuronSliders"></div>
+        <canvas id="neuronCanvas" width="440" height="220" style="width:100%;height:auto;margin-top:8px"></canvas>
+        <div class="readout" id="neuronOut"></div>
+      </div>
+      <div>
+        <canvas id="boundaryCanvas" width="380" height="380" style="width:100%;height:auto"></canvas>
+        <p class="muted" style="text-align:center;font-size:12.5px">Input space \((x_1,x_2)\). Yellow line = boundary. White dot = current input.</p>
+      </div>
+    </div>
+  </div>
+
+  <h4>Where this shows up in ML</h4>
+  <p>One neuron with a sigmoid is <em>logistic regression</em> &mdash; a complete classifier on its own. A whole network is just layers of these units, where each layer's outputs become the next layer's inputs. Everything large is built from this small piece.</p>
+
+  <div class="key"><b>Pitfall &mdash; without the bias, the line is trapped.</b> If \(b=0\), the boundary \(w_1x_1+w_2x_2=0\) must pass through the origin \((0,0)\). The bias is what lets the neuron place its decision line <em>anywhere</em>. Set \(b\) to 0 in the lab and notice the line snaps through the centre.</div>
+
+  <p class="muted"><b>Bridge &rarr;</b> A neuron outputs a single confident-looking number. But the world is noisy, and that noise almost always follows one famous shape. Meet the bell curve.</p>
+ </div>
+</section>
+
+<section id="normal">
+ <div class="wrap">
+  <div class="kicker">03 &middot; The shape of randomness</div>
+  <h2>The Normal Distribution</h2>
+  <p class="lead">Measure people's heights, sum many small random effects, or look at the errors a model makes &mdash; over and over you get the same symmetric hump. This is the <strong>Normal</strong> (or Gaussian) distribution, the most important curve in all of statistics.</p>
+
+  <div class="note"><b>Analogy first.</b> Drop a thousand marbles through a board of pegs (a Galton board). Each marble bounces left or right at every peg, purely by chance. Yet they do not spread out evenly &mdash; they pile up in the middle and thin out at the edges, forming a bell. Most outcomes are near the average; extremes are rare. That pile is the Normal distribution.</div>
+
+  <h3>Step 1 &mdash; the two knobs</h3>
+  <p>The whole shape is controlled by just two numbers:</p>
+  <ul class="muted">
+    <li><strong>\(\mu\)</strong> (mu) &mdash; the <em>mean</em>: where the peak sits. Slide it and the bell moves left or right.</li>
+    <li><strong>\(\sigma\)</strong> (sigma) &mdash; the <em>standard deviation</em>: how wide the spread is. Small \(\sigma\) is a tall narrow spike; large \(\sigma\) is a low wide hump.</li>
+  </ul>
+
+  <h3>Step 2 &mdash; the formula</h3>
+  <p>The height of the curve at a value \(x\) &mdash; the <strong>probability density</strong> \(f(x)\) &mdash; is:</p>
+  <div class="eqbox">$$ f(x) \;=\; \frac{1}{\sigma\sqrt{2\pi}}\;\exp\!\left(-\,\frac{(x-\mu)^2}{2\sigma^2}\right) $$</div>
+  <p>It looks heavy, but every piece earns its place. The fraction \(\frac{x-\mu}{\sigma}\) measures <em>how many standard deviations</em> \(x\) is from the mean. Squaring it and negating means the height falls off fast as you move away from \(\mu\). The front factor \(\frac{1}{\sigma\sqrt{2\pi}}\) is just bookkeeping so the total area under the curve is exactly 1.</p>
+
+  <div class="key"><b>Worked example, real numbers.</b> Take \(\mu=0,\;\sigma=1\) (the "standard" Normal) and ask for the height at \(x=0\).<br>
+  The exponent is \(-\dfrac{(0-0)^2}{2\cdot1^2}=0\), and \(e^{0}=1\).<br>
+  So \(f(0)=\dfrac{1}{1\cdot\sqrt{2\pi}}=\dfrac{1}{\sqrt{6.2832}}=\dfrac{1}{2.5066}\approx 0.399\).<br>
+  That \(0.399\) is the height of the peak of the standard bell &mdash; the single most important number on the curve.</div>
+
+  <h3>Step 3 &mdash; the 68&ndash;95&ndash;99.7 rule</h3>
+  <p>Because the shape is fixed, the area (probability) inside bands around the mean is always the same:</p>
+  <div class="eqbox">$$ \begin{aligned} P(\mu-\sigma < x < \mu+\sigma) &\approx 68\% \\ P(\mu-2\sigma < x < \mu+2\sigma) &\approx 95\% \\ P(\mu-3\sigma < x < \mu+3\sigma) &\approx 99.7\% \end{aligned} $$</div>
+  <p>So about 2 in 3 values land within one \(\sigma\) of the mean, and almost everything (99.7%) is within three. This is why a "3-sigma event" means "extremely rare".</p>
+
+  <div class="lab">
+    <h4 style="margin-top:4px">&#9889; Reshape the bell</h4>
+    <p class="muted" style="font-size:14px">Slide \(\mu\) to move the peak and \(\sigma\) to squeeze or spread it &mdash; the curve redraws live, and the peak height updates to match the formula. Press <strong>shade bands</strong> to paint the 68&ndash;95&ndash;99.7 regions and confirm the rule with your own eyes.</p>
+    <div class="grid2" style="align-items:start">
+      <div>
+        <div id="normSliders"></div>
+        <div class="chips" style="margin-top:10px">
+          <button class="btn" id="normBands">shade 68&ndash;95&ndash;99.7</button>
+          <button class="btn" id="normReset">&#8634; reset</button>
+        </div>
+        <div class="readout" id="normOut"></div>
+      </div>
+      <div><canvas id="normCanvas" width="440" height="340" style="width:100%;height:auto"></canvas></div>
+    </div>
+  </div>
+
+  <h4>Where this shows up in ML</h4>
+  <p>Weights are often <em>initialised</em> from a Normal distribution. Many models assume their errors are Normally distributed &mdash; that assumption is exactly what makes "minimise squared error" the right thing to do. And the Central Limit Theorem explains <em>why</em> the bell appears everywhere: sums of many small independent effects tend toward Normal, no matter their individual shapes.</p>
+
+  <div class="key"><b>Pitfall &mdash; not everything is Normal.</b> Incomes, city sizes, and word frequencies are heavily skewed with long tails &mdash; assuming a bell there badly underestimates rare-but-large events. Always look at your data before trusting the 68&ndash;95&ndash;99.7 rule.</div>
+
+  <p class="muted"><b>Bridge &rarr;</b> Three ideas, one rhythm: learn a number, use it in a unit, and model the noise around it. Let's pull them together.</p>
+ </div>
+</section>
+
+<section id="summary">
+ <div class="wrap">
+  <div class="kicker">04 &middot; Tying it together</div>
+  <h2>Key Takeaways</h2>
+  <p class="lead">Three foundational ideas, each one a piece of how modern machine learning actually works. If these click, a great deal of the rest has a home to land in.</p>
+  <div class="grid3">
+    <div class="card"><h4>1 &middot; Gradient descent</h4><p class="muted" style="font-size:14px">Learning is walking downhill on a loss curve. Slope gives direction; the learning rate \(\eta\) gives step size. Too big diverges, too small crawls.</p></div>
+    <div class="card"><h4>2 &middot; The neuron</h4><p class="muted" style="font-size:14px">Weighted sum, plus a bias, squashed by a sigmoid. It draws a decision line you can tilt and slide. Networks are just layers of these.</p></div>
+    <div class="card"><h4>3 &middot; The Normal distribution</h4><p class="muted" style="font-size:14px">The bell curve from \(\mu\) and \(\sigma\). About 68% within one \(\sigma\), 95% within two, 99.7% within three. The default model of noise.</p></div>
+  </div>
+  <div class="note" style="margin-top:22px"><b>The thread.</b> A model has weights (idea 2). It learns them by gradient descent (idea 1). And we reason about its uncertainty with the Normal distribution (idea 3). Each chapter here follows the same shape: hook, analogy, math step by step. Then a worked example, an ML link, a pitfall, and a hands-on canvas lab.</div>
+  <div class="chips" style="margin-top:18px">
+    <span class="tag">analogy before algebra</span>
+    <span class="tag">every symbol named</span>
+    <span class="tag">real-number examples</span>
+    <span class="tag">bespoke canvas labs</span>
+    <span class="tag">self-contained &middot; file safe</span>
+  </div>
+ </div>
+</section>
+
+<div class="foot">
+  Sample lecture &middot; the kit's finished calibration example for the interactive-lecture house style
+  (sidebar, progress, theme toggle, guided tour, slider + canvas helpers). Math rendered with MathJax.
+  Build your own lecture from `templates/lecture.html`, matching this page's depth and chrome.
+</div>
+</main>
+</div>
+
+<script>
+/* shared utilities */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const fmt=(x,d=3)=>{ if(Math.abs(x)<1e-9)x=0; return x.toFixed(d); };
+const sigmoid=z=>1/(1+Math.exp(-z));
+
+/* REUSABLE HELPER 1: slider factory.
+   makeSlider(host,{id,label,min,max,step,value},onInput) builds a .ctrl row
+   (label + range + live value), wires onInput, returns a getter for the value. */
+function makeSlider(host,opt,onInput){
+  const row=document.createElement('div');row.className='ctrl';
+  const lab=document.createElement('label');lab.innerHTML=opt.label;
+  const inp=document.createElement('input');
+  inp.type='range';inp.id=opt.id;
+  inp.min=opt.min;inp.max=opt.max;inp.step=opt.step;inp.value=opt.value;
+  const val=document.createElement('span');val.className='val';
+  const dec=(opt.step+'').includes('.')?(opt.step+'').split('.')[1].length:0;
+  const show=()=>{val.textContent=parseFloat(inp.value).toFixed(dec);};
+  inp.addEventListener('input',()=>{show();if(onInput)onInput(parseFloat(inp.value));});
+  row.appendChild(lab);row.appendChild(inp);row.appendChild(val);host.appendChild(row);
+  show();
+  return ()=>parseFloat(inp.value);
+}
+
+/* REUSABLE HELPER 2: DPR-aware canvas.
+   setupCanvas(canvas,drawFn) sizes the backing store for the device pixel
+   ratio (crisp lines), keeps the authored aspect ratio, exposes CSS-pixel
+   width/height to drawFn(ctx,w,h), and redraws on resize. Returns {redraw}. */
+function setupCanvas(canvas,drawFn){
+  const ctx=canvas.getContext('2d');
+  function resize(){
+    const dpr=Math.max(1,window.devicePixelRatio||1);
+    const rect=canvas.getBoundingClientRect();
+    const cssW=rect.width||canvas.width;
+    const cssH=cssW*(canvas.height/canvas.width);
+    canvas.style.height=cssH+'px';
+    canvas.width=Math.round(cssW*dpr);
+    canvas.height=Math.round(cssH*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    drawFn(ctx,cssW,cssH);
+  }
+  let raf=null;
+  window.addEventListener('resize',()=>{if(raf)cancelAnimationFrame(raf);raf=requestAnimationFrame(resize);});
+  resize();
+  return {redraw:()=>{const dpr=Math.max(1,window.devicePixelRatio||1);
+    drawFn(ctx,canvas.width/dpr,canvas.height/dpr);}};
+}
+
+/* scroll progress + active nav (scroll-spy) */
+const tocLinks=$$('#toc a');
+const sections=tocLinks.map(a=>$(a.getAttribute('href')));
+function onScroll(){
+  const st=window.scrollY, h=document.body.scrollHeight-window.innerHeight;
+  $('#progbar').style.width=(100*st/(h||1))+'%';
+  let idx=0;
+  sections.forEach((sec,i)=>{ if(sec && sec.offsetTop-120<=st) idx=i; });
+  tocLinks.forEach((a,i)=>a.classList.toggle('active',i===idx));
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+
+/* registry: each demo registers itself, then runDemos() fires them */
+window.__demos=[];
+function runDemos(){ window.__demos.forEach(f=>{try{f();}catch(e){console.error(e);}}); }
+
+/* theme toggle with localStorage */
+function initTheme(){
+  const btn=$('#themeBtn'); if(!btn)return;
+  const sync=()=>{const light=document.documentElement.getAttribute('data-theme')==='light';btn.innerHTML=light?'🌙 Dark':'☀ Light';};
+  sync();
+  btn.addEventListener('click',()=>{
+    const root=document.documentElement, light=root.getAttribute('data-theme')==='light';
+    if(light){root.removeAttribute('data-theme');try{localStorage.setItem('lectheme','dark');}catch(e){}}
+    else{root.setAttribute('data-theme','light');try{localStorage.setItem('lectheme','light');}catch(e){}}
+    sync();
+  });
+}
+
+/* scroll reveal */
+function initReveal(){
+  if(!('IntersectionObserver' in window))return;
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),
+    {threshold:0.04,rootMargin:'0px 0px -4% 0px'});
+  $$('section .wrap > *').forEach(el=>{
+    /* never animate panels holding a canvas: promoting them to their own
+       layer can leave the canvas texture blank or frozen. */
+    if(el.classList.contains('lab')||el.querySelector('canvas')) return;
+    el.classList.add('reveal'); io.observe(el);
+  });
+}
+
+/* guided story mode */
+const STORY=[
+ {id:'intro',t:'Welcome',x:'Three foundational ideas, each with a live canvas you can drag. Intuition first, then exact math. Use the prev / next buttons or the arrow keys; press space to pause.'},
+ {id:'gd',t:'Gradient descent',x:'Learning is walking downhill on a loss curve. Press step in the lab, then slide the learning rate eta. Too small crawls, just right glides, above 2 it diverges.'},
+ {id:'neuron',t:'The neuron',x:'A weighted sum, a bias, and a sigmoid squash. Drag the weights to tilt the decision line and the bias to slide it. One neuron is logistic regression.'},
+ {id:'normal',t:'The Normal distribution',x:'The bell curve from two knobs: mu moves it, sigma widens it. Hit shade bands to see the 68-95-99.7 rule painted on the curve.'},
+ {id:'summary',t:'Key takeaways',x:'Learn a weight, use it in a neuron, model the noise with a Normal. Three ideas, one rhythm. That wraps the tour - go play with every panel hands-on!'}
+];
+let storyI=0,storyPlaying=false,storyTimer=null,storyActive=false;
+function storySec(){return $('#'+STORY[storyI].id);}
+function positionSpot(){
+  const sec=storySec(); if(!sec)return; const el=sec.querySelector('h1,h2')||sec;
+  const r=el.getBoundingClientRect(), sp=$('#storyspot');
+  sp.style.display='block';
+  sp.style.left=(r.left-12)+'px'; sp.style.top=(r.top-10)+'px';
+  sp.style.width=(r.width+24)+'px'; sp.style.height=(r.height+20)+'px';
+}
+function showStory(){
+  const s=STORY[storyI];
+  $('#storyStep').textContent='Step '+(storyI+1)+' / '+STORY.length;
+  $('#storyTitle').textContent=s.t; $('#storyText').innerHTML=s.x;
+  $$('#storyDots i').forEach((d,i)=>d.classList.toggle('on',i===storyI));
+  const sec=storySec();
+  if(sec){const y=sec.getBoundingClientRect().top+window.scrollY-86;window.scrollTo({top:y,behavior:'smooth'});}
+  setTimeout(positionSpot,520);
+}
+function resetTimer(){clearInterval(storyTimer);if(storyPlaying)storyTimer=setInterval(()=>{if(storyI===STORY.length-1){togglePlay();}else nextStory();},9000);}
+function nextStory(){storyI=(storyI+1)%STORY.length;showStory();resetTimer();}
+function prevStory(){storyI=(storyI-1+STORY.length)%STORY.length;showStory();resetTimer();}
+function togglePlay(){storyPlaying=!storyPlaying;$('#storyPlay').innerHTML=storyPlaying?'⏸ pause':'▶ play';resetTimer();}
+function spotFollow(){if(storyActive)positionSpot();}
+function startStory(){
+  storyActive=true;storyI=0;storyPlaying=true;
+  $('#storycard').style.display='block';$('#storyPlay').innerHTML='⏸ pause';
+  $('#storyDots').innerHTML=STORY.map((_,i)=>'<i data-i="'+i+'"></i>').join('');
+  $$('#storyDots i').forEach(d=>d.addEventListener('click',()=>{storyI=+d.dataset.i;showStory();resetTimer();}));
+  showStory();resetTimer();
+  window.addEventListener('scroll',spotFollow,{passive:true});
+  window.addEventListener('resize',positionSpot);
+}
+function endStory(){
+  storyActive=false;storyPlaying=false;clearInterval(storyTimer);
+  $('#storycard').style.display='none';$('#storyspot').style.display='none';
+  window.removeEventListener('scroll',spotFollow);window.removeEventListener('resize',positionSpot);
+}
+function initStory(){
+  if(!$('#tourBtn'))return;
+  $('#tourBtn').addEventListener('click',startStory);
+  $('#storyExit').addEventListener('click',endStory);
+  $('#storyNext').addEventListener('click',nextStory);
+  $('#storyPrev').addEventListener('click',prevStory);
+  $('#storyPlay').addEventListener('click',togglePlay);
+  document.addEventListener('keydown',e=>{if(!storyActive)return;
+    if(e.key==='Escape')endStory();else if(e.key==='ArrowRight')nextStory();
+    else if(e.key==='ArrowLeft')prevStory();else if(e.key===' '){e.preventDefault();togglePlay();}});
+}
+
+/* ============================================================
+   DEMOS - each registers itself; runDemos() fires them on load
+   ============================================================ */
+
+/* hero: animated loss landscape with a stepping ball */
+window.__demos.push(function(){
+  const c=$('#heroCanvas'); if(!c)return; const ctx=c.getContext('2d');
+  const W=c.width,H=c.height,pad=24;
+  const loss=u=>0.55*Math.pow(u,2)+0.12*Math.sin(u*7+1)+0.18;
+  let t=0;
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    const X=u=>pad+(u+1)/2*(W-2*pad);
+    const Y=v=>H-pad-v*(H-2*pad)*1.4;
+    ctx.strokeStyle='rgba(120,150,210,.5)';ctx.lineWidth=2;ctx.beginPath();
+    let minU=0,minV=1e9;
+    for(let px=pad;px<=W-pad;px++){const u=(px-pad)/(W-2*pad)*2-1;const v=loss(u);
+      if(v<minV){minV=v;minU=u;} const y=Y(v); if(px===pad)ctx.moveTo(px,y);else ctx.lineTo(px,y);}
+    ctx.stroke();
+    ctx.fillStyle='#ff6ec7';ctx.shadowColor='#ff6ec7';ctx.shadowBlur=12;
+    ctx.beginPath();ctx.arc(X(minU),Y(minV),5,0,7);ctx.fill();ctx.shadowBlur=0;
+    t+=0.02;
+    const start=-0.85, u=minU+(start-minU)*Math.max(0,Math.cos(t)*0.5+0.5);
+    const bx=X(u),by=Y(loss(u));
+    ctx.strokeStyle='rgba(155,140,255,.55)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(X(minU),Y(minV));ctx.stroke();
+    ctx.fillStyle='#38f0d8';ctx.shadowColor='#38f0d8';ctx.shadowBlur=14;
+    ctx.beginPath();ctx.arc(bx,by,8,0,7);ctx.fill();ctx.shadowBlur=0;
+    requestAnimationFrame(frame);
+  }
+  frame();
+});
+
+/* 01 GRADIENT DESCENT lab */
+window.__demos.push(function(){
+  const c=$('#gdCanvas'); if(!c)return;
+  const host=$('#gdSliders'); host.innerHTML='';
+  const Lf=w=>0.5*Math.pow(w-3,2)+1, dL=w=>(w-3);
+  const wmin=-5,wmax=11,ymin=0,ymax=34;
+  let w=1, trail=[w], steps=0;
+  const getLr=makeSlider(host,{id:'gdLr',label:'η (rate)',min:'0.05',max:'2.6',step:'0.05',value:'0.5'},()=>render());
+  const cv=setupCanvas(c,function(ctx,W,H){
+    const pad=42;
+    const X=v=>pad+(v-wmin)/(wmax-wmin)*(W-2*pad), Y=v=>H-pad-(v-ymin)/(ymax-ymin)*(H-2*pad);
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='rgba(120,150,210,.18)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(pad,Y(0));ctx.lineTo(W-pad,Y(0));ctx.stroke();
+    ctx.fillStyle='#64759c';ctx.font='11px monospace';
+    ctx.fillText('w',W-pad+4,Y(0)+4);ctx.fillText('L(w)',pad-2,pad-8);
+    ctx.strokeStyle='#2a3a5c';ctx.lineWidth=2;ctx.beginPath();
+    for(let px=pad;px<=W-pad;px++){const ww=wmin+(px-pad)/(W-2*pad)*(wmax-wmin);const yy=Y(Lf(ww));if(px===pad)ctx.moveTo(px,yy);else ctx.lineTo(px,yy);}
+    ctx.stroke();
+    ctx.fillStyle='#62e88a';ctx.beginPath();ctx.arc(X(3),Y(Lf(3)),4,0,7);ctx.fill();
+    ctx.font='11px monospace';ctx.fillText('min w*=3',X(3)-22,Y(Lf(3))+20);
+    ctx.strokeStyle='rgba(255,203,107,.6)';ctx.lineWidth=1.4;ctx.beginPath();
+    trail.forEach((tw,i)=>{const px=X(clamp(tw,wmin,wmax)),py=Y(clamp(Lf(tw),ymin,ymax));if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);});ctx.stroke();
+    trail.forEach(tw=>{ctx.fillStyle='rgba(255,203,107,.5)';ctx.beginPath();ctx.arc(X(clamp(tw,wmin,wmax)),Y(clamp(Lf(tw),ymin,ymax)),3,0,7);ctx.fill();});
+    const bx=X(clamp(w,wmin,wmax)),by=Y(clamp(Lf(w),ymin,ymax));
+    ctx.fillStyle='#38f0d8';ctx.shadowColor='#38f0d8';ctx.shadowBlur=12;ctx.beginPath();ctx.arc(bx,by,8,0,7);ctx.fill();ctx.shadowBlur=0;
+  });
+  function render(){
+    cv.redraw();
+    const g=dL(w);
+    $('#gdOut').innerHTML='step '+steps+':  w = '+fmt(w,3)+'   L(w) = '+(isFinite(Lf(w))?fmt(Lf(w),3):'∞')+'\n'+
+      'slope dL/dw = (w−3) = <span class="hl">'+fmt(g,3)+'</span>\n'+
+      'update: w ← w − η·slope = '+fmt(w,2)+' − '+fmt(getLr(),2)+'·('+fmt(g,2)+')\n'+
+      (getLr()>2?'<span style="color:var(--red)">η &gt; 2 → each step overshoots further → DIVERGES</span>':
+       getLr()>1?'<span class="hl">η in (1,2) → overshoots and oscillates, but still converges</span>':
+       '<span class="g">η in (0,1) → smooth, steady descent toward w*=3</span>');
+  }
+  function step(){const g=dL(w);w=w-getLr()*g;w=clamp(w,-1e6,1e6);trail.push(w);if(trail.length>40)trail.shift();steps++;render();}
+  $('#gdStep').addEventListener('click',step);
+  $('#gdRun').addEventListener('click',()=>{let n=0;const t=setInterval(()=>{step();if(++n>=20)clearInterval(t);},60);});
+  $('#gdReset').addEventListener('click',()=>{w=1;trail=[w];steps=0;render();});
+  render();
+});
+
+/* 01b GRADIENT DESCENT IN 3D — pure-canvas surface, NO 3D library.
+   REUSABLE 3D PATTERN (copy this for any loss-landscape / bowl / saddle lab):
+     1. sample a grid of z=f(x,y);
+     2. proj() rotates each point by azimuth+elevation and drops the depth
+        (a plain orthographic projection -> screen x,y + a depth for sorting);
+     3. fill the quads far-to-near (painter's algorithm) with the house colour
+        ramp so height reads as colour; then draw the descent trail on top.
+   Drag the canvas to rotate. Only the 2D canvas API is used. */
+window.__demos.push(function(){
+  const c=$('#bowlCanvas'); if(!c) return;
+  const host=$('#bowlSliders'); host.innerHTML='';
+  const f=(x,y)=>0.42*x*x+0.16*y*y;          // the loss surface (a gentle bowl)
+  const gx=x=>0.84*x, gy=y=>0.32*y;          // its gradient (slope in x and y)
+  const R=3.2, N=20;                          // domain half-width, grid cells
+  let az=0.9, el=0.6;                         // view angles (radians)
+  let p={x:2.7,y:2.8}, trail=[{x:p.x,y:p.y}], steps=0;
+  const getLr=makeSlider(host,{id:'bowlLr',label:'η (rate)',min:'0.02',max:'1.15',step:'0.02',value:'0.18'},()=>render());
+  const STOPS=[[33,53,94],[44,90,160],[62,142,156],[159,191,143],[200,136,30]];
+  function houseColor(t){t=t<0?0:t>1?1:t;const s=t*4,i=Math.floor(s),fr=s-i,a=STOPS[i],b=STOPS[Math.min(i+1,4)];return Math.round(a[0]+(b[0]-a[0])*fr)+','+Math.round(a[1]+(b[1]-a[1])*fr)+','+Math.round(a[2]+(b[2]-a[2])*fr);}
+  let proj;
+  const cv=setupCanvas(c,function(ctx,W,H){
+    ctx.clearRect(0,0,W,H);
+    const cx=W*0.5, cy=H*0.62, scale=Math.min(W,H)/(R*2.7), zmax=f(R,R)||1;
+    const ca=Math.cos(az),sa=Math.sin(az),ce=Math.cos(el),se=Math.sin(el);
+    proj=function(x,y,z){const zc=z-zmax*0.5,X=x*ca-y*sa,Y=x*sa+y*ca,Y2=Y*ce-zc*se,Z2=Y*se+zc*ce;return{sx:cx+X*scale,sy:cy-Z2*scale*0.92,depth:Y2};};
+    const cells=[];
+    for(let i=0;i<N;i++)for(let j=0;j<N;j++){
+      const x0=-R+i/N*2*R,x1=-R+(i+1)/N*2*R,y0=-R+j/N*2*R,y1=-R+(j+1)/N*2*R;
+      const z00=f(x0,y0),z10=f(x1,y0),z11=f(x1,y1),z01=f(x0,y1);
+      const P=[proj(x0,y0,z00),proj(x1,y0,z10),proj(x1,y1,z11),proj(x0,y1,z01)];
+      cells.push({P,t:((z00+z10+z11+z01)/4)/zmax,depth:(P[0].depth+P[1].depth+P[2].depth+P[3].depth)/4});
+    }
+    cells.sort((a,b)=>b.depth-a.depth);       // far cells first
+    cells.forEach(cl=>{ctx.fillStyle='rgba('+houseColor(cl.t)+',0.97)';ctx.strokeStyle='rgba(255,255,255,0.10)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(cl.P[0].sx,cl.P[0].sy);for(let k=1;k<4;k++)ctx.lineTo(cl.P[k].sx,cl.P[k].sy);ctx.closePath();ctx.fill();ctx.stroke();});
+    const lift=zmax*0.02;
+    function trace(col,wd){ctx.strokeStyle=col;ctx.lineWidth=wd;ctx.beginPath();trail.forEach((tp,i)=>{const P=proj(tp.x,tp.y,f(tp.x,tp.y)+lift);i?ctx.lineTo(P.sx,P.sy):ctx.moveTo(P.sx,P.sy);});ctx.stroke();}
+    trace('rgba(255,255,255,.9)',3.2); trace('rgba(255,203,107,.98)',1.7);
+    const Pm=proj(0,0,f(0,0)+lift);ctx.fillStyle='#62e88a';ctx.beginPath();ctx.arc(Pm.sx,Pm.sy,5,0,7);ctx.fill();
+    const Pb=proj(p.x,p.y,f(p.x,p.y)+lift);ctx.fillStyle='#38f0d8';ctx.shadowColor='#38f0d8';ctx.shadowBlur=12;ctx.beginPath();ctx.arc(Pb.sx,Pb.sy,7,0,7);ctx.fill();ctx.shadowBlur=0;
+  });
+  function render(){cv.redraw();$('#bowlOut').innerHTML='step '+steps+':  (x,y) = ('+fmt(p.x,2)+', '+fmt(p.y,2)+')   loss = '+fmt(f(p.x,p.y),3)+'\n'+'gradient (0.84x, 0.32y) = ('+fmt(gx(p.x),2)+', '+fmt(gy(p.y),2)+')\n'+'(x,y) ← (x,y) − η·gradient   ·   <span class="muted">drag to rotate</span>';}
+  function step(){p={x:p.x-getLr()*gx(p.x),y:p.y-getLr()*gy(p.y)};trail.push({x:p.x,y:p.y});if(trail.length>60)trail.shift();steps++;render();}
+  $('#bowlStep').addEventListener('click',step);
+  $('#bowlRun').addEventListener('click',()=>{let n=0;const t=setInterval(()=>{step();if(++n>=24)clearInterval(t);},55);});
+  $('#bowlReset').addEventListener('click',()=>{p={x:2.7,y:2.8};trail=[{x:p.x,y:p.y}];steps=0;render();});
+  let drag=false,lx=0,ly=0;
+  c.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;try{c.setPointerCapture(e.pointerId);}catch(_){}});
+  c.addEventListener('pointermove',e=>{if(!drag)return;az+=(e.clientX-lx)*0.01;el=clamp(el+(e.clientY-ly)*0.01,0.12,1.45);lx=e.clientX;ly=e.clientY;cv.redraw();});
+  c.addEventListener('pointerup',()=>{drag=false;});
+  render();
+});
+
+/* 02 THE NEURON lab */
+window.__demos.push(function(){
+  const flow=$('#neuronCanvas'); if(!flow)return;
+  const host=$('#neuronSliders'); host.innerHTML='';
+  const getW1=makeSlider(host,{id:'nw1',label:'w₁',min:'-3',max:'3',step:'0.1',value:'1.5'},()=>render());
+  const getW2=makeSlider(host,{id:'nw2',label:'w₂',min:'-3',max:'3',step:'0.1',value:'-1'},()=>render());
+  const getB =makeSlider(host,{id:'nb', label:'bias b',min:'-3',max:'3',step:'0.1',value:'0.5'},()=>render());
+  const x1=1,x2=2;
+  const flowCv=setupCanvas(flow,function(ctx,W,H){
+    const w1=getW1(),w2=getW2(),b=getB(),z=w1*x1+w2*x2+b,y=sigmoid(z);
+    ctx.clearRect(0,0,W,H);
+    const inX=58,sumX=W*0.52,outX=W-58,ys=[H*0.32,H*0.68];
+    const xv=[x1,x2],wv=[w1,w2];
+    xv.forEach((xi,i)=>{
+      ctx.strokeStyle=wv[i]>=0?'rgba(56,240,216,'+(0.3+0.6*Math.min(1,Math.abs(wv[i])/3))+')':'rgba(255,110,129,'+(0.3+0.6*Math.min(1,Math.abs(wv[i])/3))+')';
+      ctx.lineWidth=1+3*Math.min(1,Math.abs(wv[i])/3);
+      ctx.beginPath();ctx.moveTo(inX+18,ys[i]);ctx.lineTo(sumX-24,H/2);ctx.stroke();
+      ctx.fillStyle='#93a4c8';ctx.font='11px monospace';ctx.fillText('w'+(i+1)+'='+fmt(wv[i],1),(inX+sumX)/2-30,(ys[i]+H/2)/2+(i?10:-4));
+    });
+    xv.forEach((xi,i)=>{
+      ctx.beginPath();ctx.arc(inX,ys[i],17,0,7);ctx.fillStyle='#0e2138';ctx.fill();
+      ctx.strokeStyle='#19c4ff';ctx.lineWidth=2;ctx.stroke();
+      ctx.fillStyle='#cfe6ff';ctx.font='12px monospace';ctx.textAlign='center';ctx.fillText(fmt(xi,1),inX,ys[i]+4);
+      ctx.fillStyle='#64759c';ctx.fillText('x'+(i+1),inX-32,ys[i]+4);
+    });
+    ctx.fillStyle='#ffcb6b';ctx.font='12px monospace';ctx.textAlign='center';ctx.fillText('b='+fmt(b,1),sumX,H*0.16);
+    ctx.strokeStyle='rgba(255,203,107,.5)';ctx.beginPath();ctx.moveTo(sumX,H*0.2);ctx.lineTo(sumX,H/2-26);ctx.stroke();
+    ctx.beginPath();ctx.arc(sumX,H/2,26,0,7);ctx.fillStyle='#15233f';ctx.fill();ctx.strokeStyle='#9b8cff';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle='#cdc4ff';ctx.font='16px monospace';ctx.fillText('Σ',sumX,H/2-2);
+    ctx.fillStyle='#9b8cff';ctx.font='11px monospace';ctx.fillText('z='+fmt(z,2),sumX,H/2+40);
+    ctx.strokeStyle='#9b8cff';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(sumX+28,H/2);ctx.lineTo(outX-22,H/2);ctx.stroke();
+    ctx.fillStyle='#64759c';ctx.font='12px monospace';ctx.fillText('σ',(sumX+outX)/2+2,H/2-10);
+    ctx.beginPath();ctx.arc(outX,H/2,22,0,7);ctx.fillStyle='#2a1430';ctx.fill();ctx.strokeStyle='#ff6ec7';ctx.lineWidth=2.5;ctx.stroke();
+    ctx.fillStyle='#ffd0ec';ctx.font='13px monospace';ctx.fillText(fmt(y,2),outX,H/2+4);
+    ctx.fillStyle='#ff6ec7';ctx.fillText('y',outX,H/2+44);
+    ctx.textAlign='left';
+  });
+  const bound=$('#boundaryCanvas');
+  const boundCv=setupCanvas(bound,function(ctx,W,H){
+    const w1=getW1(),w2=getW2(),b=getB();
+    const pad=40, lo=-3, hi=3;
+    const X=v=>pad+(v-lo)/(hi-lo)*(W-2*pad), Y=v=>H-pad-(v-lo)/(hi-lo)*(H-2*pad);
+    ctx.clearRect(0,0,W,H);
+    const step=12;
+    for(let px=pad;px<W-pad;px+=step)for(let py=pad;py<H-pad;py+=step){
+      const ux=lo+(px-pad)/(W-2*pad)*(hi-lo), uy=hi-(py-pad)/(H-2*pad)*(hi-lo);
+      const z=w1*ux+w2*uy+b;
+      ctx.fillStyle=z>0?'rgba(98,232,138,.10)':'rgba(120,140,180,.07)';
+      ctx.fillRect(px,py,step,step);
+    }
+    ctx.strokeStyle='rgba(120,150,210,.25)';ctx.lineWidth=1;ctx.strokeRect(pad,pad,W-2*pad,H-2*pad);
+    ctx.beginPath();ctx.moveTo(X(0),pad);ctx.lineTo(X(0),H-pad);ctx.moveTo(pad,Y(0));ctx.lineTo(W-pad,Y(0));ctx.stroke();
+    ctx.fillStyle='#64759c';ctx.font='12px monospace';ctx.fillText('x₁',W-pad+2,Y(0)-6);ctx.fillText('x₂',X(0)+6,pad-6);
+    ctx.strokeStyle='#ffcb6b';ctx.lineWidth=2.4;
+    ctx.save();ctx.beginPath();ctx.rect(pad,pad,W-2*pad,H-2*pad);ctx.clip();
+    if(Math.abs(w2)>1e-6){
+      const x2a=-(w1*lo+b)/w2, x2b=-(w1*hi+b)/w2;
+      ctx.beginPath();ctx.moveTo(X(lo),Y(x2a));ctx.lineTo(X(hi),Y(x2b));ctx.stroke();
+    } else if(Math.abs(w1)>1e-6){
+      const xv=-b/w1; ctx.beginPath();ctx.moveTo(X(xv),Y(lo));ctx.lineTo(X(xv),Y(hi));ctx.stroke();
+    }
+    ctx.restore();
+    ctx.fillStyle='#fff';ctx.shadowColor='#fff';ctx.shadowBlur=8;
+    ctx.beginPath();ctx.arc(X(x1),Y(x2),7,0,7);ctx.fill();ctx.shadowBlur=0;
+    ctx.fillStyle='#cfe6ff';ctx.font='11px monospace';ctx.fillText('('+x1+','+x2+')',X(x1)+10,Y(x2)-8);
+  });
+  function render(){
+    flowCv.redraw();boundCv.redraw();
+    const w1=getW1(),w2=getW2(),b=getB(),z=w1*x1+w2*x2+b,y=sigmoid(z);
+    $('#neuronOut').innerHTML=
+      'input x = ['+x1+', '+x2+']  (white dot at right)\n'+
+      'z = w₁x₁ + w₂x₂ + b = ('+fmt(w1,1)+')('+x1+') + ('+fmt(w2,1)+')('+x2+') + ('+fmt(b,1)+')\n'+
+      '  = <span class="hl">'+fmt(z,3)+'</span>\n'+
+      'y = σ(z) = 1/(1+e^(−'+fmt(z,2)+')) = <span class="g">'+fmt(y,4)+'</span>  →  '+(y>=0.5?'<span class="g">YES</span>':'<span style="color:var(--red)">no</span>');
+  }
+  render();
+});
+
+/* 03 THE NORMAL DISTRIBUTION lab */
+window.__demos.push(function(){
+  const c=$('#normCanvas'); if(!c)return;
+  const host=$('#normSliders'); host.innerHTML='';
+  let bands=false;
+  const getMu=makeSlider(host,{id:'nMu',label:'μ (mean)',min:'-4',max:'4',step:'0.1',value:'0'},()=>render());
+  const getSig=makeSlider(host,{id:'nSig',label:'σ (sd)',min:'0.4',max:'3',step:'0.05',value:'1'},()=>render());
+  const xmin=-9,xmax=9,ymax=1.05;
+  const pdf=(x,mu,s)=>1/(s*Math.sqrt(2*Math.PI))*Math.exp(-Math.pow(x-mu,2)/(2*s*s));
+  const cv=setupCanvas(c,function(ctx,W,H){
+    const mu=getMu(),s=getSig(),pad=38;
+    const X=v=>pad+(v-xmin)/(xmax-xmin)*(W-2*pad), Y=v=>H-pad-(v/ymax)*(H-2*pad);
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='rgba(120,150,210,.25)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(pad,Y(0));ctx.lineTo(W-pad,Y(0));ctx.stroke();
+    ctx.fillStyle='#64759c';ctx.font='11px monospace';ctx.fillText('x',W-pad+4,Y(0)+4);
+    if(bands){
+      const colb=[['rgba(56,240,216,.18)',1],['rgba(155,140,255,.14)',2],['rgba(255,110,199,.10)',3]];
+      colb.slice().reverse().forEach(([col,k])=>{
+        ctx.fillStyle=col;ctx.beginPath();
+        const a=mu-k*s,b=mu+k*s;
+        ctx.moveTo(X(a),Y(0));
+        for(let xx=a;xx<=b;xx+=(b-a)/120){ctx.lineTo(X(xx),Y(pdf(xx,mu,s)));}
+        ctx.lineTo(X(b),Y(0));ctx.closePath();ctx.fill();
+      });
+    }
+    ctx.strokeStyle='#38f0d8';ctx.lineWidth=2.6;ctx.beginPath();let first=true;
+    for(let px=pad;px<=W-pad;px++){const xx=xmin+(px-pad)/(W-2*pad)*(xmax-xmin);const yy=Y(pdf(xx,mu,s));if(first){ctx.moveTo(px,yy);first=false;}else ctx.lineTo(px,yy);}
+    ctx.stroke();
+    ctx.strokeStyle='rgba(255,203,107,.6)';ctx.setLineDash([4,4]);ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.moveTo(X(mu),Y(0));ctx.lineTo(X(mu),Y(pdf(mu,mu,s)));ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#ffcb6b';ctx.beginPath();ctx.arc(X(mu),Y(pdf(mu,mu,s)),4,0,7);ctx.fill();
+    ctx.font='11px monospace';ctx.textAlign='center';ctx.fillText('μ='+fmt(mu,1),X(mu),Y(0)+16);
+    if(bands){
+      ctx.fillStyle='#9bb0d6';ctx.font='10px monospace';
+      ctx.fillText('68%',X(mu),Y(pdf(mu,mu,s)*0.45));
+    }
+    ctx.textAlign='left';
+  });
+  function render(){
+    cv.redraw();
+    const mu=getMu(),s=getSig(),peak=pdf(mu,mu,s);
+    $('#normOut').innerHTML=
+      'μ = '+fmt(mu,2)+'   σ = '+fmt(s,2)+'\n'+
+      'peak f(μ) = 1/(σ√(2π)) = 1/('+fmt(s,2)+'·'+fmt(Math.sqrt(2*Math.PI),3)+') = <span class="g">'+fmt(peak,4)+'</span>\n'+
+      'bands:  μ±σ ≈ 68%   μ±2σ ≈ 95%   μ±3σ ≈ 99.7%\n'+
+      '1σ range = ['+fmt(mu-s,2)+', '+fmt(mu+s,2)+']'+(bands?'   <span class="hl">(shaded)</span>':'');
+  }
+  $('#normBands').addEventListener('click',function(){bands=!bands;this.classList.toggle('active',bands);render();});
+  $('#normReset').addEventListener('click',()=>{
+    const mu=$('#nMu'),sg=$('#nSig');mu.value=0;sg.value=1;
+    mu.dispatchEvent(new Event('input'));sg.dispatchEvent(new Event('input'));
+  });
+  render();
+});
+
+/* boot */
+window.addEventListener('load',()=>{
+  runDemos(); initTheme(); initReveal(); initStory(); onScroll();
+  if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise();
+});
+</script>
+</body>
+</html>
