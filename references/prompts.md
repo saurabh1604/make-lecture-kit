@@ -2,8 +2,10 @@
 
 Ready-made prompts for **make-lecture-kit**. Copy one into your chat
 (Claude Code, Claude Cowork, or OpenAI Codex), swap in your topic, and go.
-Attach your lecture file (PDF or PPTX) whenever you have one — the kit gets
-much better when the assistant can read the real slides.
+Attach your lecture material whenever you have it — slides (PDF/PPTX), a session
+transcript (doc/docx/pdf/txt), or notes; the kit gets much better when the
+assistant can read the real material, and you can attach more than one at once
+(see prompt 9).
 
 ---
 
@@ -90,10 +92,36 @@ questions with complete solutions at the end of the companion.
 **When to use:** `scripts/lint.py` flagged problems in your lecture.html.
 
 ```text
-lint.py reported FAILs on my make-lecture-kit lecture page. Fix every
-FAIL — overflow, readability, math, interactivity, whatever it flags —
-and re-run python3 scripts/lint.py output/<my-topic>/lecture.html until
-it passes. Show me the final lint output.
+lint.py reported FAILs on my make-lecture-kit lecture page. For each FAIL,
+grep for the exact snippet it printed and fix just that block — don't
+rewrite the whole file. Re-run python3 scripts/lint.py
+output/<my-topic>/lecture.html until it passes. Show me the final lint
+output.
+```
+
+## 9. Multiple sources at once
+
+**When to use:** you have slides *and* something extra — a transcript of the
+session, or the instructor's own notes — and want both used.
+
+```text
+Use make-lecture-kit on the attached lecture slides. I'm also attaching
+the full session transcript (and instructor notes) — use the slides for
+structure and the definitive list of examples, and mine the transcript
+for extra explanations, asides, and examples the slides don't show. If
+they disagree on a fact or number, go with the slides and say so.
+```
+
+## 10. Quick mode
+
+**When to use:** you need something fast and don't need the full interactive
+lecture or the full polish layer.
+
+```text
+Use make-lecture-kit in quick mode: full coverage of every concept and
+every worked example, but keep it to one interaction per chapter in the
+interactive lecture and skip the signature-upgrades layer — I need this
+fast.
 ```
 
 ---

@@ -130,6 +130,9 @@ is also a red-list item (Section H).
 - [ ] Highlights/bolds the result of each step and the final answer.
 - [ ] Ends with a one-sentence "so what" tying the number to the intuition.
 - [ ] (HTML) If an interaction replays the example, the static steps and the interactive steps **agree**.
+- [ ] **Recomputed independently** from the stated inputs — redo the arithmetic fresh, don't just
+      re-read the derivation. The hand-waving linters catch skipped-step *phrasing*; only this catches a
+      wrong-but-fluent *number*.
 
 A single worked example with a skipped step fails category #6 below ship threshold.
 
@@ -180,7 +183,9 @@ A single worked example with a skipped step fails category #6 below ship thresho
 ## I. Ship checklist (final gate — tick all, then ship)
 
 - [ ] **Coverage:** every concept present, one section/chapter each, teaching order; every slide example
-      worked in full.
+      worked in full. `python3 scripts/check_coverage.py output/<slug>` clean against the `concepts.json`
+      manifest — this is a self-consistency check against your own plan, not a substitute for the eyeball
+      sweep below, since it can't see the original material.
 - [ ] **Spine:** all steps in every concept (incl. the opening one-liner), correct callout per step,
       ML/AI in every one.
 - [ ] **Opens by doing:** the first section/chapter hands over the central skill in miniature before any
@@ -195,6 +200,7 @@ A single worked example with a skipped step fails category #6 below ship thresho
 - [ ] **Math:** built step by step, every symbol named, wide math contained.
 - [ ] **Worked examples:** every one passes Section E.
 - [ ] **Interactivity (HTML):** every one passes Section F; 2+ per major concept.
+      `lint.py`'s `check_canvas_wiring` clean — every `<canvas id>` is referenced by a script.
 - [ ] **No-overflow contract:** every box in Section C ticked.
 - [ ] **Readability & flow:** hierarchy clean; hook opener; bridges between concepts; reads as one lecture.
 - [ ] **Self-contained (HTML):** Section G all green; opened, clicked every control, console clean.
@@ -239,7 +245,8 @@ and three equations overflow the page sideways on a 360px phone.
 
 1. **Coverage sweep first.** Put the deck beside the artifact. Tick each slide → its section. A single
    missing concept or unworked example is an instant fail; stop and send it back before scoring anything
-   else.
+   else. Run `python3 scripts/check_coverage.py output/<slug>` too — it catches a manifest/output mismatch
+   automatically, though it can't replace this eyeball sweep against the actual source material.
 2. **Walk one concept end to end.** Verify all 9 spine steps and the right callout per step. Read its worked
    example against Section E. This catches most spine and example defects in minutes.
 3. **Sample easy language (Section D).** Pick 5 random paragraphs. Long sentences and undefined jargon are

@@ -1,7 +1,8 @@
 # make-lecture-kit — turn any lecture into an easy, visual, interactive study kit
 
-Give it a lecture (slides, notes, or just a topic) and your AI assistant
-produces two things into an `output/` folder:
+Give it lecture material — slides, a full session transcript, notes, or just a
+topic, one of these or several together — and your AI assistant produces two
+things into an `output/` folder:
 
 - **`companion.pdf`** — a real, professionally typeset study companion in plain,
   easy English, with analogies and fully-worked examples (built with LaTeX +
@@ -100,19 +101,25 @@ work in `output/` is never touched.**
 
 ## Use
 
-Attach your lecture file (PDF/PPTX) if you have one — results are much better —
-then tell your assistant any of these (more in `references/prompts.md`):
+Attach your lecture material if you have it — slides (PDF/PPTX), a session
+transcript (doc/docx/pdf/txt), or notes; results are much better — then tell your
+assistant any of these (more in `references/prompts.md`):
 
 - "Use make-lecture-kit on this lecture PDF."
 - "Make a study PDF and a complete interactive lecture for **eigenvectors**."
 - "Explain **backpropagation** simply, with worked examples and an interactive lecture."
+
+You can attach more than one source at once — e.g. slides *and* a session
+transcript — and the assistant follows a documented rule for which one drives
+structure (the slides, or whichever is most structured) while the other fills in
+extra explanations and examples.
 
 You'll get a new folder `output/<topic>/` containing `companion.pdf` (the typeset
 study companion) and `lecture.html` (the complete interactive lecture), alongside
 the `companion.tex` source and the `figures/` used to build it.
 
 Behind the scenes, your assistant reads `SKILL.md` and follows its workflow
-(read the style references, expand every slide, work every example in full,
+(read the style references, expand every concept, work every example in full,
 build the page and the PDF, then run the quality gates). You don't do any of
 that — just give it a lecture.
 
@@ -137,14 +144,15 @@ make-lecture-kit/
 ├─ publish.sh                   instructors only: self-check, commit and push a release
 ├─ templates/
 │  ├─ companion.tex             LaTeX study-companion template (→ PDF)
-│  ├─ lecture.html              complete interactive lecture template
+│  ├─ lecture.html              lean interactive-lecture skeleton (chrome only)
 │  └─ assets/
 │     ├─ bits-logo.png          BITS Pilani logo (PDF banner + HTML sidebar; optional)
 │     └─ README.md              how to swap the logo (placement, base64 embed, fallback)
 ├─ references/
+│  ├─ cheatsheet.md             fast-start reference: the 7 rules + concept→recipe lookup
 │  ├─ plain_language.md         the easy-English rulebook (both linters enforce it)
 │  ├─ quality_rubric.md         the quality bar + ship checklist (both)
-│  ├─ companion_style.md        how to expand slides into the companion
+│  ├─ companion_style.md        how to expand lecture material into the companion
 │  ├─ lecture_style.md          how to build the complete interactive lecture
 │  ├─ intuition_playbook.md     analogies, mental models, ML/AI links
 │  ├─ prompts.md                copy-paste prompts for students
@@ -153,12 +161,16 @@ make-lecture-kit/
 │  ├─ figstyle.py               matplotlib house style + reusable plotters
 │  ├─ build_pdf.py              run figures + compile companion.tex → PDF
 │  ├─ _plain_language.py        shared word lists used by both linters
-│  ├─ lint.py                   lecture HTML quality gate (readability, no-overflow, keyless)
+│  ├─ lint.py                   lecture HTML quality gate (readability, no-overflow, keyless, canvas wiring)
 │  ├─ lint_tex.py               companion PDF-source language + layout gate
+│  ├─ check_coverage.py         concepts.json vs. shipped sections/worked-examples gate
 │  ├─ selfcheck.py              verify the whole kit is healthy
 │  └─ update.py                 pull the latest kit (keeps your output/)
 ├─ examples/
-│  ├─ sample_companion.tex      a finished example to show the quality bar
+│  ├─ sample_companion.tex      a finished example to show the PDF quality bar
+│  ├─ sample_lecture.html       a finished example to show the HTML quality bar
+│  ├─ sample_lecture_concepts.json    manifest matching sample_lecture.html
+│  ├─ sample_companion_concepts.json  manifest matching sample_companion.tex
 │  └─ figures/
 │     └─ example_normal_curve.py  copy-adaptable house-style figure script
 └─ output/                      your generated kits land here (the skill

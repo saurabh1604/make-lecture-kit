@@ -15,7 +15,9 @@ Checks (PASS / WARN / FAIL):
       - banned hand-waving ("it can be shown", "clearly", …) => FAIL;
       - fancy words / literary flourishes => WARN, many => FAIL;
       - Flesch reading-ease estimate => WARN if it reads hard.
-  * Layout / no-overflow (on raw TeX):
+  * Layout / no-overflow (on raw TeX; these five report a real line number so a
+    fix iteration can jump straight to the flagged block instead of rereading
+    the whole file):
       - worked-example steps that use a raw `enumerate` with a "Step" label
         (the label spills OUTSIDE the callout box) => FAIL; use `steps`.
       - wide `tabular` not wrapped in `\\resizebox`/`adjustbox` => WARN.
@@ -263,20 +265,40 @@ def _body(raw):
     return m.group(1) if m else raw
 
 
+def _body_with_start(raw):
+    """Like _body(), but also returns the body's character offset in `raw` so
+    callers can translate a match position inside the (comment-stripped) body
+    back into a real line number in the original file."""
+    m = re.search(r"\\begin\{document\}(.*?)\\end\{document\}", raw, re.DOTALL)
+    return (m.group(1), m.start(1)) if m else (raw, 0)
+
+
 def _strip_comments(s):
-    return re.sub(r"(?<!\\)%.*", "", s)
+    # Blank the comment text (same-length spaces), never delete it: deleting
+    # would shift every later character's offset, breaking line-number lookup
+    # against the original file. Comments never contain a newline themselves
+    # (the pattern stops at end-of-line), so this preserves line counts too.
+    return re.sub(r"(?<!\\)%.*", lambda m: " " * len(m.group(0)), s)
+
+
+def _line_no(raw, body_start, pos_in_body):
+    """1-indexed line number in `raw` for a position inside a
+    comment-stripped body string that started at `body_start` in `raw`."""
+    return raw.count("\n", 0, body_start + pos_in_body) + 1
 
 
 def check_step_lists(raw, report):
-    body = _strip_comments(_body(raw))
+    body_raw, body_start = _body_with_start(raw)
+    body = _strip_comments(body_raw)
     # A raw enumerate whose options mention "Step" — the label overflows the box.
-    bad = re.findall(r"\\begin\{enumerate\}\s*\[[^\]]*Step[^\]]*\]", body)
+    bad = list(re.finditer(r"\\begin\{enumerate\}\s*\[[^\]]*Step[^\]]*\]", body))
     if bad:
+        lines = ", ".join(str(_line_no(raw, body_start, m.start())) for m in bad[:8])
         report.failed(
             "worked-example steps",
             f"{len(bad)} worked example(s) use a raw enumerate with a 'Step' "
-            "label. The wide 'Step N.' label spills OUTSIDE the callout box. "
-            "Use the dedicated environment instead:\n"
+            f"label, at line(s) {lines}. The wide 'Step N.' label spills OUTSIDE "
+            "the callout box. Use the dedicated environment instead:\n"
             "  \\begin{steps} ... \\end{steps}")
     else:
         uses_steps = "\\begin{steps}" in body
@@ -288,7 +310,8 @@ def check_step_lists(raw, report):
 
 
 def check_wide_tables(raw, report):
-    src = _strip_comments(_body(raw))
+    body_raw, body_start = _body_with_start(raw)
+    src = _strip_comments(body_raw)
     risky = []
     for m in re.finditer(r"\\begin\{tabular\}\s*(\[[^\]]*\])?\s*\{([^}]*)\}", src):
         colspec = m.group(2)
@@ -299,30 +322,34 @@ def check_wide_tables(raw, report):
         wrapped = ("resizebox" in window or "adjustbox" in window
                    or "\\begin{adjustbox}" in window)
         if not wrapped:
-            risky.append(ncols)
+            risky.append((ncols, _line_no(raw, body_start, m.start())))
     if risky:
+        listing = ", ".join(f"line {ln} ({n} cols)" for n, ln in risky[:8])
         report.warned(
             "wide tables",
             f"{len(risky)} wide tabular(s) (≥5 cols) not wrapped in "
-            "\\resizebox/adjustbox — they may run off the page. Wrap with "
-            "\\resizebox{\\linewidth}{!}{…} or size columns to fit.")
+            f"\\resizebox/adjustbox — they may run off the page: {listing}. "
+            "Wrap with \\resizebox{\\linewidth}{!}{…} or size columns to fit.")
     else:
         report.passed("wide tables", "No unwrapped wide tables.")
 
 
 def check_long_display_math(raw, report):
+    body_raw, body_start = _body_with_start(raw)
+    src = _strip_comments(body_raw)
     long_disp = []
-    for m in re.finditer(r"\\\[(.*?)\\\]", _strip_comments(_body(raw)), flags=re.DOTALL):
+    for m in re.finditer(r"\\\[(.*?)\\\]", src, flags=re.DOTALL):
         inner = m.group(1)
         if "\\\\" in inner or "split" in inner or "aligned" in inner:
             continue  # already broken across lines
         if len(inner.strip()) > 140:
-            long_disp.append(len(inner.strip()))
+            long_disp.append((len(inner.strip()), _line_no(raw, body_start, m.start())))
     if long_disp:
+        listing = ", ".join(f"line {ln} ({n} chars)" for n, ln in long_disp[:8])
         report.warned(
             "display math width",
             f"{len(long_disp)} long single-line display equation(s) "
-            "(>140 chars) — may overflow the margin. Break with align/split.")
+            f"(>140 chars) — may overflow the margin: {listing}. Break with align/split.")
     else:
         report.passed("display math width", "No over-long single-line equations.")
 
@@ -368,12 +395,14 @@ def check_figure_coverage(raw, report):
 
 
 def check_placeholders(raw, report):
-    body = _body(raw)
-    # Strip comments so commented {{...}} scaffolding doesn't count.
-    visible = re.sub(r"(?<!\\)%.*", "", body)
-    left = re.findall(r"\{\{[^}]{0,60}\}\}", visible)
+    body_raw, body_start = _body_with_start(raw)
+    # Blank comments (not delete) so commented {{...}} scaffolding doesn't
+    # count, while keeping offsets valid for line-number lookup.
+    visible = _strip_comments(body_raw)
+    left = list(re.finditer(r"\{\{[^}]{0,60}\}\}", visible))
     if left:
-        sample = "; ".join(t[:40] for t in left[:5])
+        sample = "; ".join(f"line {_line_no(raw, body_start, m.start())}: {m.group(0)[:40]}"
+                            for m in left[:5])
         report.failed("placeholders",
                       f"{len(left)} visible {{{{placeholder}}}} token(s) would "
                       f"print literally: {sample}")
@@ -382,12 +411,15 @@ def check_placeholders(raw, report):
 
 
 def check_bbding_guard(raw, report):
-    if "\\usepackage{bbding}" in raw and "IfFileExists{bbding.sty}" not in raw:
+    m = re.search(r"\\usepackage\{bbding\}", raw)
+    if m and "IfFileExists{bbding.sty}" not in raw:
+        line = raw.count("\n", 0, m.start()) + 1
         report.warned(
             "bbding dependency",
-            "Hard \\usepackage{bbding} with no \\IfFileExists guard. bbding is "
-            "missing on some TeX installs (TinyTeX / some sandboxes) and would "
-            "abort the build. Guard it and fall back to pifont \\ding{43}/{46}.")
+            f"Hard \\usepackage{{bbding}} (line {line}) with no \\IfFileExists "
+            "guard. bbding is missing on some TeX installs (TinyTeX / some "
+            "sandboxes) and would abort the build. Guard it and fall back to "
+            "pifont \\ding{43}/{46}.")
     else:
         report.passed("bbding dependency", "No unguarded bbding dependency.")
 

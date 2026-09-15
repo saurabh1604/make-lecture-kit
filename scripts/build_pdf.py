@@ -34,7 +34,9 @@ unexpected errors are caught, reported, and turned into a non-fatal exit.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
+import json
 import os
 import re
 import shutil
@@ -143,12 +145,43 @@ def ensure_matplotlib() -> bool:
 # ---------------------------------------------------------------------------
 # Step 2 -- run every figure script so PNGs are written next to the .tex.
 # ---------------------------------------------------------------------------
-def render_figures(figdir: str, have_mpl: bool) -> None:
+def _figcache_path(figdir: str) -> str:
+    return os.path.join(figdir, ".figcache.json")
+
+
+def _load_figcache(figdir: str) -> dict:
+    try:
+        with open(_figcache_path(figdir), "r", encoding="utf-8") as fh:
+            return json.load(fh)
+    except (OSError, ValueError):
+        return {}
+
+
+def _save_figcache(figdir: str, cache: dict) -> None:
+    try:
+        with open(_figcache_path(figdir), "w", encoding="utf-8") as fh:
+            json.dump(cache, fh)
+    except OSError:
+        pass  # a cache-write failure must never fail the build
+
+
+def _script_hash(path: str) -> str:
+    return hashlib.sha256(open(path, "rb").read()).hexdigest()
+
+
+def render_figures(figdir: str, have_mpl: bool, changed_only: bool = False) -> None:
     """Execute every ``*.py`` in ``figdir`` so its PNG lands beside the .tex.
 
     Scripts run with ``figdir`` on ``sys.path`` (via PYTHONPATH) and with
     ``figdir`` as the working directory, so ``import figstyle`` resolves and a
     script that saves to ``os.path.dirname(__file__)`` writes into ``figdir``.
+
+    With ``changed_only=True``, a script whose content hash matches the last
+    successful run (cached in ``.figcache.json``) AND whose conventional
+    ``<stem>.png`` output already exists and is newer than the script is
+    skipped. Any script that doesn't follow that naming convention, or whose
+    hash/output doesn't match, is simply re-run -- safe by construction, never
+    a false skip.
     """
     if not os.path.isdir(figdir):
         warn(f"figure dir not found: {figdir} -- skipping figure render.")
@@ -166,19 +199,42 @@ def render_figures(figdir: str, have_mpl: bool) -> None:
         warn(f"skipping {len(scripts)} figure script(s): matplotlib unavailable.")
         return
 
-    # Put the figdir (and its parent, where figstyle.py may live) on the path.
+    cache = _load_figcache(figdir) if changed_only else {}
+
+    # Put the figdir, its parent, and this kit's own scripts/ (where
+    # figstyle.py actually lives) on the path -- a plain `import figstyle`
+    # from a real output/<slug>/figures/*.py script needs that last one; it
+    # is neither figdir nor figdir's parent for the documented directory
+    # layout, so it was previously never on PYTHONPATH at all.
     env = dict(os.environ)
     parent = os.path.dirname(os.path.abspath(figdir))
-    extra = os.pathsep.join([os.path.abspath(figdir), parent])
+    kit_scripts = os.path.dirname(os.path.abspath(__file__))
+    extra = os.pathsep.join([os.path.abspath(figdir), parent, kit_scripts])
     env["PYTHONPATH"] = (
         extra + os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else extra
     )
     env.setdefault("MPLBACKEND", "Agg")  # headless-safe even if a script forgets
 
-    info(f"rendering {len(scripts)} figure script(s) from {figdir} ...")
+    info(f"rendering {len(scripts)} figure script(s) from {figdir} ..."
+         + (" (--changed-only)" if changed_only else ""))
     ok = 0
+    skipped = 0
     for script in scripts:
         name = os.path.basename(script)
+        stem = os.path.splitext(name)[0]
+        png = os.path.join(figdir, stem + ".png")
+
+        if changed_only:
+            digest = _script_hash(script)
+            unchanged = cache.get(name) == digest
+            png_fresh = (os.path.isfile(png)
+                         and os.path.getmtime(png) >= os.path.getmtime(script))
+            if unchanged and png_fresh:
+                info(f"  {name} unchanged -- skipped (--changed-only)")
+                skipped += 1
+                ok += 1
+                continue
+
         try:
             proc = subprocess.run(
                 [sys.executable, os.path.abspath(script)],
@@ -192,6 +248,8 @@ def render_figures(figdir: str, have_mpl: bool) -> None:
             if proc.returncode == 0:
                 good(f"  {name}")
                 ok += 1
+                if changed_only:
+                    cache[name] = _script_hash(script)
             else:
                 warn(f"  {name} exited {proc.returncode}")
                 tail = "\n".join((proc.stdout or "").strip().splitlines()[-6:])
@@ -202,7 +260,11 @@ def render_figures(figdir: str, have_mpl: bool) -> None:
         except Exception as exc:  # never let one bad script kill the build
             warn(f"  {name} raised: {exc}")
 
-    info(f"figures rendered: {ok}/{len(scripts)} succeeded.")
+    if changed_only:
+        _save_figcache(figdir, cache)
+
+    suffix = f" ({skipped} unchanged, skipped)" if skipped else ""
+    info(f"figures rendered: {ok}/{len(scripts)} succeeded{suffix}.")
 
 
 # ---------------------------------------------------------------------------
@@ -428,6 +490,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "--out", default=None,
         help="output PDF path (default: output/<texstem>/companion.pdf)",
     )
+    parser.add_argument(
+        "--changed-only", action="store_true",
+        help="skip re-running a figure script whose content hash and output "
+             "PNG haven't changed since the last successful run (speeds up "
+             "prose-only rebuild iterations)",
+    )
     args = parser.parse_args(argv)
 
     texpath = os.path.abspath(args.tex)
@@ -452,14 +520,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         have_mpl = ensure_matplotlib()
 
         # Step 2
-        render_figures(figdir, have_mpl)
+        render_figures(figdir, have_mpl, changed_only=args.changed_only)
         # Some pipelines drop figure scripts right next to the .tex instead of
         # in a figures/ subfolder. Render those too, if the folders differ.
         if os.path.abspath(figdir) != os.path.abspath(texdir):
             sibling = [f for f in os.listdir(texdir)
                        if f.endswith(".py") and f != "figstyle.py"]
             if sibling:
-                render_figures(texdir, have_mpl)
+                render_figures(texdir, have_mpl, changed_only=args.changed_only)
 
         # Step 3 / Step 5
         engine = find_engine()

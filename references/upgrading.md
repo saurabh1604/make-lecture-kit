@@ -14,9 +14,11 @@ because the only tools involved are standard Python and LaTeX.
    ```bash
    python3 scripts/selfcheck.py
    ```
-   It must end in **PASS**: every script compiles, `figstyle` renders, both linters
-   run, the bundled example still passes, and all required files are present.
-3. **If you changed authoring behaviour, regenerate the example** (or any lecture in
+   It must end in **PASS**: every script compiles, `figstyle` renders, `lint.py` /
+   `lint_tex.py` / `check_coverage.py` all run, the bundled examples still pass, and
+   all required files are present.
+3. **If you changed authoring behaviour, regenerate the examples** (`examples/
+   sample_companion.tex` and/or `examples/sample_lecture.html`, or any lecture in
    `output/`) and eyeball the PDF + HTML.
 4. **Record it:** bump `VERSION` and add a dated entry to `CHANGELOG.md`.
 5. **Re-export the skill** (see SKILL.md → "Packaging & versioning").

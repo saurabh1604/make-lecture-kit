@@ -4,10 +4,11 @@ This is the build manual for the **interactive lecture HTML** — the touchable 
 The companion is the written study doc; this file is the **experience**: same lecture, same concepts, same
 depth, but every concept is also something the student can *drag*, *flip*, and *watch move*.
 
-> **The quality bar is one file: `nlp-lecture5-v2.html`.** Open it, scroll it top to bottom, click every ⚡
-> panel, run the guided tour, flip the theme. That page *is* the spec. This guide just teaches you to
-> reproduce its level on a new topic. When in doubt, do what `nlp-lecture5-v2.html` does. Read it before you
-> write a single tag.
+> **The quality bar is one file: `examples/sample_lecture.html`.** Open it, scroll it top to bottom, click
+> every ⚡ panel, run the guided tour, flip the theme. That page *is* the spec. This guide just teaches you
+> to reproduce its level on a new topic — a real lecture has many more chapters than this compact sample, but
+> every chapter follows the exact same spine and chrome. When in doubt, do what `examples/sample_lecture.html`
+> does. Read it before you write a single tag.
 
 The output is **ONE self-contained `.html`** that opens by double-click from `file://`. **The only external
 dependency is MathJax from cdnjs.** No Plotly, no D3, no Tailwind, no Google Fonts, no API keys, no backend.
@@ -22,13 +23,14 @@ then drag to rotate. Copy that block for any 3-D surface — still no chart/3-D 
 
 ## 0. Non-negotiable mindset
 
-- This is a **complete lecture**, NOT a one-concept "visualizer". `nlp-lecture5-v2.html` has **21 chapters**
-  (00–20) for one 60-minute deck. A real lecture is **~12–20 chapters**. If the deck has 15 concepts, the
-  page has 15 chapters grouped in the sidebar. **Drop nothing.**
+- This is a **complete lecture**, NOT a one-concept "visualizer". `examples/sample_lecture.html` ships
+  **5 sections** (an intro, 3 concept chapters, a summary) because it demos a compact 3-concept topic — a
+  real lecture is **~12–20 chapters**, one per concept, same spine and chrome throughout. If the deck has 15
+  concepts, the page has 15 chapters grouped in the sidebar. **Drop nothing.**
 - Every interaction must **uncover the intuition**. The test: *"What does the student understand after
   touching this that they didn't before?"* If the answer is "nothing, it just looks nice" — cut it. In the
-  gold standard, you flip XOR bits and *watch h₂ stay silent until both are on*; you crank η and *watch the
-  ball overshoot and diverge*. Move it → the idea changes.
+  shipped example, you crank η and *watch the ball overshoot and diverge*, or drag a neuron's weights and
+  *watch its decision line tilt*. Move it → the idea changes.
 - **Bespoke beats generic.** Do NOT reach for a chart library. Each concept gets its *own* hand-drawn
   canvas built for *that* idea: a neuron diagram whose edges thicken with weight, a softmax bar race, a loss
   bowl with a rolling ball, a sliding window over a sentence. A generic line plot teaches almost nothing.
@@ -55,21 +57,35 @@ then drag to rotate. Copy that block for any 3-D surface — still no chart/3-D 
 
 ---
 
-## 1. Read the deck → enumerate EVERY concept → one chapter each, grouped in the sidebar
+## 1. Read the material → enumerate EVERY concept → one chapter each, grouped in the sidebar
 
-The input is a terse slide deck: a title, an agenda, concept slides (bullets, a definition, maybe a formula,
-a one-line example). Your first action is **mechanical enumeration** — coverage before polish.
+The input is usually a terse slide deck (a title, an agenda, concept slides — bullets, a definition, maybe
+a formula, a one-line example), but may instead be a full session transcript (doc/docx/pdf/txt), instructor
+notes, a textbook excerpt, just a topic, or several of these together. When more than one source is given,
+follow the reconciliation rule in `companion_style.md` §1 step 0 (the deck/most-structured source drives
+chapter order and the definitive example list; a transcript/notes are mined for extra explanations and
+examples folded into the existing chapters). Your first action is **mechanical enumeration** — coverage
+before polish.
 
-1. List the **title** and **agenda** verbatim. The agenda is your chapter spine and your nav.
-2. Walk the deck slide by slide. Each distinct **concept** → exactly one chapter. Sub-bullets that define a
-   sub-idea become sub-sections (`<h3>`) *inside* that chapter, not new chapters.
+1. List the **title** and **agenda** (or, absent a deck, your own concept ordering) verbatim/derived. This
+   is your chapter spine and your nav.
+2. Walk the material slide by slide (or section by section). Each distinct **concept** → exactly one
+   chapter. Sub-bullets that define a sub-idea become sub-sections (`<h3>`) *inside* that chapter, not new
+   chapters.
 3. Order chapters in **teaching order**: the order that lets idea *N* lean on idea *N−1*. Prerequisites
    first. This is usually deck order; reorder when a later slide is a prerequisite for an earlier one.
-4. Record **every slide example.** Each one MUST be worked out in full in its chapter (§5).
-5. **Group the chapters into 4–6 named bands** in the sidebar, exactly like the gold standard. Its bands are
-   a model you can re-skin per topic:
+4. Record **every worked example** (from a slide, or worked live in a transcript). Each one MUST be worked
+   out in full in its chapter (§5).
+4b. **Save the manifest.** If you haven't already (via `companion_style.md` §1 step 5, when building both
+   artifacts from the same catalogue), write `output/<slug>/concepts.json`: a flat array of
+   `{"title": "...", "difficulty": "easy"|"hard", "n_examples": <int>}` objects, one per concept, in
+   teaching order. `scripts/check_coverage.py` (§11 gate) checks the finished HTML against this manifest.
+5. **Group the chapters into 4–6 named bands** in the sidebar. `examples/sample_lecture.html` uses a
+   simpler 3-band grouping for its compact demo — "Start here" / "Three core ideas" / "Wrap up". For a real
+   12–20-chapter lecture, use one band per teaching phase; the table below illustrates the idea for a
+   neural-network topic — re-skin the names per row for other subjects:
 
-   | Band (gold standard) | Holds | Re-skin idea for other topics |
+   | Band (illustrative) | Holds | Re-skin idea for other topics |
    |---|---|---|
    | **Foundations** | the atom + its parts (unit, activations, first worked example) | "Basics", "Setup", "The object" |
    | **The XOR Story** | the central puzzle that motivates everything | "The Problem", "The Story", "Motivation" |
@@ -88,7 +104,16 @@ a one-line example). Your first action is **mechanical enumeration** — coverag
    missed it. A 12–18-slide deck → **12–20 chapters** across 4–6 bands. Merging two slides that teach the
    *same* idea is fine. **Silently dropping one is not.**
 
-The sidebar markup mirrors the gold standard exactly — grouped, numbered, scroll-spy:
+### 1.1 Self-consistency checkpoint (8+ concepts)
+
+For lectures with 8 or more concepts: before starting each new chapter, re-skim the running nickname/
+story-world lexicon (`plain_language.md` §9) established so far — keep a running friendly→textbook note as
+you go — so terminology and the analogy world read as identical from chapter 1 to chapter N. Never silently
+rename a nickname partway through. `quality_rubric.md`'s ship checklist checks the *outcome* (lexicon
+consistency); this is the *process* step that actually prevents the drift.
+
+The sidebar markup follows this shape — grouped, numbered, scroll-spy (real markup for the same idea, at
+smaller scale, is in `examples/sample_lecture.html`'s `<nav class="toc">`):
 
 ```html
 <nav class="toc" id="toc">
@@ -108,7 +133,7 @@ The sidebar markup mirrors the gold standard exactly — grouped, numbered, scro
 
 Every chapter follows the **same spine**: a story arc from hook to bridge. Keep it identical across
 chapters so the page reads as one lecture; only the topic differs. Map each step to the component palette
-(the exact CSS classes that exist in `nlp-lecture5-v2.html`):
+(the exact CSS classes shipped in `examples/sample_lecture.html`):
 
 | # | Step | What it does | Component |
 |---|------|--------------|-----------|
@@ -121,7 +146,7 @@ chapters so the page reads as one lecture; only the topic differs. Map each step
 | 7 | **Pitfall / key insight** | the trap or the one big takeaway, in one sharp sentence. | `.key` (amber) |
 | 8 | **Bridge** | one line that hands off to the next chapter. | closing `<p>` or `.note` "Summary & bridge" |
 
-The component palette, verbatim from the gold standard — use these and only these:
+The component palette, verbatim from `examples/sample_lecture.html` — use these and only these:
 
 - **`.card`** — neutral container for setups, sub-points, side-by-side comparisons (often inside `.grid2`/`.grid3`).
 - **`.lab`** — the interactive block. It auto-renders an "⚡ INTERACTIVE" badge via `::before`. Every live
@@ -138,8 +163,9 @@ The component palette, verbatim from the gold standard — use these and only th
 - **`.kicker`** — the small cyan "01 · The building block" eyebrow above each `<h2>`.
 
 The interactive (step 5) is the thing that makes this the *lecture* and not the *PDF*. It can also be
-*woven into* steps 3–4 (a step-through that builds the derivation; a calculator that runs the example) — the
-gold standard's §03 worked example *is* a Next-button stepper.
+*woven into* steps 3–4 (a step-through that builds the derivation; a calculator that runs the example) —
+§5 below shows both a static worked example (Way A, what `examples/sample_lecture.html` uses throughout)
+and a Next-button stepper (Way B) for when a step-through adds more than a static block would.
 
 ---
 
@@ -157,13 +183,14 @@ plain teaching prose, then make it pass the gate.
   *about* not *approximately*, *show* not *demonstrate*. No literary flourishes.
 - **Never hand-wave** ("clearly", "obviously", "it can be shown", "left to the reader" are banned — `plain_language.md` §4).
 - Replace symbols-in-prose with words on first mention, then introduce the symbol: "the learning rate, written \(\eta\)".
-- Lead with the analogy; the gold standard calls a hidden neuron an *"at least one is on" detector* before it shows \(h_1=\text{ReLU}(x_1+x_2)\).
+- Lead with the analogy; e.g. call a hidden neuron an *"at least one is on" detector* before showing
+  \(h_1=\text{ReLU}(x_1+x_2)\) — name the plain-English behaviour, then the formula that produces it.
 - **Show, don't pile up prose** (`plain_language.md` §6): a comparison becomes a table; a
   pipeline becomes a labelled canvas; a sequence of stages becomes a short numbered list.
 - **Right-size** (`plain_language.md` §8): an easy slide line needs two or three plain
   sentences, not a paragraph. Expand for clarity, never for bulk.
 
-**Before / after** (the right column is the gold-standard register):
+**Before / after** (the right column is the target register):
 
 | Slide line (terse) | Lecture HTML (easy) |
 |---|---|
@@ -178,9 +205,9 @@ If a smart beginner with no prior exposure could not follow a paragraph cold, re
 
 ## 4. Building the math step by step (every symbol named, in `.eqbox`)
 
-Never drop a finished formula on the reader. Build it. The gold standard's §01 introduces the unit in two
-moves — first the weighted sum, then the activation — each in its own `.eqbox`, each preceded by a sentence
-naming the new symbols:
+Never drop a finished formula on the reader. Build it in moves — e.g. a neuron's formula splits into first
+the weighted sum, then the activation — each in its own `.eqbox`, each preceded by a sentence naming the
+new symbols (`examples/sample_lecture.html`'s "The Neuron" chapter does exactly this):
 
 ```html
 <h3>Step 1 — the weighted sum</h3>
@@ -196,8 +223,8 @@ Rules:
 - One display equation per `.eqbox`. Wide math (matrices, multi-step chains) scrolls horizontally *inside*
   the box — never the page.
 - Name each symbol the instant it appears: "where \(g\) is the hidden activation, applied *element-wise*."
-- Introduce notation explicitly when depth grows (the gold standard's §09 spends a whole `.card` defining
-  the `W[ℓ]`, `a[ℓ]`, `z[ℓ]`, `a[0]=x` convention before using it).
+- Introduce notation explicitly when depth grows — e.g. spend a whole `.card` defining a layered-network
+  convention (`W[ℓ]`, `a[ℓ]`, `z[ℓ]`, `a[0]=x`) before using it, if the lecture's notation gets that deep.
 - Inline math uses `\( \)`; display uses `$$ $$`. Both are configured in the MathJax block (§9).
 
 ---
@@ -205,16 +232,18 @@ Rules:
 ## 5. Writing a FULLY worked example in HTML (every step, real numbers)
 
 Every chapter has at least one worked example — the slide's own, computed end to end. **Zero "it can be
-shown that."** The gold standard does this two ways; use whichever fits.
+shown that."** There are two good ways to build one; use whichever fits.
 
 **Way A — a static, fully-shown calculation.** State the numbers up front, show every arithmetic step, bold
-the result of each step, end with a one-sentence "so what." The §03 sanity-check note is the model:
+the result of each step, end with a one-sentence "so what." A sanity-check note like this is the model
+(`examples/sample_lecture.html`'s worked examples all use this pattern):
 
 > the dot product \(0.2(0.5)+0.3(0.6)+0.9(0.1)=0.1+0.18+0.09=0.37\). Add the bias \(0.5\) to get \(z=0.87\),
 > and \(\sigma(0.87)\approx0.7045\) — a confident-ish "yes."
 
-**Way B — a Next-button stepper that reveals one step at a time** (this is what §03 actually ships). Pre-write
-the steps in an array; reveal up to `i`; the static steps and any live demo must agree on the same numbers.
+**Way B — a Next-button stepper that reveals one step at a time.** Pre-write the steps in an array; reveal
+up to `i`; the static steps and any live demo must agree on the same numbers — the code sample below shows
+the pattern.
 
 ```html
 <div class="card">
@@ -249,20 +278,27 @@ The `.readout` uses `\n` newlines (its CSS is `white-space:pre-wrap`), `<span cl
 numbers (amber) and `<span class="g">` for final answers (green). Mirror the worked numbers in the chapter's
 bespoke interactive so the student can change them and watch the same arithmetic update.
 
+**Before shipping, recompute every hand-typed number** (Way A's prose, and Way B's pre-written `steps[]`
+strings) independently from the stated inputs and confirm it matches what a fresh calculation gives — don't
+just trust that it reads plausibly. Way B's *displayed* running numbers (`dot`, `z`, `y` above) are
+computed live by the same code that drives the demo, so they self-correct as long as the formula is right;
+the pre-written narration strings around them are still hand-typed text and need the same manual recheck.
+
 ---
 
 ## 6. BESPOKE CANVAS RECIPES — the heart of the quality
 
 This is what separates a gold-standard page from a deck of widgets. **Every visual is a plain 2D
-`<canvas>`, hand-drawn, built for its one idea.** No chart library. The patterns below are lifted from
-`nlp-lecture5-v2.html`; copy and adapt them.
+`<canvas>`, hand-drawn, built for its one idea.** No chart library. The patterns below are lifted from real,
+shipped canvases in `examples/sample_lecture.html`; copy and adapt them — this page uses several of them
+(Recipes A, D, and H) and the rest generalize the same way to their own concept types.
 
 ### 6.0 The DPR-aware canvas + draw-loop skeleton (use for ALL of them)
 
 Three universal rules: (a) set the backing store to `cssWidth × devicePixelRatio` so lines are crisp on
 retina; (b) keep ALL drawing inside one `draw(state)` function; (c) call `draw()` once on init and again on
-every input. The gold standard registers each demo in a global `window.__demos` array and runs them all on
-load (§8), so a demo that fails to find its canvas just returns and never throws.
+every input. Register each demo in a global `window.__demos` array and run them all on load (§8) — see
+`examples/sample_lecture.html` — so a demo that fails to find its canvas just returns and never throws.
 
 ```js
 /* a tiny DPR helper — call once per canvas, and again on resize */
@@ -278,11 +314,11 @@ function fitCanvas(c){
 }
 ```
 
-> The gold standard takes the simpler route — it sets a large `width="880"` attribute plus
-> `style="width:100%;height:auto"`, letting the browser downscale (already crisp on most screens). The
-> `fitCanvas` helper above is the fully DPR-correct version; prefer it for anything with thin 1px lines or
-> small text. **Every canvas keeps `style="max-width:100%"` (or `width:100%`) so it never causes horizontal
-> overflow**, and re-reads its size on `resize` if you use `fitCanvas`.
+> `examples/sample_lecture.html` ships the fully DPR-correct version already, as `setupCanvas(canvas,
+> drawFn)`: it reads `getBoundingClientRect()`, scales the backing store by `devicePixelRatio`, and
+> re-invokes `drawFn` on resize. Prefer this over a static `width` attribute for anything with thin 1px
+> lines or small text — copy `setupCanvas` wholesale. **Every canvas keeps `style="max-width:100%"` (or
+> `width:100%;height:auto"`) so it never causes horizontal overflow.**
 
 The skeleton every demo follows:
 
@@ -311,7 +347,8 @@ const PY=v=>H-pad-v*(H-2*pad);        // data y∈[0,1] → pixel y (note the fl
 *For: activation functions, loss curves, any \(y=f(x)\).* Draw the axes, sweep `x` pixel-by-pixel to trace
 the curve, then drop a marker at the selected `x` and print \(f(x)\). Wire a slider **and** pointer-move so
 the student can scrub it. *Uncovers:* the exact value and slope at a point — e.g. that ReLU's derivative is
-flat 1 for \(z>0\) while sigmoid's slope dies. (Gold standard: §02 activation plotter, §15 loss bowl.)
+flat 1 for \(z>0\) while sigmoid's slope dies. (An animated version of this pattern is
+`examples/sample_lecture.html`'s gradient-descent ball-on-a-curve lab.)
 
 ```js
 function curve(f){
@@ -342,7 +379,7 @@ a breadcrumb trail, and (at high η) overshoot or diverge.
 *For: a neuron diagram, a forward pass, any "arrows carry numbers".* Draw nodes as filled+stroked circles
 at fixed positions; draw edges as lines whose **color encodes sign** (cyan positive, pink negative) and
 **width encodes magnitude**. Label each edge with its weight. *Uncovers:* a weighted sum is literally
-"arrows of different strengths feeding a node." (Gold standard: §01 neuron, §06 XOR network, §14 forward/backward.)
+"arrows of different strengths feeding a node."
 
 ```js
 function edge(a,b,wt){
@@ -368,8 +405,9 @@ For a **forward pass** the same canvas can light edges/nodes as activation flows
 ### Recipe C — a small network of nodes that light up (animated or staged)
 *For: hero banners, "which layers are active", forward-then-backward.* Same node/edge primitives as B, but
 either (i) animated with `requestAnimationFrame` and a phase `t` so connections pulse and nodes breathe
-(gold standard hero), or (ii) staged by a Next button so each press lights the next layer / reverses the
-arrows for the backward pass (§14). *Uncovers:* the directional, layered flow of computation.
+(`examples/sample_lecture.html`'s hero canvas does a simpler version of this pulse-and-breathe pattern), or
+(ii) staged by a Next button so each press lights the next layer / reverses the arrows for a backward pass.
+*Uncovers:* the directional, layered flow of computation.
 
 ```js
 let t=0;
@@ -386,7 +424,8 @@ frame();
 *For: softmax, a Gaussian, any "scores → shape".* Read the slider values into an array, compute the derived
 quantity (probabilities, densities), and draw bars/curve from it. Print the full computation to the
 `.readout` so the numbers and the picture agree. *Uncovers:* how raising one input "steals" mass from the
-others, and that the parts always sum to 1. (Gold standard: §08 softmax calculator.)
+others, and that the parts always sum to 1. (`examples/sample_lecture.html`'s "Reshape the bell" lab is the
+same pattern for a Normal distribution's \(\mu,\sigma\) sliders.)
 
 ```js
 const z = init.map((_,i)=>parseFloat($('#sm'+i).value));   // slider logits
@@ -407,8 +446,8 @@ $('#smOut').innerHTML =
 *For: decision boundaries, separable-vs-not, "which region is class 1".* Buttons in a `.chips` row switch
 `mode`; `draw()` re-shades the plane by sampling a grid of pixels and coloring each by the model's
 prediction, then overlays the boundary line(s). *Uncovers:* "this model carves the space *like this*" — e.g.
-one straight cut (logistic regression) vs. a bent region (a 2-layer net). (Gold standard: §05 perceptron
-line, §07 LR-vs-MLP.)
+one straight cut (logistic regression) vs. a bent region (a 2-layer net).
+(`examples/sample_lecture.html`'s neuron decision-boundary lab shades exactly this way.)
 
 ```js
 const step=11;                                   // coarse grid = cheap shading
@@ -422,15 +461,15 @@ for(let px=pad; px<W-pad; px+=step)
 ctx.strokeStyle='#ffcb6b'; ctx.lineWidth=2.4;
 ctx.beginPath(); ctx.moveTo(PX(0.5),PY(0)); ctx.lineTo(PX(0.5),PY(1)); ctx.stroke();
 ```
-A **draggable line** variant (§05): three sliders set \(w_1,w_2,b\); redraw the line
-\(w_1x_1+w_2x_2+b=0\) and count how many of the four points are classified right — letting the student *feel*
-that no line ever gets XOR past 3/4.
+A **draggable line** variant: three sliders set \(w_1,w_2,b\); redraw the line \(w_1x_1+w_2x_2+b=0\) — for a
+lecture whose central puzzle is "can one straight cut ever solve this?", also count how many of a fixed set
+of labelled points are classified right, letting the student *feel* when no single line ever gets them all.
 
 ### Recipe F — clickable cells / switches / tokens (non-canvas, still bespoke)
-Some ideas read better as styled DOM than as canvas: the XOR bit-switches (§06), the sliding-window sentence
-(§13), the truth tables. These are still bespoke interactives — clickable `.bitsw` switches, a row of
-`<span>`s that recolor as the window slides, a `<table>` whose current row gets `.cur`. Drive them the same
-way: a `render(state)` that rewrites the DOM and a `.readout` that prints the computation.
+Some ideas read better as styled DOM than as canvas: bit-switches for a logic puzzle, a sliding window over
+a tagged sentence, a truth table. These are still bespoke interactives — clickable `.bitsw` switches, a row
+of `<span>`s that recolor as the window slides, a `<table>` whose current row gets `.cur`. Drive them the
+same way: a `render(state)` that rewrites the DOM and a `.readout` that prints the computation.
 
 ### Recipe G — a clickable "big-picture" journey map (canvas navigation)
 *For: the overview up top.* Lay the lecture's bands as numbered nodes along a downhill path; hover
@@ -465,7 +504,7 @@ window.__demos.push(function(){
 *For: any `z=f(x,y)` surface — a loss landscape, a 2-var function, a probability or attention surface, in any subject — and especially the "local minima — the start matters" idea.* Sample
 `z=f(x,y)`, project each point by azimuth+elevation, depth-sort the quads (painter's algorithm), colour by
 height, then **drag to rotate** — all with the 2-D canvas API (the `bowlCanvas` block in
-`templates/lecture.html` is the full projector). The teaching win is to ship **two** surfaces behind a
+`examples/sample_lecture.html` is the full projector). The teaching win is to ship **two** surfaces behind a
 toggle: a **convex** bowl (one minimum) and a **non-convex** one with **two valleys**, plus two start
 presets so nearly identical starts roll into *different* valleys. *Uncovers:* why initialisation matters and
 what a "local minimum" really is. Only `f`, its gradient, and the markers change between modes:
@@ -543,7 +582,7 @@ buttons mutate state and redraw.
 
 ## 7. The chrome: sidebar scroll-spy TOC, progress bar, MathJax, theme toggle, guided tour
 
-All of this exists, working, in `nlp-lecture5-v2.html`. Copy it. Don't reinvent it.
+All of this exists, working, in `examples/sample_lecture.html`. Copy it. Don't reinvent it.
 
 ### 7.1 Layout shell + sidebar
 A CSS grid `grid-template-columns:288px 1fr`. The sidebar is `position:sticky; top:0; height:100vh;
@@ -586,10 +625,9 @@ window.addEventListener('load',()=>{
   if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();   // typeset AFTER demos build DOM
 });
 ```
-> Note: the new `templates/lecture.html` sets `startup:{typeset:true}` because it has no DOM-injected math.
-> If any chapter injects math into the page from JS, use `typeset:false` + a manual `typesetPromise()` as
-> above (the gold-standard pattern), and re-typeset only the changed node after dynamic updates:
-> `MathJax.typesetPromise([node])`.
+> `templates/lecture.html` and `examples/sample_lecture.html` both use this exact `typeset:false` +
+> manual-`typesetPromise()` pattern — copy it as-is. If a chapter injects math into the page from JS,
+> re-typeset only the changed node after the update: `MathJax.typesetPromise([node])`.
 
 **The zero-dependency option — skip MathJax when the notation is one-dimensional.** First scan the
 lecture's actual notation. If it never rises above subscripts/superscripts, simple inline fractions, and
@@ -626,8 +664,8 @@ only** — interactive consoles, `.lab` panels, and `.eqbox` plates stay dark so
 A `STORY[]` array — one `{id, t, x}` per chapter — drives a bottom "story card" with prev/play/next/exit and
 a spotlight that scrolls to and rings each section's heading. Auto-advances on a timer; arrow keys and space
 also drive it. Lift `STORY`, `startStory/endStory/nextStory/prevStory/togglePlay`, and the `.storycard` /
-`.spot` markup straight from the gold standard, and write **one story line per chapter** in the same warm,
-"here's what to try" voice:
+`.spot` markup straight from `examples/sample_lecture.html`, and write **one story line per chapter** in the
+same warm, "here's what to try" voice:
 
 ```js
 const STORY=[
@@ -638,8 +676,9 @@ const STORY=[
 ```
 
 ### 7.6 Scroll-reveal (optional)
-An `IntersectionObserver` fades `.reveal` elements in. **Critical caveat from the gold standard:** never put
-`.reveal` (opacity/transform) on anything containing a `<canvas>` — promoting the canvas to its own layer can
+An `IntersectionObserver` fades `.reveal` elements in. **Critical caveat** (this is exactly why
+`examples/sample_lecture.html`'s own `initReveal()` explicitly skips them): never put `.reveal`
+(opacity/transform) on anything containing a `<canvas>` — promoting the canvas to its own layer can
 freeze/blank the demo. Skip `.lab` blocks and any element holding a canvas.
 
 ---
@@ -647,7 +686,9 @@ freeze/blank the demo. Skip `.lab` blocks and any element holding a canvas.
 ## 8. The script architecture (demo registry + shared helpers)
 
 Define shared helpers **once**, before any demo uses them (cleanliness rule: every helper defined before
-use). The gold standard's header block:
+use). `examples/sample_lecture.html`'s header block (`$`, `$$`, `clamp`, `fmt`, `sigmoid`, plus
+`window.__demos`/`runDemos`) is exactly this pattern — add whatever else your topic's math needs (e.g.
+`relu`, a softmax, a derivative) alongside it:
 
 ```js
 const $=(s,r=document)=>r.querySelector(s);
@@ -655,23 +696,21 @@ const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const fmt=(x,d=3)=>{ if(Math.abs(x)<1e-9)x=0; return x.toFixed(d); };
 const sigmoid=z=>1/(1+Math.exp(-z));
-const relu=z=>Math.max(0,z);
-const dsig=z=>{const s=sigmoid(z);return s*(1-s);};
-/* ...whatever math your topic needs... */
+/* ...whatever else your topic needs... */
 
 window.__demos=[];                                  // every chapter pushes its init here
 function runDemos(){ window.__demos.forEach(f=>{ try{f();}catch(e){console.error(e);} }); }
 ```
 Each chapter's demo is a self-contained `window.__demos.push(function(){ ... })` that bails (`if(!c)return`)
 when its canvas is absent — so a missing chapter never throws and the page degrades gracefully. `runDemos()`
-fires on `load` (§7.3). This registry pattern is why the gold standard has 20+ independent interactives in
-one file with zero cross-talk.
+fires on `load` (§7.3). This registry pattern is what lets a real 12–20-chapter lecture pack that many
+independent interactives into one file with zero cross-talk.
 
 ---
 
 ## 9. House idiom — the exact tokens (the gold-standard palette)
 
-This is the rich dark theme of `nlp-lecture5-v2.html` — **not** the older Slate palette. Put these in
+This is the rich dark theme of `examples/sample_lecture.html` — **not** the older Slate palette. Put these in
 `:root`:
 
 ```css
@@ -692,7 +731,7 @@ This is the rich dark theme of `nlp-lecture5-v2.html` — **not** the older Slat
   **loaded from the OS, no Google Fonts fetch.** Keeps the file truly self-contained.
 - **Component CSS** (`.card`, `.lab` + its ⚡ badge, `.note`, `.key`, `.eqbox`, `.readout`, `.ctrl` with the
   glowing thumb, `.btn`, `.chips`, `.grid2/3`, `.toc`, `.progress`, `.topbtn`, `.storycard`, `.spot`) is all
-  in the gold standard's `<style>`. **Copy that stylesheet wholesale** and re-theme only if the topic
+  in `examples/sample_lecture.html`'s `<style>`. **Copy that stylesheet wholesale** and re-theme only if the topic
   genuinely needs it. The slider thumb glow, the ⚡ badge, the `.readout` console, and the `[data-theme=light]`
   overrides are load-bearing — don't drop them.
 
@@ -745,6 +784,13 @@ syntax.** Two cheap ways:
   main `<script>`; fire the saved `load` handler so `runDemos()` runs; then assert no `console.error` fired.
   A ~60-line Node script does this and catches exactly the class of bug above.
 
+`scripts/lint.py`'s `check_canvas_wiring` catches the shallower, always-available version of this class of
+bug (a `<canvas id>` no script ever references — "wired to nothing") on every platform, no Node required.
+It cannot catch the deeper "wired up but throws" bug above — only actually *executing* the JS can. The Node
+harness is therefore an optional, manual, deeper check for when your environment has Node — it is
+deliberately **not** wired into `scripts/selfcheck.py` or the required gate list, because requiring it would
+add a toolchain dependency this kit can't guarantee on every agent sandbox.
+
 ```js
 // harness.js (sketch): node harness.js lecture.html  ->  "ALL DEMOS RAN WITH NO ERRORS"
 const errs=[]; console.error=(...a)=>errs.push(a.join(' '));
@@ -773,6 +819,9 @@ Tick every box; any red-list item is an automatic fail regardless of polish. The
 
 - [ ] **Coverage:** every concept/slide from the deck has its own chapter, in teaching order, grouped into
       4–6 named sidebar bands. ~12–20 chapters for a real lecture. **Nothing dropped.**
+      `python3 scripts/check_coverage.py output/<slug>` clean against `concepts.json` (§1 step 4b).
+- [ ] **Canvas wiring:** `python3 scripts/lint.py output/<slug>/lecture.html` clean, including the
+      `check_canvas_wiring` gate — every `<canvas id>` is actually referenced by a script.
 - [ ] **Opens by doing:** chapter 1 puts the central skill in the student's hands in miniature before any
       definitions, then names what they just did. No agenda-first opening.
 - [ ] **Headlines + one-liners:** every chapter title states its claim in plain words; every `.lead` opens
@@ -810,8 +859,8 @@ Tick every box; any red-list item is an automatic fail regardless of polish. The
       Every other visual hand-drawn on canvas. No Plotly/D3/Tailwind/Google-Fonts/keys/fetch.
 
 Coverage, worked-example completeness, and bespoke-revealing interactives are the three that fail most
-often — verify them first. **And before you call it done: open `nlp-lecture5-v2.html` beside your page. If
-yours feels thinner, it is. Go back.**
+often — verify them first. **And before you call it done: open `examples/sample_lecture.html` beside your
+page. If yours feels thinner, it is. Go back.**
 
 ---
 

@@ -1,0 +1,5 @@
+[
+  {"title": "Gradient Descent", "difficulty": "hard", "n_examples": 1},
+  {"title": "The Neuron", "difficulty": "hard", "n_examples": 1},
+  {"title": "The Normal Distribution", "difficulty": "easy", "n_examples": 1}
+]

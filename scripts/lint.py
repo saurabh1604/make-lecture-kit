@@ -13,6 +13,11 @@ Checks (each reported as PASS / WARN / FAIL):
   * No leaked secrets (sk-ant-, AKIA..., api_key, Authorization: Bearer).
   * Interactivity present (addEventListener / oninput / onclick, ideally a
     drawing/plotting lib). A lecture page with zero interactions FAILS.
+  * Canvas wiring: every <canvas id> must be referenced by some <script> (by
+    id, or via the template's $('#id') helper) — an unreferenced canvas can
+    never draw anything => FAIL. (Cannot catch a canvas that IS wired up but
+    throws at runtime or draws nothing when run — see lecture_style.md §10.1
+    for the optional, deeper Node-execution check for that.)
   * Overflow guards present (overflow-wrap / word-break / table-layout:fixed /
     a .math-scroll wrapper).
   * Readability heuristic: visible sentences longer than ~28 words are flagged;
@@ -121,6 +126,7 @@ class DocParser(HTMLParser):
         self.has_mathjax_tag = False   # a <script src=...mathjax...> tag
         self.event_attrs = []          # inline on* handler names found
         self.canvas = False
+        self.canvas_ids = []            # id= of every <canvas>, "" if none
         self.svg = False
         # Visible-prose collection.
         self._suppress_depth = 0       # >0 while inside a non-prose tag
@@ -161,6 +167,7 @@ class DocParser(HTMLParser):
 
         if tag == "canvas":
             self.canvas = True
+            self.canvas_ids.append(attrd.get("id") or "")
         if tag == "svg":
             self.svg = True
 
@@ -376,6 +383,64 @@ def check_interactivity(raw, parser, report):
             "interactivity",
             "No interactions found (no addEventListener / oninput / onclick). "
             "A lecture/visualizer page must have >=1 working interaction.",
+        )
+
+
+def check_canvas_wiring(raw, parser, report):
+    """Static check: is every <canvas id> actually referenced by a script?
+
+    Catches "declared a canvas, never wired it up" — the shallow, always-
+    available half of the class of bug lecture_style.md §10.1 documents. It
+    cannot catch a demo that IS wired up but throws at runtime, or draws
+    nothing despite running cleanly — only actually executing the JS (the
+    optional Node harness in §10.1) can catch that deeper half.
+    """
+    script_text = "\n".join(re.findall(r"<script\b[^>]*>(.*?)</script>", raw,
+                                        re.DOTALL | re.IGNORECASE))
+    unwired = []
+    for cid in parser.canvas_ids:
+        if not cid:
+            continue
+        referenced = (
+            f"'#{cid}'" in script_text or f'"#{cid}"' in script_text
+            or f"#{cid}`" in script_text
+            or re.search(r"getElementById\(\s*['\"]" + re.escape(cid) + r"['\"]\s*\)",
+                         script_text)
+        )
+        if not referenced:
+            unwired.append(cid)
+
+    if unwired:
+        report.failed(
+            "canvas wiring",
+            f"{len(unwired)} <canvas id> never referenced by any script: "
+            + ", ".join(unwired) + " — this lab cannot draw anything.",
+        )
+    elif parser.canvas_ids:
+        report.passed(
+            "canvas wiring",
+            f"All {len(parser.canvas_ids)} canvas(es) are referenced by a script.",
+        )
+    else:
+        report.passed("canvas wiring", "No <canvas> elements to check.")
+
+    # Approximate WARN: a .lab block with neither a canvas nor a range/button
+    # control reads as decorative — flag it, but this is a text-window
+    # heuristic, not real DOM scoping, so it stays a WARN, never a FAIL.
+    lab_starts = [m.start() for m in re.finditer(r'class="[^"]*\blab\b[^"]*"', raw)]
+    empty_labs = 0
+    for i, start in enumerate(lab_starts):
+        end = lab_starts[i + 1] if i + 1 < len(lab_starts) else min(start + 1500, len(raw))
+        window = raw[start:end]
+        if not re.search(r"<canvas\b", window) and not re.search(
+            r'<input\b[^>]*type=["\']range["\']|<button\b', window
+        ):
+            empty_labs += 1
+    if empty_labs:
+        report.warned(
+            "lab content",
+            f"{empty_labs} .lab block(s) appear to have neither a canvas nor a "
+            "slider/button control — looks decorative. (Heuristic scan; verify by eye.)",
         )
 
 
@@ -632,6 +697,7 @@ def lint_file(path):
     check_cdn_allowlist(parser, report)
     check_secrets(raw, report)
     check_interactivity(raw, parser, report)
+    check_canvas_wiring(raw, parser, report)
     check_overflow_guards(raw, report)
     check_readability(parser, report)
     check_plain_words(parser, report)
