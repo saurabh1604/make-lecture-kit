@@ -1,28 +1,25 @@
 % =============================================================================
-%  ISM COMPANION READER  —  LaTeX template  (gold-standard faithful)
+%  STUDY COMPANION  —  LaTeX template  (generic, unbranded)
 % =============================================================================
-%  Reproduces Saurabh's hand-made companion PDF:
-%    * fancyhdr running header ("ISM Companion" | "Session N · <Title>") + rule
-%    * full-width DARK NAVY title banner (label / big title / subtitle / meta)
-%    * numbered, sans, navy section headings with a rule beneath (titlesec)
-%    * FIVE pill-tab tcolorbox callouts: intuition / everyday / worked /
-%      watchout / keytake — each a rounded pill title tab on the top-left edge,
-%      a leading glyph, a thin colour frame, and a very light tint fill.
-%    * \housefig{path}{caption} for full-width matplotlib PNG figures.
+%  Works for ANY input: a topic, a list of topics, notes, a book chapter, a PDF
+%  or a slide deck. Nothing here assumes slides exist.
 %
-%  BUILD:   pdflatex companion.tex && pdflatex companion.tex
-%           (run twice so the table of contents / hyperref refs settle)
+%  THE LOOK (v3.1 "quiet" design): one ink colour + ONE accent colour. Calm,
+%  editorial, lots of white space. No coloured fills, no rainbow of boxes.
+%    * running header: series name (left) | topic title (right), small, grey
+%    * title block: small accent label, large ink title, grey subtitle, hairline
+%    * numbered sans section headings; the number in the accent colour
+%    * SIX callouts, all the SAME shape: a thin accent rule on the left and a
+%      small uppercase label. They differ by label, not by colour. Only the
+%      worked example gets a faint grey wash, so it reads as "the work area".
+%    * \housefig{path}{caption}: every figure the same width, caption below
 %
-%  KEYLESS / OFFLINE: no network, no secrets. Real companions drop matplotlib
-%  PNGs in via \housefig; this template's specimen uses an inline tikzpicture
-%  so the FILE ALONE compiles to a sensible PDF with no PNG present yet.
+%  BUILD:   python3 scripts/build_pdf.py output/<slug>/companion.tex
 %
-%  HOST AGENT: replace every {{PLACEHOLDER}}. The placeholders that drive the
-%  running header live in the three \newcommand lines just below \begin{document}
-%  is set up in the preamble (see \CourseShort / \SessionLine / \LectureTitle).
-%  One specimen section ("Bernoulli: the atom of randomness") is fully written,
-%  using the callouts (incl. the new waitwhat) + a fully worked example, so the template renders
-%  meaningfully. Duplicate its structure per slide-concept, then delete it.
+%  HOST AGENT: replace every {{PLACEHOLDER}}. The running header is driven by
+%  two macros in the preamble (\SeriesName / \TopicTitle).
+%  One specimen section is fully written so the template renders meaningfully.
+%  Duplicate its structure per concept, then delete it.
 % =============================================================================
 
 \documentclass[a4paper,11pt]{article}
@@ -30,11 +27,16 @@
 % ---- Encoding & fonts -------------------------------------------------------
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern}
+% Palatino text + matching math when available (ships with TeX Live's psnfss);
+% falls back to Latin Modern on minimal installs. Helvetica for headings.
+\IfFileExists{mathpazo.sty}{\usepackage[sc]{mathpazo}\linespread{1.06}}{\usepackage{lmodern}}
+\IfFileExists{helvet.sty}{\usepackage[scaled=0.9]{helvet}}{}
+\renewcommand{\ttdefault}{lmtt}     % Latin Modern mono: scalable, always present
 \usepackage{microtype}              % protrusion/kerning -> fewer overfull boxes
 
-% ---- Geometry (~1in margins) ------------------------------------------------
-\usepackage[a4paper,margin=1in,headheight=15pt,headsep=14pt]{geometry}
+% ---- Geometry ---------------------------------------------------------------
+\usepackage[a4paper,top=26mm,bottom=26mm,left=27mm,right=27mm,
+            headheight=14pt,headsep=12mm,footskip=12mm]{geometry}
 
 % ---- Math -------------------------------------------------------------------
 \usepackage{amsmath,amssymb}
@@ -42,50 +44,37 @@
 % ---- Graphics, tables, colour ----------------------------------------------
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{array}
 \usepackage[table,svgnames]{xcolor}
+\usepackage{caption}
+\usepackage{float}
+\usepackage[section]{placeins}      % figures never drift into the next section
+\usepackage{needspace}
 
-% ---- Callout boxes (breakable pill-tab tcolorboxes) -------------------------
+% ---- Callout boxes ------------------------------------------------------------
 \usepackage[most]{tcolorbox}
 \tcbuselibrary{skins,breakable}
 
-% ---- Tikz (ONLY for the specimen's inline PMF; real figs use \housefig) -----
+% ---- Tikz (ONLY for the specimen's inline sketch; real figs use \housefig) --
 \usepackage{tikz}
 
-% ---- Callout glyphs (robust + cross-platform) -------------------------------
-% pifont ALWAYS ships with TeX Live and gives crisp dingbats: ✗ (\ding{55}),
-% ✓ (\ding{51}), the pointing hand (\ding{43}) and the pencil (\ding{46}).
-% bbding's \Pointinghand / \Pencil look a touch nicer, but bbding is MISSING on
-% some minimal installs (TinyTeX, and several Codex / Jules / CI sandboxes) — a
-% hard "\usepackage{bbding}" then aborts the whole build. So load bbding ONLY if
-% it is present and fall back to pifont otherwise. Use \glyphHand / \glyphPencil
-% everywhere below so the callouts render identically either way.
+% ---- Glyphs -----------------------------------------------------------------
 \usepackage{pifont}
-\IfFileExists{bbding.sty}{%
-  \usepackage{bbding}%
-  \newcommand{\glyphHand}{\Pointinghand}%
-  \newcommand{\glyphPencil}{\Pencil}%
-}{%
-  \newcommand{\glyphHand}{\ding{43}}%
-  \newcommand{\glyphPencil}{\ding{46}}%
-}
 
 % ---- Lists & spacing --------------------------------------------------------
 \usepackage{enumitem}
 \setlist{leftmargin=1.5em,topsep=4pt,itemsep=3pt}
 
-% ---- Dedicated "Step 1. / Step 2. ..." list for WORKED EXAMPLES -------------
-% WHY THIS EXISTS (a real bug it fixes): the bold "Step N." label is WIDE. With
-% the small global leftmargin above, enumitem cannot fit the label in its box
-% and overflows it to the LEFT — pushing "Step 1." OUTSIDE the callout's frame.
-% This dedicated list reserves enough label width so every "Step N." sits
-% cleanly INSIDE the box, with the step text aligned in a neat hanging column.
-% ALWAYS use \begin{steps}...\end{steps} for worked-example steps.
+% ---- Dedicated "Step 1 / Step 2 ..." list for WORKED EXAMPLES ----------------
+% Reserves label width so every "Step N" sits cleanly INSIDE the box, with the
+% step text in a neat hanging column. ALWAYS use \begin{steps}...\end{steps}.
 % NEVER write a raw \begin{enumerate}[label=\textbf{Step \arabic*.}] — it leaks.
 \newlist{steps}{enumerate}{1}
-\setlist[steps]{label=\textbf{Step \arabic*.},
-  leftmargin=4.4em, labelwidth=3.8em, labelsep=0.6em, labelindent=0pt,
-  align=left, topsep=5pt, itemsep=6pt}
+\setlist[steps]{label={\sffamily\small\bfseries\color{accent}Step \arabic*},
+  leftmargin=4.2em, labelwidth=3.6em, labelsep=0.6em, labelindent=0pt,
+  align=left, topsep=6pt, itemsep=5pt}
 \usepackage{parskip}                % blank-line paragraph spacing, no indent
+\setlength{\parskip}{0.55em plus 0.1em}
 
 % ---- Headers / footers ------------------------------------------------------
 \usepackage{fancyhdr}
@@ -99,295 +88,203 @@
 \hypersetup{breaklinks=true}
 
 % =============================================================================
-%  COLOURS — navy chrome + the FIVE taxonomy ramps (frame + light fill)
-%  Frame hexes match the gold standard; fills approximate the tcolorbox
-%  "blue!4 / orange!7 / green!5 / red!4 / violet!6" tints with explicit HTML so
-%  the result is identical on every TeX distribution.
+%  COLOURS — ink, grey, ONE accent. That is the whole palette.
+%  To re-theme a kit, change \definecolor{accent} only.
 % =============================================================================
-\definecolor{navy}{HTML}{21355E}        % banner + headings
-\definecolor{navyrule}{HTML}{21355E}
-\definecolor{inktext}{HTML}{1A202C}     % body ink
-\definecolor{mutedtext}{HTML}{6B7280}   % header / meta grey
-
-% Intuition — blue
-\definecolor{intuFrame}{HTML}{2C5AA0}   \definecolor{intuFill}{HTML}{F4F7FC}  % ~ blue!4
-% Everyday — amber
-\definecolor{everyFrame}{HTML}{8A5A1E}  \definecolor{everyFill}{HTML}{FBF1E3}  % ~ orange!7
-% Worked — green
-\definecolor{workFrame}{HTML}{2E7D52}   \definecolor{workFill}{HTML}{F1F8F3}  % ~ green!5
-% Watch out — red
-\definecolor{watchFrame}{HTML}{B23A48}  \definecolor{watchFill}{HTML}{FBF1F2}  % ~ red!4
-% Key takeaway — purple/violet
-\definecolor{keyFrame}{HTML}{6A4C93}    \definecolor{keyFill}{HTML}{F4F0F9}    % ~ violet!6
-% Wait, what? — teal (the honest surprise)
-\definecolor{waitFrame}{HTML}{0F766E}   \definecolor{waitFill}{HTML}{EEF7F5}   % ~ teal!5
+\definecolor{accent}{HTML}{1F4E79}      % deep blue: numbers, labels, rules
+\definecolor{inktext}{HTML}{1F2328}     % body text
+\definecolor{mutedtext}{HTML}{6B7280}   % header, captions, subtitles
+\definecolor{hairline}{HTML}{D0D5DD}    % thin rules
+\definecolor{wash}{HTML}{F5F6F8}        % the one fill (worked examples)
+% Compatibility names (older kits and the specimen use these)
+\colorlet{navy}{accent}      \colorlet{navyrule}{hairline}
+\colorlet{intuFrame}{accent} \colorlet{everyFrame}{accent} \colorlet{workFrame}{accent}
+\colorlet{watchFrame}{inktext} \colorlet{keyFrame}{accent} \colorlet{waitFrame}{accent}
 
 \color{inktext}
-\hypersetup{linkcolor=navy,urlcolor=navy,citecolor=navy}
+\hypersetup{linkcolor=accent,urlcolor=accent,citecolor=accent}
 
 % =============================================================================
 %  RUNNING HEADER / FOOTER  (fancyhdr)  — every page
-%  Left:  "{{COURSE_SHORT}}"      Right: "Session {{SESSION}} · {{LECTURE_TITLE}}"
-%  A thin rule sits below; the footer is the centred page number.
-%  Edit the three macros below (or let the host agent fill the {{...}}).
+%  Left:  "{{SERIES_NAME}}"      Right: "{{TOPIC_TITLE}}"
+%  SERIES_NAME is whatever frames the kit: a course name the user gave, a
+%  series ("Study Companion"), or the subject area ("Linear Algebra").
 % =============================================================================
-\newcommand{\CourseShort}{{{COURSE_SHORT}}}          % e.g. "ISM Companion"
-\newcommand{\SessionNo}{{{SESSION}}}                 % e.g. "6"
-\newcommand{\LectureTitle}{{{LECTURE_TITLE}}}        % e.g. "Probability Distributions"
+\newcommand{\SeriesName}{{{SERIES_NAME}}}          % e.g. "Study Companion"
+\newcommand{\TopicTitle}{{{TOPIC_TITLE}}}          % e.g. "Probability Distributions"
 
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\footnotesize\color{mutedtext}\textsf{\CourseShort}}
-\fancyhead[R]{\footnotesize\color{mutedtext}\textsf{Session \SessionNo\ \textperiodcentered\ \LectureTitle}}
-\fancyfoot[L]{\footnotesize\color{mutedtext}\textsf{WILP, BITS Pilani}}
-\fancyfoot[C]{\footnotesize\color{mutedtext}\thepage}
-\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\sffamily\scriptsize\color{mutedtext}\MakeUppercase{\SeriesName}}
+\fancyhead[R]{\sffamily\scriptsize\color{mutedtext}\TopicTitle}
+\fancyfoot[C]{\sffamily\footnotesize\color{mutedtext}\thepage}
+\renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
-\renewcommand{\headrule}{\hbox to\headwidth{\color{navyrule!55}\leaders\hrule height \headrulewidth\hfill}}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\sffamily\footnotesize\color{mutedtext}\thepage}}
 
 % =============================================================================
-%  SECTION HEADINGS (titlesec) — sans, bold, navy, NUMBERED, rule beneath
-%  Produces e.g. "1  The big idea: ..." with a full-width navy hairline under it.
+%  SECTION HEADINGS — sans, bold, ink; the number in the accent colour.
+%  No heavy rules. Sections flow on (no forced page breaks, so no half-empty
+%  pages); \needspace keeps a heading from stranding at a page bottom, and
+%  placeins keeps each section's figures inside the section.
 % =============================================================================
 \titleformat{\section}
-  {\sffamily\Large\bfseries\color{navy}}      % font
-  {\thesection}                               % label (the number)
-  {0.8em}                                      % gap label -> title
-  {}                                           % before-code
-  [{\vspace{2pt}\color{navy!70}\titlerule[0.8pt]}]   % rule beneath
+  {\sffamily\Large\bfseries\color{inktext}}
+  {\color{accent}\thesection}{0.7em}{}
 \titleformat{\subsection}
-  {\sffamily\large\bfseries\color{navy!92}}
-  {\thesubsection}{0.7em}{}
-\titlespacing*{\section}{0pt}{16pt}{8pt}
-\titlespacing*{\subsection}{0pt}{12pt}{4pt}
-
-% Each top-level TOPIC starts on a fresh page, so a heading never lands at the
-% bottom of a page with its content spilling across the break. We skip the break
-% before the FIRST section only — it continues under the title banner — using a
-% one-shot flag, which is robust no matter when titlesec steps the section
-% counter. Every section after the first clears to a new page.
-\newif\ifmlkfirstsec \mlkfirstsectrue
-\newcommand{\sectionbreak}{\ifmlkfirstsec\mlkfirstsecfalse\else\clearpage\fi}
+  {\sffamily\large\bfseries\color{inktext}}
+  {\color{accent}\thesubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{26pt}{6pt}
+\titlespacing*{\subsection}{0pt}{14pt}{4pt}
+\newcommand{\sectionbreak}{\needspace{14\baselineskip}}
 
 % -----------------------------------------------------------------------------
 %  \secsub{...} — the ONE-LINER under a section title.
 %  Every section opens with the WHOLE idea in one or two plain sentences,
 %  right under the heading, before any body prose. Write it as the claim the
-%  section will prove ("Three moves clean any system; the staircase shows every
-%  answer."), never as an agenda ("In this section we will...").
+%  section will prove, never as an agenda ("In this section we will...").
 % -----------------------------------------------------------------------------
 \newcommand{\secsub}[1]{%
-  \noindent{\sffamily\bfseries\itshape\color{navy!85}\large #1}\par\medskip}
+  \noindent{\large\itshape\color{mutedtext}#1}\par
+  \vspace{2pt}{\color{hairline}\rule{\linewidth}{0.4pt}}\par\medskip}
 
 % -----------------------------------------------------------------------------
-%  \flipanswer{...} — an upside-down answer for self-test questions, so the
-%  reader must try before reading. Use inside the closing self-test:
-%  "Q3. Can a system have exactly two solutions?  \flipanswer{No — 0, 1 or
-%  infinity. Two crossing points would force a whole line of them.}"
+%  \flipanswer{...} — an upside-down answer for self-test questions.
 % -----------------------------------------------------------------------------
-\newcommand{\flipanswer}[1]{\rotatebox[origin=c]{180}{\parbox{0.92\linewidth}{\small #1}}}
+\newcommand{\flipanswer}[1]{\par\noindent\hfill\rotatebox[origin=c]{180}{\parbox{0.9\linewidth}{\small\color{mutedtext}#1}}\par\medskip}
 
 % =============================================================================
-%  PILL-TAB CALLOUTS  —  the SIX taxonomy boxes
-%  Shared look: enhanced + breakable, rounded corners, boxrule 0.6pt, very light
-%  tint fill, thin colour frame, and a ROUNDED PILL boxed-title tab attached to
-%  the top-left edge (xshift 6mm, yshift -3mm) in the frame colour with white
-%  bold sans text and a leading glyph.
-%
-%  A single \housecallout style macro keeps all five visually identical; each
-%  environment only swaps the frame colour, fill colour, and the pill text.
+%  CALLOUTS — six environments, ONE shape.
+%  A thin accent rule on the left, a small uppercase sans label on top, no fill.
+%  They are told apart by the label. Only `worked` gets the faint grey wash.
+%  Environment names are unchanged from earlier versions:
+%     intuition · everyday · worked{caption} · watchout · waitwhat · keytake
 % =============================================================================
 \tcbset{
-  housecallout/.style 2 args={
-    % #1 = frame/pill colour,  #2 = light fill colour
-    enhanced, breakable,
-    colback=#2, colframe=#1,
-    boxrule=0.6pt, arc=2.4pt, outer arc=2.4pt,
-    left=10pt, right=10pt, top=9pt, bottom=9pt,
-    before skip=11pt, after skip=11pt,
-    fontupper=\normalsize,
-    coltitle=white,
-    fonttitle=\bfseries\sffamily\small,
-    attach boxed title to top left={xshift=6mm,yshift=-3mm},
-    boxed title style={
-      colback=#1, colframe=#1,
-      rounded corners, arc=3pt,
-      boxrule=0pt, left=6pt, right=6pt, top=2pt, bottom=2pt
-    }
+  quiet/.style 2 args={          % #1 = rule colour, #2 = background
+    enhanced, breakable, sharp corners,
+    colback=#2, colframe=#2, boxrule=0pt,
+    borderline west={1.6pt}{0pt}{#1},
+    left=12pt, right=10pt, top=7pt, bottom=7pt,
+    before skip=12pt, after skip=12pt,
+    fontupper=\normalsize, coltitle=#1,
+    fonttitle=\sffamily\scriptsize\bfseries,
+    attach title to upper={\par\smallskip},
   }
 }
+\newcommand{\calloutlabel}[1]{\MakeUppercase{#1}}
 
-% --- Intuition (blue, glyph ☞) ------------------------------------------------
-\newtcolorbox{intuition}{%
-  housecallout={intuFrame}{intuFill},
-  title={\raisebox{-0.05ex}{\glyphHand}\,\ The intuition}}
-
-% --- Everyday picture (amber, glyph ★) ---------------------------------------
-\newtcolorbox{everyday}{%
-  housecallout={everyFrame}{everyFill},
-  title={\raisebox{-0.05ex}{$\bigstar$}\,\ Everyday picture}}
-
-% --- Worked example (green, glyph ✎, takes a caption argument) -----------------
+\newtcolorbox{intuition}{quiet={accent}{white},
+  title={\calloutlabel{The intuition}}}
+\newtcolorbox{everyday}{quiet={accent}{white},
+  title={\calloutlabel{Everyday picture}}}
 %  Usage: \begin{worked}{The caption}  ...steps...  \end{worked}
-\newtcolorbox{worked}[1]{%
-  housecallout={workFrame}{workFill},
-  title={\raisebox{-0.05ex}{\glyphPencil}\,\ Worked example: #1}}
-
-% --- Watch out (red, glyph ✗) -------------------------------------------------
-\newtcolorbox{watchout}{%
-  housecallout={watchFrame}{watchFill},
-  title={\raisebox{-0.05ex}{\ding{55}}\,\ Watch out}}
-
-% --- Key takeaway (purple, glyph ✓) ------------------------------------------
-\newtcolorbox{keytake}{%
-  housecallout={keyFrame}{keyFill},
-  title={\raisebox{-0.05ex}{\ding{51}}\,\ Key takeaway}}
-
-% --- Wait, what? (teal, glyph ❠) — the honest surprise ------------------------
-%  One per concept AT MOST, and only where a consequence is genuinely startling
-%  ("turn every dial, land on the same spot"). Never forced; an empty slot is
-%  better than a fake surprise. Word-only, like intuition/everyday.
-\newtcolorbox{waitwhat}{%
-  housecallout={waitFrame}{waitFill},
-  title={\raisebox{-0.05ex}{\ding{93}}\,\ Wait --- really?}}
+\newtcolorbox{worked}[1]{quiet={accent}{wash},
+  title={\calloutlabel{Worked example}\ \textperiodcentered\ {\normalfont\itshape\small\color{inktext}#1}}}
+\newtcolorbox{watchout}{quiet={inktext}{white},
+  title={\calloutlabel{Watch out}}}
+%  The honest surprise: one per concept AT MOST, only where a consequence is
+%  genuinely startling. Never forced; an empty slot beats a fake surprise.
+\newtcolorbox{waitwhat}{quiet={accent}{white},
+  title={\calloutlabel{Wait --- really?}}}
+\newtcolorbox{keytake}{quiet={accent}{white},
+  borderline north={0.4pt}{0pt}{hairline},
+  borderline south={0.4pt}{0pt}{hairline},
+  title={\upshape\calloutlabel{Key takeaway}}, fontupper=\normalsize\itshape}
 
 % =============================================================================
-%  BITS BRAND  —  "WILP, BITS Pilani" wordmark + optional logo file
-%  The institute brand is fixed on every kit. The white wordmark ALWAYS renders
-%  (legible on the navy banner). If a logo image is present it is shown in a small
-%  WHITE chip, so any logo colour stays readable on navy. To enable the logo, drop
-%  a PNG at templates/assets/bits-logo.png (or output/<slug>/assets/bits-logo.png).
-%  No file => wordmark only; nothing breaks. See templates/assets/README.md.
+%  TITLE BLOCK  —  \titlebanner{LABEL}{TITLE}{SUBTITLE}{META LINE}
+%  Quiet and typographic: accent label, big ink title, grey subtitle, hairline,
+%  small grey meta line. No coloured slab.
 % =============================================================================
-\newif\ifbitslogo \bitslogofalse
-\IfFileExists{assets/bits-logo.png}%
-  {\bitslogotrue \def\bitslogopath{assets/bits-logo.png}}%
-  {\IfFileExists{../../templates/assets/bits-logo.png}%
-     {\bitslogotrue \def\bitslogopath{../../templates/assets/bits-logo.png}}%
-     {}}
-% White wordmark — always shown.
-\newcommand{\bitswordmark}{{\sffamily\bfseries\color{white}\fontsize{12.5}{15}\selectfont WILP, BITS Pilani}}
-% Logo inside a white chip — only when a logo file was found (any colour stays legible).
-\newcommand{\bitslogochip}{\ifbitslogo\colorbox{white}{\,\raisebox{-0.2ex}{\includegraphics[height=26pt]{\bitslogopath}}\,}\fi}
-
-% =============================================================================
-%  TITLE BANNER  —  full-width dark navy tcolorbox on page 1
-%  \titlebanner{LABEL}{BIG TITLE}{SUBTITLE}{META LINE}
-%    #1 small uppercase tracked label
-%    #2 very large bold title
-%    #3 one-line lighter subtitle
-%    #4 small meta line (shown under a thin white rule)
-%  Full text width via \linewidth; white text; breakable=false keeps it whole.
-% =============================================================================
-% \addfontfeatureslike is a tiny shim so the label field stays a plain
-% pass-through even without a letterspacing package; defined as identity here so
-% it is in scope before \titlebanner is ever expanded.
-\providecommand{\addfontfeatureslike}[1]{#1}
 \newcommand{\titlebanner}[4]{%
-  \begin{tcolorbox}[
-    enhanced, breakable=false,
-    colback=navy, colframe=navy,
-    boxrule=0pt, arc=3pt, outer arc=3pt,
-    left=16pt, right=16pt, top=16pt, bottom=16pt,
-    before skip=2pt, after skip=14pt,
-    width=\linewidth ]
-    % --- BITS brand row: wordmark left, optional logo chip right ---
-    \noindent
-    \begin{minipage}[c]{0.72\linewidth}\bitswordmark\end{minipage}%
-    \hfill
-    \begin{minipage}[c]{0.26\linewidth}\raggedleft\bitslogochip\end{minipage}\par
-    \vspace{9pt}
-    {\sffamily\footnotesize\bfseries\color{white!85}%
-      \MakeUppercase{\addfontfeatureslike{#1}}}\par
-    \vspace{6pt}
-    {\sffamily\bfseries\fontsize{30}{34}\selectfont\color{white} #2\par}
-    \vspace{5pt}
-    {\sffamily\large\color{white!88} #3\par}
-    \vspace{9pt}
-    {\color{white!55}\rule{\linewidth}{0.4pt}}\par
-    \vspace{6pt}
-    {\sffamily\footnotesize\color{white!82} #4\par}
-  \end{tcolorbox}%
+  \begingroup\raggedright
+  \vspace*{4mm}
+  {\sffamily\footnotesize\bfseries\color{accent}\MakeUppercase{#1}}\par
+  \vspace{7pt}
+  {\sffamily\bfseries\fontsize{30}{35}\selectfont\color{inktext}#2\par}
+  \vspace{7pt}
+  {\large\color{mutedtext}#3\par}
+  \vspace{12pt}
+  {\color{hairline}\rule{\linewidth}{0.5pt}}\par
+  \vspace{3pt}
+  {\sffamily\scriptsize\color{mutedtext}\MakeUppercase{#4}}\par
+  \vspace{10pt}
+  \endgroup
 }
 
 % =============================================================================
-%  \housefig{path}{caption}  —  full-width, centred matplotlib PNG figure
-%  width=\linewidth guarantees the image never exceeds the text block (no
-%  overfull \hbox). The plot's own baked-in bold title carries the headline; the
-%  \caption gives the figure number + a short description.
+%  \housefig[width]{path}{caption}  —  one standard width (0.86\linewidth),
+%  centred. Use the optional width (e.g. 0.55) only for small or tall figures
+%  such as a 2x2 heatmap or a 3-D surface. Figures float to the nearest good
+%  spot (top/bottom of the page) but never leave their section (placeins), so
+%  pages stay full and aligned. Captions: small, grey, bold "Figure n".
 % =============================================================================
-\newcommand{\housefig}[2]{%
-  \begin{figure}[htbp]
+\captionsetup[figure]{font={small,color=mutedtext},labelfont={bf,sf,color=inktext},
+  labelsep=period,justification=raggedright,singlelinecheck=false,skip=6pt}
+\setlength{\textfloatsep}{16pt plus 4pt minus 4pt}
+\setlength{\intextsep}{14pt plus 4pt minus 4pt}
+\renewcommand{\topfraction}{0.8}\renewcommand{\bottomfraction}{0.6}
+\renewcommand{\textfraction}{0.15}\renewcommand{\floatpagefraction}{0.75}
+\newcommand{\housefig}[3][0.86]{%
+  \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\linewidth]{#1}%
-    \caption{#2}
+    \includegraphics[width=#1\linewidth]{#2}%
+    \caption{#3}
   \end{figure}%
 }
 
-% A small inline-vocabulary helper: bold-navy first-use term.
-\newcommand{\vocab}[1]{\textbf{\color{navy}#1}}
+% Tables: small, sans headers, a little more row air.
+\renewcommand{\arraystretch}{1.18}
+
+% A small inline-vocabulary helper: first use of a term.
+\newcommand{\vocab}[1]{\textbf{#1}}
 
 % =============================================================================
 %  OVERFLOW-SAFETY CHEAT-SHEET (read before filling)
 % =============================================================================
-%  * WIDE MATH: never one long line. Wrap with align / split / multline so it
-%        breaks at the margin, e.g.
-%            \begin{align} a &= b + c \\ &\quad + d \end{align}
+%  * WIDE MATH: never one long line. Wrap with align / split / multline.
 %  * WIDE TABLE: \resizebox{\linewidth}{!}{\begin{tabular}...\end{tabular}}
 %        (or booktabs columns sized with p{..} that sum under \linewidth).
 %  * LONG URL: \url{...} (xurl lets it break anywhere).
-%  * FIGURES: always \housefig (width=\linewidth) — never a raw oversized box.
-%  * CALLOUTS: all breakable, so they flow cleanly to the next page; but keep a
-%        single WORKED example coherent — don't let one example sprawl over a
-%        page break mid-step if you can split the content into two boxes.
-%  * WORKED-EXAMPLE STEPS: ALWAYS use \begin{steps}...\end{steps} (defined above),
-%        never \begin{enumerate}[label=\textbf{Step \arabic*.}]. The steps list
-%        reserves label width so "Step N." can never spill OUTSIDE the box frame.
+%  * FIGURES: always \housefig — never a raw oversized box.
+%  * WORKED-EXAMPLE STEPS: ALWAYS use \begin{steps}...\end{steps}.
 %  * CONTENT INSIDE A BOX must fit the box: a wide table or long equation in a
-%        callout still needs \resizebox / align — the box does not shrink it for
-%        you. Anything wider than the box's text area overflows its frame.
+%        callout still needs \resizebox / align.
 % =============================================================================
 
 \begin{document}
 
 % ----------------------------------------------------------------------------
 %  PAGE 1 — TITLE BANNER
-%  AGENT:FILL — replace the four banner fields. Keep the meta line format:
-%  "Session N (dates) · Read alongside the lecture slides · Every slide example
-%   worked out in full".
+%  AGENT:FILL — replace the four banner fields.
+%  LABEL: the series name (\SeriesName) — no institute branding.
+%  META : what it was built from + the promise, e.g.
+%   "Built from: your notes on X · Every example worked out in full"   or
+%   "From first principles · Every example worked out in full".
 % ----------------------------------------------------------------------------
 \thispagestyle{fancy}
 
 \titlebanner
-  {Introduction to Statistical Methods \textperiodcentered\ Companion Reader}% LABEL
-  {{{LECTURE_TITLE}}}                                                        % BIG TITLE
+  {\SeriesName}                                                             % LABEL
+  {{{TOPIC_TITLE}}}                                                          % BIG TITLE
   {{{ONE_LINE_SUBTITLE}}}                                                    % SUBTITLE
-  {Session \SessionNo\ ({{SESSION_DATES}}) \textperiodcentered\ Read alongside the lecture slides \textperiodcentered\ Every slide example worked out in full} % META
-
-% ----------------------------------------------------------------------------
-%  BITS credit line (institute brand — kept on every kit)
-% ----------------------------------------------------------------------------
-\smallskip
-\noindent{\small\color{mutedtext}%
-Prepared for the Work Integrated Learning Programmes (WILP), BITS Pilani.}
-\smallskip
+  {{{META_LINE}}} % META
 
 % ----------------------------------------------------------------------------
 %  HOW TO USE THIS COMPANION  (intro paragraph right after the banner)
 % ----------------------------------------------------------------------------
 \noindent\textbf{How to use this companion.}
-The slides give you the formulas; this reader gives you the \emph{why}. Every
-slide concept is expanded into a full, plain-English explanation, and every
-slide example is worked out in full, step by step. Colour-coded boxes guide you:
-the \textcolor{intuFrame}{\textbf{blue}} ``intuition'' box states the core idea
-in one breath; the \textcolor{everyFrame}{\textbf{amber}} ``everyday picture''
-box ties it to real life before any math; the \textcolor{workFrame}{\textbf{green}}
-``worked example'' box solves a problem with real numbers and no skipped steps;
-the \textcolor{watchFrame}{\textbf{red}} ``watch out'' box flags the common
-mistake; the \textcolor{waitFrame}{\textbf{teal}} ``wait --- really?'' box holds
-a consequence so surprising it sounds wrong (it isn't); and the
-\textcolor{keyFrame}{\textbf{purple}} ``key takeaway'' box is the one sentence to
-remember. Read it alongside the slides, in order.
+This companion explains the topic from scratch, in plain English. Every idea
+starts with an everyday picture, then the math is built up one step at a time,
+and every example is worked out in full. Small labels mark the boxes.
+\textsf{\small\textbf{THE INTUITION}} states the core idea in one breath.
+\textsf{\small\textbf{EVERYDAY PICTURE}} ties it to real life before any math.
+\textsf{\small\textbf{WORKED EXAMPLE}}, on a grey background, solves a problem
+with real numbers and no skipped steps. \textsf{\small\textbf{WATCH OUT}} flags
+the common mistake. \textsf{\small\textbf{WAIT --- REALLY?}} holds a result that
+sounds wrong but is true. \textsf{\small\textbf{KEY TAKEAWAY}} is the one
+sentence to remember. Read it in order; each section leans on the one before.
 
 \medskip
 
@@ -397,7 +294,7 @@ remember. Read it alongside the slides, in order.
 %  lecture's central thing in miniature, by feel, before any definitions
 %  ("Solve one right now"), then names what they just did. If a short map of
 %  the reader helps, it goes AFTER that first taste, never first. Then one
-%  \section per slide-concept, each opening with \secsub{the whole idea in one
+%  \section per concept, each opening with \secsub{the whole idea in one
 %  line}. Use \vocab{...} on each term's first use, wrap display math in
 %  align/split, and add a \housefig per matplotlib plot.
 %  Example skeleton (uncomment + fill, or duplicate the specimen below):
@@ -420,7 +317,7 @@ remember. Read it alongside the slides, in order.
 %  Uses the callouts + one fully worked example. The figure here is an
 %  INLINE tikzpicture (a tiny 2-bar PMF) so the TEMPLATE ALONE compiles with NO
 %  PNG present. In real companions, replace it with \housefig + a matplotlib PNG.
-%  Duplicate this \section per slide-concept, then DELETE the specimen.
+%  Duplicate this \section per concept, then DELETE the specimen.
 % ============================================================================
 \section{The big idea: Bernoulli, the atom of randomness}
 \secsub{One yes/no trial, one number $p$ for the chance of yes --- that is the
@@ -513,17 +410,14 @@ $p = 0.6$.
     \draw[->,gray] (0,-0.02) -- (0,1.05) node[above,black,font=\small]{$P(X=x)$};
     % gridline at 1.0
     \draw[gray!30] (0,1) -- (1.4,1) node[right,gray,font=\scriptsize]{$1.0$};
-    % bar for x = 0  (height 0.4, failure, red ramp)
-    \fill[watchFrame!75] (0.0,0) rectangle (0.28,0.4);
+    % bar for x = 0  (height 0.4, failure, light accent)
+    \fill[accent!35] (0.0,0) rectangle (0.28,0.4);
     \node[below,font=\small] at (0.14,0) {$0$};
     \node[above,font=\small] at (0.14,0.4) {$0.4$};
-    % bar for x = 1  (height 0.6, success, green ramp)
-    \fill[workFrame!80] (1.0,0) rectangle (1.28,0.6);
+    % bar for x = 1  (height 0.6, success, accent)
+    \fill[accent] (1.0,0) rectangle (1.28,0.6);
     \node[below,font=\small] at (1.14,0) {$1$};
     \node[above,font=\small] at (1.14,0.6) {$0.6$};
-    % baked-in bold title, house style
-    \node[font=\sffamily\bfseries\small,navy] at (0.7,1.18)
-      {Bernoulli($p=0.6$): one shot, two outcomes};
   \end{tikzpicture}
   \caption{The Bernoulli($p=0.6$) PMF: failure ($x=0$) has mass $0.4$, success
   ($x=1$) has mass $0.6$. Inline placeholder --- real companions use a
@@ -545,8 +439,8 @@ single building block from which the Binomial, and much of classification in
 machine learning, is assembled.
 \end{keytake}
 
-% ---- Optional ML/AI connection (the teacher asks for one where natural) -----
-\noindent\textbf{ML/AI connection.}
+% ---- "Where it's used" connection (field-appropriate: ML/AI for ML topics) --
+\noindent\textbf{Where it's used.}
 Every binary classifier --- spam vs.\ not-spam, fraud vs.\ legitimate --- models
 its label as a Bernoulli variable. The model outputs $\hat p$, the predicted
 probability of the positive class, and the training loss
@@ -557,15 +451,15 @@ neural-network classifiers.
 
 % ============================================================================
 %  AGENT:FILL — REMAINING CONCEPT SECTIONS
-%  Duplicate the specimen \section structure for each remaining slide-concept:
-%  expand the slide's bullets/definition/formula into plain English, build the
+%  Duplicate the specimen \section structure for each remaining concept in the
+%  concept inventory: explain it in plain English, build the
 %  math step by step, add the relevant callouts (intuition / everyday / worked /
-%  watchout / keytake), an ML/AI connection where natural, and a \housefig per
+%  watchout / keytake), a "where it's used" connection, and a \housefig per
 %  matplotlib plot. Then DELETE the specimen above. Examples to template next:
 %
 %  \section{ {{CONCEPT_2_TITLE}} }   % e.g. "Binomial: counting the successes"
 %  \section{ {{CONCEPT_3_TITLE}} }   % e.g. "Poisson: rare events over time"
-%  ... one \section per slide-concept, in slide order ...
+%  ... one \section per concept, in teaching order ...
 % ============================================================================
 
 % ============================================================================

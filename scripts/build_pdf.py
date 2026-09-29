@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Keyless build orchestrator for an ISM Companion reader.
+"""Keyless build orchestrator for a study companion.
 
 Turns a single companion ``.tex`` (plus its matplotlib figure scripts) into a
 real PDF, with zero secrets and zero network calls at author time. The only
@@ -166,10 +166,13 @@ def render_figures(figdir: str, have_mpl: bool) -> None:
         warn(f"skipping {len(scripts)} figure script(s): matplotlib unavailable.")
         return
 
-    # Put the figdir (and its parent, where figstyle.py may live) on the path.
+    # Put the figdir, its parent, and the kit's own scripts/ dir on the path, so
+    # `import figstyle` works at any output depth (output/<slug>/figures or
+    # output/<series>/<nn>-<topic>/figures) without per-script path hacks.
     env = dict(os.environ)
     parent = os.path.dirname(os.path.abspath(figdir))
-    extra = os.pathsep.join([os.path.abspath(figdir), parent])
+    kit_scripts = os.path.dirname(os.path.abspath(__file__))
+    extra = os.pathsep.join([os.path.abspath(figdir), parent, kit_scripts])
     env["PYTHONPATH"] = (
         extra + os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else extra
     )
@@ -417,7 +420,7 @@ def run_tex_lint(texpath: str) -> None:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser(
         prog="build_pdf.py",
-        description="Keyless build orchestrator for an ISM Companion reader.",
+        description="Keyless build orchestrator for a study companion.",
     )
     parser.add_argument("tex", help="path to the companion .tex file")
     parser.add_argument(

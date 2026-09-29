@@ -10,8 +10,9 @@ import os
 import sys
 
 # --- 1) Import the house style robustly ------------------------------------
-# Resolve scripts/ relative to THIS FILE (never the cwd). Real per-lecture
-# scripts in output/<topic>/figures/ are also ../../scripts from figstyle.py.
+# Resolve scripts/ relative to THIS FILE (never the cwd). For real kits in
+# output/<slug>/figures/, scripts/build_pdf.py already puts the kit's scripts/
+# on PYTHONPATH, so a plain `from figstyle import ...` works at any depth.
 _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.normpath(os.path.join(_HERE, "..", "..", "scripts")))
 

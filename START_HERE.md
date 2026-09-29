@@ -2,10 +2,12 @@
 
 ## What this is
 
-Your teacher made this kit for you. Give it any lecture — slides, notes, or
-just a topic — and your AI assistant turns it into a beautiful study PDF
-(`companion.pdf`) and a complete interactive lecture page (`lecture.html`).
-No accounts, no API keys, nothing to configure.
+Give it anything you want to understand — a topic, a list of topics, your
+notes, a PDF or a slide deck — and your AI assistant turns it into a beautiful
+study PDF (`companion.pdf`) and a complete interactive lecture page
+(`lecture.html`). Every idea starts with an everyday picture, and every example
+is walked through step by step. No slides needed, no accounts, no API keys,
+nothing to configure.
 
 ## Set it up in 1 minute
 
@@ -43,11 +45,12 @@ Jules, or any agent and ask away.
 
 ## Use it
 
-Attach your lecture file (PDF or PPTX) if you have one — results are much
-better — then say something like:
+Just name a topic, or attach your material if you have some. Say something
+like:
 
-- "Use make-lecture-kit on the attached lecture slides."
-- "Make a study PDF and a complete interactive lecture for eigenvectors."
+- "Use make-lecture-kit on the topic eigenvectors."
+- "Use make-lecture-kit on these topics: vectors, matrices, determinants."
+- "Use make-lecture-kit on my attached notes / PDF / slides."
 - "Explain backpropagation simply, with fully worked examples and an
   interactive lecture."
 
@@ -68,7 +71,7 @@ will say so plainly and tell you exactly what to do next — your
 
 ## Stay updated
 
-Your teacher ships improvements over time. Getting the latest takes one command,
+The kit gets improvements over time. Getting the latest takes one command,
 and your own work in `output/` is kept:
 
 ```bash
@@ -83,6 +86,7 @@ repo. To just peek at what's new: `python3 scripts/update.py --check`.
 
 - Ask: "Run `scripts/lint.py` on my lecture.html and show me what it says."
 - Ask: "lint reported FAILs — fix every FAIL and re-run until it passes."
-- Weak or generic result? Re-ask with the actual lecture file attached.
+- Weak or generic result? Say who it is for ("for a first-year student") and
+  attach any notes or material you have.
 
 Happy studying.

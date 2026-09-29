@@ -1,14 +1,21 @@
-# make-lecture-kit — turn any lecture into an easy, visual, interactive study kit
+# make-lecture-kit — turn any topic into an easy, visual, interactive study kit
 
-Give it a lecture (slides, notes, or just a topic) and your AI assistant
-produces two things into an `output/` folder:
+Give it **a topic**, **a list of topics**, **your notes or study material**, or
+**PDFs / slide decks** — and your AI assistant produces two things into an
+`output/` folder:
 
-- **`companion.pdf`** — a real, professionally typeset study companion in plain,
-  easy English, with analogies and fully-worked examples (built with LaTeX +
-  figures, the way the originals were made).
-- **`lecture.html`** — a complete, very detailed, very interactive lecture: the
-  whole lecture rebuilt as a story-driven page where you *play* with every idea
-  and watch the intuition appear.
+- **`companion.pdf`** — a professionally typeset study companion in plain, easy
+  English: an everyday analogy before every idea, real-life examples, and every
+  worked example walked through step by step (LaTeX + figures).
+- **`lecture.html`** — a complete, very interactive lecture: the whole topic as a
+  story-driven page where you *play* with every idea and watch the intuition
+  appear.
+
+**No slides needed.** With just a topic name, the assistant designs the
+syllabus, the analogies and the worked examples itself. With material, it covers
+all of it and fills in the steps, intuition and examples the material skips. The
+output is generic and unbranded — use it for any subject, any course, any
+learner.
 
 **No API keys. You install nothing.** Your own agent session writes the source,
 makes the figures, and compiles the PDF for you. It works first-class on **all
@@ -36,7 +43,7 @@ git clone https://github.com/saurabh1604/make-lecture-kit ~/.claude/skills/make-
 ```
 Claude Code auto-discovers any skill in `~/.claude/skills/`. (For one project
 only, clone into `<your-project>/.claude/skills/` instead.) Then ask:
-*"Use make-lecture-kit on this lecture PDF."*
+*"Use make-lecture-kit on the topic eigenvectors."*
 
 ### OpenAI Codex
 ```bash
@@ -45,7 +52,7 @@ git clone https://github.com/saurabh1604/make-lecture-kit ~/.agents/skills/make-
 Codex auto-discovers `SKILL.md` skills in `~/.agents/skills/` (and in
 `.agents/skills/` inside a repo). List them with `/skills`, invoke explicitly
 with `$make-lecture-kit`, or just say: *"Use the make-lecture-kit skill on the
-attached lecture."* (No-git option: in Codex run `$skill-installer` and point it
+topic backpropagation."* (No-git option: in Codex run `$skill-installer` and point it
 at the repo.)
 
 ### Google Jules
@@ -53,8 +60,8 @@ Jules runs on a GitHub repo and reads **`AGENTS.md`** at the repo root
 automatically. Two ways to use it:
 
 - **Fastest:** in Jules, connect the `saurabh1604/make-lecture-kit` repo, then
-  ask *"Use make-lecture-kit to turn this lecture into a companion PDF and an
-  interactive lecture."* Jules reads `AGENTS.md` → `SKILL.md` and follows it.
+  ask *"Use make-lecture-kit to make a companion PDF and an interactive
+  lecture for <topic>."* Jules reads `AGENTS.md` → `SKILL.md` and follows it.
 - **In your own repo:** drop the `make-lecture-kit/` folder into your project
   (or copy its `AGENTS.md` to your repo root) and point Jules at that repo.
 
@@ -66,17 +73,17 @@ for a lecture kit in chat.
 ### Cursor / Gemini CLI / any other agent
 The kit is platform-neutral. Clone it or drop the folder into your project; the
 root `AGENTS.md` (and `SKILL.md`) tell the agent exactly what to do. Then ask:
-*"use make-lecture-kit on the attached lecture."*
+*"use make-lecture-kit on <topic or attached material>."*
 
 ### Or don't install at all
 Drop the `make-lecture-kit` folder into a chat with any agent and say: *"Use this
-skill to turn my lecture into a companion PDF and an interactive lecture."*
+skill to make a companion PDF and an interactive lecture for <topic>."*
 
 ---
 
 ## Staying updated
 
-Your instructor improves the kit over time (every change bumps `VERSION` and adds
+The kit improves over time (every change bumps `VERSION` and adds
 a `CHANGELOG.md` line). Pulling the latest takes one command — and **your own
 work in `output/` is never touched.**
 
@@ -100,21 +107,22 @@ work in `output/` is never touched.**
 
 ## Use
 
-Attach your lecture file (PDF/PPTX) if you have one — results are much better —
-then tell your assistant any of these (more in `references/prompts.md`):
+Tell your assistant any of these (more in `references/prompts.md`):
 
-- "Use make-lecture-kit on this lecture PDF."
-- "Make a study PDF and a complete interactive lecture for **eigenvectors**."
-- "Explain **backpropagation** simply, with worked examples and an interactive lecture."
+- "Use make-lecture-kit on the topic **eigenvectors**."
+- "Use make-lecture-kit on these topics: **mean, median, mode, variance**."
+- "Use make-lecture-kit on my attached **notes / PDF / slides**."
+- "Explain **photosynthesis** simply for a Class 10 student, with worked examples."
 
 You'll get a new folder `output/<topic>/` containing `companion.pdf` (the typeset
 study companion) and `lecture.html` (the complete interactive lecture), alongside
 the `companion.tex` source and the `figures/` used to build it.
 
 Behind the scenes, your assistant reads `SKILL.md` and follows its workflow
-(read the style references, expand every slide, work every example in full,
-build the page and the PDF, then run the quality gates). You don't do any of
-that — just give it a lecture.
+(work out what kind of input it got, build a concept inventory, write every
+idea with an analogy first, work every example in full step by step, build the
+page and the PDF, then run the quality gates). You don't do any of
+that — just give it a topic or your material.
 
 > **About the PDF:** it compiles instantly in Claude Cowork and Codex sandboxes
 > (TeX Live is built in). On a bare machine without TeX, the assistant will say
@@ -134,21 +142,19 @@ make-lecture-kit/
 ├─ VERSION                      current version (the updater compares this)
 ├─ CHANGELOG.md                 what changed in each version
 ├─ update_source.txt            where scripts/update.py pulls updates from
-├─ publish.sh                   instructors only: self-check, commit and push a release
+├─ publish.sh                   maintainers only: self-check, commit and push a release
 ├─ templates/
 │  ├─ companion.tex             LaTeX study-companion template (→ PDF)
 │  ├─ lecture.html              complete interactive lecture template
-│  └─ assets/
-│     ├─ bits-logo.png          BITS Pilani logo (PDF banner + HTML sidebar; optional)
-│     └─ README.md              how to swap the logo (placement, base64 embed, fallback)
 ├─ references/
 │  ├─ plain_language.md         the easy-English rulebook (both linters enforce it)
 │  ├─ quality_rubric.md         the quality bar + ship checklist (both)
-│  ├─ companion_style.md        how to expand slides into the companion
+│  ├─ source_modes.md           any input (topic / list / notes / PDF / slides) → concept inventory
+│  ├─ companion_style.md        how to write the companion
 │  ├─ lecture_style.md          how to build the complete interactive lecture
-│  ├─ intuition_playbook.md     analogies, mental models, ML/AI links
-│  ├─ prompts.md                copy-paste prompts for students
-│  └─ upgrading.md              the improve-the-kit loop (for instructors)
+│  ├─ intuition_playbook.md     analogies, mental models, real-world links
+│  ├─ prompts.md                copy-paste prompts for learners
+│  └─ upgrading.md              the improve-the-kit loop (for maintainers)
 ├─ scripts/
 │  ├─ figstyle.py               matplotlib house style + reusable plotters
 │  ├─ build_pdf.py              run figures + compile companion.tex → PDF
@@ -162,7 +168,7 @@ make-lecture-kit/
 │  └─ figures/
 │     └─ example_normal_curve.py  copy-adaptable house-style figure script
 └─ output/                      your generated kits land here (the skill
-                                creates one subfolder per lecture — don't
+                                creates one subfolder per topic — don't
                                 edit this folder by hand)
 ```
 

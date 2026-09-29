@@ -23,8 +23,8 @@ then drag to rotate. Copy that block for any 3-D surface — still no chart/3-D 
 ## 0. Non-negotiable mindset
 
 - This is a **complete lecture**, NOT a one-concept "visualizer". `nlp-lecture5-v2.html` has **21 chapters**
-  (00–20) for one 60-minute deck. A real lecture is **~12–20 chapters**. If the deck has 15 concepts, the
-  page has 15 chapters grouped in the sidebar. **Drop nothing.**
+  (00–20) for one 60-minute session. A full topic is usually **~8–20 chapters**. If the concept inventory
+  has 15 concepts, the page has 15 chapters grouped in the sidebar. **Drop nothing.**
 - Every interaction must **uncover the intuition**. The test: *"What does the student understand after
   touching this that they didn't before?"* If the answer is "nothing, it just looks nice" — cut it. In the
   gold standard, you flip XOR bits and *watch h₂ stay silent until both are on*; you crank η and *watch the
@@ -55,17 +55,20 @@ then drag to rotate. Copy that block for any 3-D surface — still no chart/3-D 
 
 ---
 
-## 1. Read the deck → enumerate EVERY concept → one chapter each, grouped in the sidebar
+## 1. From the concept inventory → one chapter per concept, grouped in the sidebar
 
-The input is a terse slide deck: a title, an agenda, concept slides (bullets, a definition, maybe a formula,
-a one-line example). Your first action is **mechanical enumeration** — coverage before polish.
+The input may be a bare topic, a list of topics, notes, a PDF or a slide deck — `source_modes.md` turns
+all of them into one **concept inventory**. Your first action here is **mechanical enumeration** from that
+inventory — coverage before polish.
 
-1. List the **title** and **agenda** verbatim. The agenda is your chapter spine and your nav.
-2. Walk the deck slide by slide. Each distinct **concept** → exactly one chapter. Sub-bullets that define a
-   sub-idea become sub-sections (`<h3>`) *inside* that chapter, not new chapters.
+1. Write the page **title** (the topic) and the **one question** the topic answers. That question is the
+   hook of the opening "do it first" chapter.
+2. Walk the inventory row by row. Each distinct **concept** → exactly one chapter. Small sub-ideas become
+   sub-sections (`<h3>`) *inside* that chapter, not new chapters.
 3. Order chapters in **teaching order**: the order that lets idea *N* lean on idea *N−1*. Prerequisites
-   first. This is usually deck order; reorder when a later slide is a prerequisite for an earlier one.
-4. Record **every slide example.** Each one MUST be worked out in full in its chapter (§5).
+   first. When the source has its own order, keep it unless a later idea is a prerequisite for an earlier one.
+4. Record **every example** — each source example (✦) and each designed one (✧). Each MUST be worked out in
+   full in its chapter (§5). Every chapter has at least one.
 5. **Group the chapters into 4–6 named bands** in the sidebar, exactly like the gold standard. Its bands are
    a model you can re-skin per topic:
 
@@ -83,9 +86,9 @@ a one-line example). Your first action is **mechanical enumeration** — coverag
    system, three safe moves to clean it, one staircase to read every answer off."* Reading only the band
    promises should give the lecture's skeleton. Style it as a muted lede line under the band title.
 
-6. Produce a **coverage checklist** before coding: `concept → chapter id → band → its slide example →
-   bespoke interactive`. Tick it off at the end. If a concept is on a slide and not in the checklist, you
-   missed it. A 12–18-slide deck → **12–20 chapters** across 4–6 bands. Merging two slides that teach the
+6. Produce a **coverage checklist** before coding: `concept → chapter id → band → its examples →
+   bespoke interactive`. Tick it off at the end. If a concept is in the inventory and not in the checklist,
+   you missed it. Aim for **8–20 chapters** across 3–6 bands. Merging two source items that teach the
    *same* idea is fine. **Silently dropping one is not.**
 
 The sidebar markup mirrors the gold standard exactly — grouped, numbered, scroll-spy:
@@ -113,12 +116,12 @@ chapters so the page reads as one lecture; only the topic differs. Map each step
 | # | Step | What it does | Component |
 |---|------|--------------|-----------|
 | 1 | **Hook** | `.kicker` + `<h2>` (a headline title) + a `.lead` paragraph whose **first sentence states the chapter's whole idea in plain words** — the one-liner — then a scene that makes the student *want* it. No math yet. | `.kicker`, `h2`, `p.lead` |
-| 2 | **Intuition + analogy** | the idea in plain words; one concrete analogy *before* any symbol. | `.note` (violet) for the analogy aside |
+| 2 | **Intuition + analogy** | the idea in plain words; one concrete analogy *before* any symbol. | `.note` for the analogy aside |
 | 3 | **Math, step by step** | build the formula one symbol at a time; name every symbol; headline equations in scrollable plates. | `<p>` build-up + `.eqbox` per equation |
-| 4 | **Fully worked example** | the slide's example, real numbers, every step — often a step-through interactive. | `.card` "setup" + `.card` "walk it" with a `.readout` |
+| 4 | **Fully worked example** | the concept's example (from the source, or designed with clean numbers), every step explained — often a step-through interactive. | `.card` "setup" + `.card` "walk it" with a `.readout` |
 | 5 | **Bespoke interactive** | the ⚡ panel that lets the student move the idea. **The heart.** | `.lab` (carries the "⚡ INTERACTIVE" badge) |
-| 6 | **ML / AI connection** | where this lands in ML/AI, concrete and short. **Mandatory every chapter.** | `.note` or inline `<p>` |
-| 7 | **Pitfall / key insight** | the trap or the one big takeaway, in one sharp sentence. | `.key` (amber) |
+| 6 | **Where it's used** | one concrete place this idea matters, in the topic's own field (ML/AI for an ML topic, daily life, medicine, money…). **Mandatory every chapter.** | `.note` or inline `<p>` |
+| 7 | **Pitfall / key insight** | the trap or the one big takeaway, in one sharp sentence. | `.key` |
 | 8 | **Bridge** | one line that hands off to the next chapter. | closing `<p>` or `.note` "Summary & bridge" |
 
 The component palette, verbatim from the gold standard — use these and only these:
@@ -127,15 +130,15 @@ The component palette, verbatim from the gold standard — use these and only th
 - **`.lab`** — the interactive block. It auto-renders an "⚡ INTERACTIVE" badge via `::before`. Every live
   demo lives in a `.lab`. Inside: an `<h4>` title starting with ⚡, a one-line `.muted` "what to look for",
   the controls, the `<canvas>`, and a `.readout`.
-- **`.note`** (violet left-border) — asides, analogies, "why does this work", gentle warnings, bridges.
-- **`.key`** (amber left-border) — the one load-bearing insight or pitfall of the chapter. Use sparingly.
+- **`.note`** (thin accent left rule + small label) — asides, analogies, "why does this work", gentle warnings, bridges.
+- **`.key`** (thin accent left rule, italic) — the one load-bearing insight or pitfall of the chapter. Use sparingly.
 - **`.eqbox`** — a scrollable dark plate for one display equation. Wide math scrolls *inside* it.
-- **`.readout`** — the mono "console" that prints the live computation, with `<span class="hl">` (amber)
+- **`.readout`** — the mono "console" that prints the live computation, with `<span class="hl">` (highlight)
   and `<span class="g">` (green) to highlight intermediate and final numbers.
 - **`.ctrl`** — one labeled slider row: `<label>` + `<input type=range>` + `<span class="val">`.
 - **`.chips`** — a row of `.btn` toggle buttons (one carries `.active`).
 - **`.grid2` / `.grid3`** — responsive columns that collapse to one column under 880px.
-- **`.kicker`** — the small cyan "01 · The building block" eyebrow above each `<h2>`.
+- **`.kicker`** — the small accent-coloured "01 · The building block" eyebrow above each `<h2>`.
 
 The interactive (step 5) is the thing that makes this the *lecture* and not the *PDF*. It can also be
 *woven into* steps 3–4 (a step-through that builds the derivation; a calculator that runs the example) — the
@@ -143,11 +146,11 @@ gold standard's §03 worked example *is* a Next-button stepper.
 
 ---
 
-## 3. The EASY-LANGUAGE mandate — terse slide line → short plain sentences
+## 3. The EASY-LANGUAGE mandate — terse source line → short plain sentences
 
 **`references/plain_language.md` is the binding rulebook (read it first).** `scripts/lint.py`
 enforces it on the shipped HTML: sentence length, fancy-word swaps, banned hand-waving, and a
-reading-level estimate. Slides are telegram-style; your job is to **expand** each line into
+reading-level estimate. Source material (and textbook habit) is telegram-style; your job is to **expand** each line into
 plain teaching prose, then make it pass the gate.
 
 **Rewrite rules**
@@ -160,12 +163,12 @@ plain teaching prose, then make it pass the gate.
 - Lead with the analogy; the gold standard calls a hidden neuron an *"at least one is on" detector* before it shows \(h_1=\text{ReLU}(x_1+x_2)\).
 - **Show, don't pile up prose** (`plain_language.md` §6): a comparison becomes a table; a
   pipeline becomes a labelled canvas; a sequence of stages becomes a short numbered list.
-- **Right-size** (`plain_language.md` §8): an easy slide line needs two or three plain
+- **Right-size** (`plain_language.md` §8): an easy idea needs two or three plain
   sentences, not a paragraph. Expand for clarity, never for bulk.
 
 **Before / after** (the right column is the gold-standard register):
 
-| Slide line (terse) | Lecture HTML (easy) |
+| Terse line (textbook / notes / slide) | Lecture HTML (easy) |
 |---|---|
 | "Unit: y = f(w·x + b); f nonlinear." | "A single unit takes some numbers in, mixes them with **weights**, adds one extra number called the **bias**, and pushes the result through a bend called the **activation**. That's the entire atom of deep learning. Drag the sliders and watch \(z\) build up term by term." |
 | "XOR not linearly separable (Minsky 1969)." | "Here's the question that nearly killed neural networks: can one unit do basic logic? AND and OR are easy. XOR — fire only when the inputs **differ** — is not. The two 'yes' corners sit on opposite diagonals, so **no single straight line** can fence them off. Try it yourself below; you'll cap out at 3 of 4." |
@@ -204,7 +207,7 @@ Rules:
 
 ## 5. Writing a FULLY worked example in HTML (every step, real numbers)
 
-Every chapter has at least one worked example — the slide's own, computed end to end. **Zero "it can be
+Every chapter has at least one worked example — from the source, or designed with clean numbers — computed end to end. **Zero "it can be
 shown that."** The gold standard does this two ways; use whichever fits.
 
 **Way A — a static, fully-shown calculation.** State the numbers up front, show every arithmetic step, bold
@@ -246,7 +249,7 @@ window.__demos.push(function(){
 ```
 
 The `.readout` uses `\n` newlines (its CSS is `white-space:pre-wrap`), `<span class="hl">` for intermediate
-numbers (amber) and `<span class="g">` for final answers (green). Mirror the worked numbers in the chapter's
+numbers (highlight) and `<span class="g">` for final answers (accent). Mirror the worked numbers in the chapter's
 bespoke interactive so the student can change them and watch the same arithmetic update.
 
 ---
@@ -340,14 +343,14 @@ a breadcrumb trail, and (at high η) overshoot or diverge.
 
 ### Recipe B — vector / arrow / edge field (a small network whose edges encode weights)
 *For: a neuron diagram, a forward pass, any "arrows carry numbers".* Draw nodes as filled+stroked circles
-at fixed positions; draw edges as lines whose **color encodes sign** (cyan positive, pink negative) and
+at fixed positions; draw edges as lines whose **color encodes sign** (accent positive, highlight negative; opacity = size) and
 **width encodes magnitude**. Label each edge with its weight. *Uncovers:* a weighted sum is literally
 "arrows of different strengths feeding a node." (Gold standard: §01 neuron, §06 XOR network, §14 forward/backward.)
 
 ```js
 function edge(a,b,wt){
   const pos = wt>=0, m=Math.min(1,Math.abs(wt));
-  ctx.strokeStyle = pos ? 'rgba(56,240,216,'+(0.25+0.6*m)+')'   // cyan = +
+  ctx.strokeStyle = alpha(pos ? COL.accent : COL.pt, 0.25+0.6*m)   // accent = +
                         : 'rgba(255,110,129,'+(0.25+0.6*m)+')'; // pink = −
   ctx.lineWidth = 1 + 3*m;
   ctx.beginPath(); ctx.moveTo(a.x+18,a.y); ctx.lineTo(b.x-22,b.y); ctx.stroke();
@@ -376,7 +379,7 @@ let t=0;
 function frame(){
   ctx.clearRect(0,0,W,H); t+=0.018;
   /* edges: opacity pulses with sin(t + index) */
-  /* nodes: radius = base + sin(t*1.4+i), with shadowBlur glow */
+  /* nodes: radius = base + sin(t*1.4+i) — no glow, keep it calm */
   requestAnimationFrame(frame);
 }
 frame();
@@ -444,7 +447,7 @@ window.__demos.push(function(){
   const c=$('#mapCanvas'); if(!c) return;
   const css=getComputedStyle(document.documentElement);
   const col=v=>(css.getPropertyValue(v)||'').trim()||'#38f0d8';
-  const stops=[{t:'The problem',hash:'#opt',c:'--cyan2'} /* …one per band… */];
+  const stops=[{t:'The problem',hash:'#opt',c:'--accent'} /* …one per band… */];
   let hover=-1, nodes=[];
   const cv=setupCanvas(c,(ctx,W,H)=>{
     const padX=64, top=54, bot=H-44;
@@ -669,32 +672,32 @@ one file with zero cross-talk.
 
 ---
 
-## 9. House idiom — the exact tokens (the gold-standard palette)
+## 9. House idiom — the quiet theme (v3.1)
 
-This is the rich dark theme of `nlp-lecture5-v2.html` — **not** the older Slate palette. Put these in
-`:root`:
+The page matches the companion: **ink plus one accent colour**, light by default, a dark theme one click
+away, generous white space. `templates/lecture.html` carries the whole stylesheet; copy it, don't restyle.
 
 ```css
-:root{
-  --bg:#070b16; --bg2:#0b1120; --panel:#0e1729; --panel2:#121d36; --line:#1f2d4d;
-  --ink:#e7edf9; --muted:#93a4c8; --dim:#64759c;
-  --cyan:#38f0d8; --cyan2:#19c4ff; --violet:#9b8cff; --pink:#ff6ec7;
-  --amber:#ffcb6b; --green:#62e88a; --red:#ff6b81;
-  --glow:0 0 18px rgba(56,240,216,.45); --r:16px;
-  --mono:'SFMono-Regular',ui-monospace,'JetBrains Mono',Menlo,Consolas,monospace;
+:root{            /* light (default) */
+  --bg:#FAFAF8; --bg2:#F3F4F6; --panel:#FFFFFF; --line:#E3E6EB;
+  --ink:#1F2328; --muted:#59616C; --dim:#8A929C;
+  --accent:#1F4E79; --accent2:#7FA3C7; --soft:#EEF3F8;
+  --high:#B4652A; --bad:#9B3B3B;
 }
+[data-theme="dark"]{ /* same names, dark values */ }
 ```
-- **Accent meanings** (keep consistent across all canvases): cyan `#38f0d8`/`#19c4ff` = inputs & primary
-  accent & positive weights; violet `#9b8cff` = hidden/intermediate; pink `#ff6ec7` = output; amber
-  `#ffcb6b` = the key/boundary/highlight; green `#62e88a` = "fired"/correct/final; red `#ff6b81` =
-  negative/wrong.
-- **Fonts:** system UI sans for prose (`Inter, system-ui, ...`) and a mono stack for all numbers/consoles —
-  **loaded from the OS, no Google Fonts fetch.** Keeps the file truly self-contained.
-- **Component CSS** (`.card`, `.lab` + its ⚡ badge, `.note`, `.key`, `.eqbox`, `.readout`, `.ctrl` with the
-  glowing thumb, `.btn`, `.chips`, `.grid2/3`, `.toc`, `.progress`, `.topbtn`, `.storycard`, `.spot`) is all
-  in the gold standard's `<style>`. **Copy that stylesheet wholesale** and re-theme only if the topic
-  genuinely needs it. The slider thumb glow, the ⚡ badge, the `.readout` console, and the `[data-theme=light]`
-  overrides are load-bearing — don't drop them.
+- **Colour meanings** (the same on every canvas): `--accent` = the main marks (curves, gradients/blame,
+  active buttons, final answers); `--high` = the ONE point of interest (the moving ball, the current knob,
+  the key number); `--dim`/`--muted` = secondary lines, labels and forward values; `--bad` = only for
+  "this diverged / this is wrong". Nothing else. No neon, no glow, no rainbow of accents.
+- **Canvases never hard-code a colour.** Read the tokens through the template's `COL` object
+  (`refreshCOL()` fills it from the CSS variables) and `alpha(COL.accent,.3)` for tints. The theme toggle
+  calls `refreshCOL()` and fires a `resize`, so every canvas redraws in the new theme.
+- **Fonts:** a serif body (Palatino stack) for reading, system sans for headings, labs and controls, and a
+  mono stack for numbers and consoles, all loaded from the OS (no web-font fetch).
+- **Components:** `.lab` (white panel, thin border, small "INTERACTIVE" label), `.note` / `.key` / `.watch` /
+  `.wow` (one shape: a thin left rule and a small uppercase label from the first `<b>`), `.worked` (grey
+  wash, "Step n" labels), `.readout` (mono, grey background, `.hl` = highlight, `.g` = accent, `.bad`).
 
 The only external `<script>` in the whole file is MathJax from cdnjs. If you find yourself adding any other
 CDN, stop — hand-draw it on canvas instead.
@@ -771,20 +774,20 @@ console.log(errs.length? 'DEMO ERRORS: '+errs.join(' | ') : 'ALL DEMOS RAN WITH 
 Tick every box; any red-list item is an automatic fail regardless of polish. The full rubric lives in
 `references/quality_rubric.md` (clear **85/100**, zero red-list items, to ship).
 
-- [ ] **Coverage:** every concept/slide from the deck has its own chapter, in teaching order, grouped into
-      4–6 named sidebar bands. ~12–20 chapters for a real lecture. **Nothing dropped.**
+- [ ] **Coverage:** every concept in the inventory has its own chapter, in teaching order, grouped into
+      3–6 named sidebar bands. ~8–20 chapters for a full topic. **Nothing dropped.**
 - [ ] **Opens by doing:** chapter 1 puts the central skill in the student's hands in miniature before any
       definitions, then names what they just did. No agenda-first opening.
 - [ ] **Headlines + one-liners:** every chapter title states its claim in plain words; every `.lead` opens
       with the chapter's whole idea in one sentence; every band header carries its one-line promise.
       Titles + one-liners alone give the lecture's skeleton.
 - [ ] **Spine:** every chapter runs hook → intuition+analogy → math step by step → fully worked example →
-      bespoke interactive → ML/AI → pitfall/key → bridge, using the right component each step.
+      bespoke interactive → where it's used → pitfall/key → bridge, using the right component each step.
 - [ ] **Goal game (where earned):** if the lecture's heart is a procedure, its chapter has a Recipe J
       playable — legal moves as buttons, win detector, hint, reset — not just watch-it demos.
 - [ ] **Easy language:** short sentences, each term defined on first use, analogy before algebra. A smart
       beginner never gets lost. (Sample 5 paragraphs.)
-- [ ] **Worked examples:** every slide example computed in full, every step shown, real numbers, final
+- [ ] **Worked examples:** every source example (and at least one per chapter) computed in full, every step shown, real numbers, final
       number highlighted in the `.readout`. **Zero "it can be shown that."**
 - [ ] **Math builds up:** every symbol named the moment it appears; one equation per `.eqbox`; wide math
       scrolls in-box.
@@ -845,9 +848,9 @@ All are hand-built — **no new dependency** (MathJax stays the only external sc
 7. **Animated, annotated labs.** A direction arrow at the moving point, on-canvas landmark labels, and an
    `auto ▶` that animates a run and stops at convergence (**Recipe I**). Motion plus a labelled "which way"
    turns a static plot into an explanation.
-8. **A persistent colour legend.** One `.legendbar` near the top fixes the meaning of each accent (cyan =
-   step/input, amber = the key number, green = converged/minimum, red = diverges/error, violet =
-   direction/hidden). Keep those meanings identical in every canvas so colour carries information.
+8. **Consistent colour meaning, not a legend of many colours.** With one accent and one highlight there is
+   little to decode: say once, near the top, what the accent and the highlight mean on this page (for
+   example "blue = blame, orange = the point you are moving"), and keep it identical on every canvas.
 9. **A "final boss" quiz + the one card to keep.** End the page with (a) a short 4–6-question quiz — one
    question per band, click-to-reveal answers that include the one-line *why* (reuse the recall-card
    pattern from item 1) — and (b) a single closing card that compresses the whole lecture onto one

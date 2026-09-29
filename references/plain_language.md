@@ -43,14 +43,14 @@ ship.**
 
 ---
 
-## 2. The rewrite move (terse slide → plain teaching prose)
+## 2. The rewrite move (terse line → plain teaching prose)
 
-The slide is a telegram. Expand it; don't transcribe it. The pattern:
+Source material — a slide, a textbook line, a note — is a telegram. Expand it; don't transcribe it. The same move applies when there is no source and you are writing from scratch: never write the telegram yourself. The pattern:
 
 > **hook question → plain answer in one breath → name the pieces → the formula, built up →
 > a number.**
 
-Real before/after, taken from this very course (Session 7, POS tagging):
+Real before/after (from a lesson on part-of-speech tagging):
 
 | ✗ Too hard / too literary (before) | ✓ Plain and clear (after) |
 |---|---|
@@ -142,7 +142,7 @@ The fix is always the same: **replace the hand-wave with the one or two lines it
 
 ---
 
-## 6. "Easier ways to represent the slides" — show it, don't say it
+## 6. "Easier ways to represent it" — show it, don't say it
 
 Dense prose is the enemy of a study aid. Wherever the content allows, **turn paragraphs into
 a picture, a table, or a short labelled list.** This keeps full depth while making the page

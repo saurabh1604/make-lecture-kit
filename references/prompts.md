@@ -1,21 +1,49 @@
-# Prompt cookbook — copy, paste, study
+# Prompt cookbook — copy, paste, learn
 
-Ready-made prompts for **make-lecture-kit**. Copy one into your chat
-(Claude Code, Claude Cowork, or OpenAI Codex), swap in your topic, and go.
-Attach your lecture file (PDF or PPTX) whenever you have one — the kit gets
-much better when the assistant can read the real slides.
+Ready-made prompts for **make-lecture-kit**. Copy one into your chat (Claude Code,
+Claude Cowork, OpenAI Codex, Jules, Cursor…), swap in your topic, and go. You do
+**not** need slides: a topic name is enough. If you do have notes, a PDF, a book
+chapter or a deck, attach it — the kit will cover all of it and fill the gaps.
 
 ---
 
-## 1. The full kit from your slides
+## 1. Just a topic
 
-**When to use:** you have the lecture slides and want everything — the study PDF and the interactive lecture.
+**When to use:** you want to understand something and have no material.
 
 ```text
-Use make-lecture-kit on the attached lecture slides. Build the full kit:
-the companion PDF and the complete interactive lecture. Cover every
-concept, work every example from the slides out in full, and keep the
-language simple — this is my first time seeing this topic.
+Use make-lecture-kit on the topic: <eigenvectors>. I'm meeting it for the
+first time. Build the companion PDF and the interactive lecture. Start with
+an everyday picture, use real-life examples, and walk me through each
+worked example step by step.
+```
+
+## 1b. A list of topics
+
+**When to use:** a syllabus, a unit, or a few related topics.
+
+```text
+Use make-lecture-kit on these topics: <vectors, matrices, determinants,
+eigenvectors>. Order them so each builds on the last, and make one kit per
+topic in a series with the same story-world and running example.
+```
+
+## 1c. Your own material (notes, PDF, book chapter, slides)
+
+**When to use:** you have study material and want it explained simply.
+
+```text
+Use make-lecture-kit on the attached <notes / PDF / slides>. Cover every
+idea and every example in it, fill in the steps and intuition it skips,
+and add worked examples for anything that has none. Keep the language
+simple — this is my first time seeing this topic.
+```
+
+## 1d. Set the level
+
+```text
+Use make-lecture-kit on <photosynthesis> for <a Class 10 student /
+a first-year undergrad / a working professional with 30 minutes>.
 ```
 
 ## 2. Companion PDF only
@@ -23,10 +51,10 @@ language simple — this is my first time seeing this topic.
 **When to use:** you just want the printable study document, not the web page.
 
 ```text
-Use make-lecture-kit, but only the companion part: turn the attached
-lecture into companion.pdf — plain English, an everyday analogy before
-each piece of math, and every slide example fully worked with real
-numbers. Skip the interactive lecture for now.
+Use make-lecture-kit, but only the companion part: turn <my topic /
+the attached material> into companion.pdf — plain English, an everyday
+analogy before each piece of math, and every example fully worked with
+real numbers. Skip the interactive lecture for now.
 ```
 
 ## 3. Interactive lecture only
@@ -34,9 +62,9 @@ numbers. Skip the interactive lecture for now.
 **When to use:** you want the play-with-it web page, not the PDF.
 
 ```text
-Use make-lecture-kit, but only the interactive lecture part: rebuild the
-attached lecture as lecture.html — the whole lecture as a story, with an
-interactive lab (sliders, steps, toggles) for every key idea. Run the
+Use make-lecture-kit, but only the interactive lecture part: build
+<my topic / the attached material> as lecture.html — the whole topic as
+a story, with an interactive lab (sliders, steps, toggles) for every key idea. Run the
 lint and fix any FAILs before you finish. Skip the PDF for now.
 ```
 
@@ -79,8 +107,8 @@ why each step is taken. Then recompile the PDF.
 **When to use:** exam soon — you need the examinable core plus practice.
 
 ```text
-Use make-lecture-kit on the attached lecture, but make it an exam-prep
-edition: focus on what's examinable, flag the formulas and results I
+Use make-lecture-kit on <my topic / the attached material>, but make it
+an exam-prep edition: focus on what's examinable, flag the formulas and results I
 must know cold, keep all the fully worked examples, and add practice
 questions with complete solutions at the end of the companion.
 ```

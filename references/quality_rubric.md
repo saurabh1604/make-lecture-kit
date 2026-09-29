@@ -17,14 +17,14 @@ page; **(PDF)** only to the companion; unmarked rows apply to both.
 
 | # | Category | Weight | What full marks looks like |
 |---|----------|:------:|----------------------------|
-| 1 | **Completeness / coverage** | 16 | Every concept in the lecture is present, one section/chapter each, in teaching order. Every slide example is worked in full. Nothing dropped, nothing merged away. |
-| 2 | **Teaching spine (9 steps)** | 12 | Every concept has all 9 steps: Hook → Intuition → Formalize → Worked Example → Real-World → ML/AI → Visual → Pitfalls → Recap+Bridge. Right callout per step. |
+| 1 | **Completeness / coverage** | 16 | Every concept in the concept inventory is present, one section/chapter each, in teaching order. Every source example is worked in full, and every concept has at least one worked example (designed if the source had none). Nothing dropped, nothing merged away. |
+| 2 | **Teaching spine (9 steps)** | 12 | Every concept has all 9 steps: Hook → Intuition → Formalize → Worked Example → Real-World → Where it's used → Visual → Pitfalls → Recap+Bridge. Right callout per step. |
 | 3 | **Easy language** | 12 | Short sentences (aim 15, ceiling 22 words). Plain words — no fancy-word offenders or literary fog (`plain_language.md` §3). No banned hand-waving (§4). Each term defined on first use; every symbol/acronym spelled out. Analogy before algebra. Reads at ~grade 9. A smart beginner never gets lost. **Right-sized** (`plain_language.md` §8): simple ideas told simply and briefly, via the most intuitive way in — no manufactured complexity. |
 | 4 | **Relatable analogies** | 8 | Every tricky idea has one concrete, plain-language analogy that actually maps to the math (not a vibe). |
 | 5 | **Step-by-step math intuition** | 12 | Every formula built up from scratch; every symbol named the moment it appears; no leaps. Wide math contained (HTML: `.eqbox`; PDF: `align`/`split`), never overflowing. |
 | 6 | **Generous worked examples** | 14 | At least one fully-solved example per concept, with **real numbers** and **every step shown**. Final numbers highlighted. Zero "it can be shown that". |
 | 7 | **Interactivity that uncovers intuition (HTML)** | 12 | Every major concept has 2+ working interactions that reveal the idea (not decoration). All run from `file://`. (PDF: redistribute this weight to #5 and #6.) |
-| 8 | **No-clutter / no-overflow contract** | 8 | Clean and unbroken 360→1440px (HTML) / clean A4 (PDF). Nothing overlaps; no horizontal overflow; everything breathes. (Enumerated in Section C.) |
+| 8 | **No-clutter / no-overflow contract** | 8 | Clean and unbroken 360→1440px (HTML) / clean A4 (PDF). Nothing overlaps; no horizontal overflow; everything breathes. Quiet design: ink + one accent, figures with at most two colours and no baked-in titles, no half-empty pages. (Enumerated in Section C.) |
 | 9 | **Readability** | 4 | Typographic hierarchy, generous spacing, scannable. Eye always knows where to go. |
 | 10 | **Story / flow** | 2 | Hook opener; each concept bridges to the next; the whole reads as one lecture, not a pile of parts. |
 |   | **Total** | **100** | |
@@ -47,11 +47,11 @@ For each concept, verify all are present and pull their weight:
 2. **Intuition** — the idea in plain words + one analogy. PDF: `intuition` box. HTML: a `.note`.
 3. **Formalize** — math built step by step; **every symbol named**; headline equation set off
    clearly. Wide math contained (HTML: `.eqbox`; PDF: `align`/`split`).
-4. **Worked Example** — the slide's example, **every step, real numbers**, final number bold.
+4. **Worked Example** — the concept's example (from the source, or designed with clean numbers), **every step, real numbers**, final number bold.
    PDF: `worked` box with "Step n." list. HTML: a `.key`/`.card` with numbered steps — and ideally
    a step-through/calculator lab that replays these exact steps live.
 5. **Real-World** — an everyday situation using this exact idea. PDF: `everyday` box.
-6. **ML / AI Connection** — where it lands in ML/AI, concrete and short. **Mandatory in every concept.**
+6. **Where it's used** — one concrete place the idea matters, in the topic's own field (ML/AI for an ML topic; daily life, medicine, money, law… otherwise). **Mandatory in every concept.**
 7. **Visual Intuition** — a figure wherever the concept is visual (a function,
    surface/landscape, distribution, vector, matrix, process, tagged sequence,
    comparison, or any worked example whose numbers can be drawn). Pick the plot
@@ -61,7 +61,7 @@ For each concept, verify all are present and pull their weight:
 8. **Pitfalls** — 2–4 traps, each one short sentence. PDF: `watchout` box.
 9. **Recap + Bridge** — one-line recap + one-line hand-off. PDF: `keytake` box closes the section.
 
-If a concept is missing any of these (especially **Worked Example** or **ML/AI**), category #2 cannot score
+If a concept is missing any of these (especially **Worked Example** or **Where it's used**), category #2 cannot score
 above half, and #1 likely loses points too.
 
 ---
@@ -161,14 +161,14 @@ A single worked example with a skipped step fails category #6 below ship thresho
 
 ## H. DO NOT SHIP IF (red-list — any one is an automatic fail)
 
-- A concept from the lecture is **left out**, or a slide example is **not worked in full**.
+- A concept from the inventory is **left out**, a source example is **not worked in full**, or a concept has **no worked example at all**.
 - A worked example **skips steps** or says **"it can be shown that"**.
 - Any **text overflow, clutter, or overlap**; any **horizontal page scroll** at any width (HTML); any
   content **bleeding off** the A4 page (PDF).
 - (HTML) Any interaction is **broken** (errors on `file://`) or **decorative only** (reveals no idea).
 - **Math does not render** (MathJax misconfigured / not loaded).
 - (HTML) Any **non-CDN** or **keyed** dependency, a `type="module"` script, or a `fetch` to a private host.
-- The **ML/AI connection is missing** from any concept.
+- The **"where it's used" link is missing** from any concept.
 - Sentences are long and jargon-dense such that a smart beginner gets lost (category #3 < half).
 - Any **banned hand-waving phrase** ("it can be shown", "clearly", "obviously", "left to the
   reader", …) appears anywhere (`plain_language.md` §4).
@@ -179,10 +179,10 @@ A single worked example with a skipped step fails category #6 below ship thresho
 
 ## I. Ship checklist (final gate — tick all, then ship)
 
-- [ ] **Coverage:** every concept present, one section/chapter each, teaching order; every slide example
-      worked in full.
+- [ ] **Coverage:** every concept present, one section/chapter each, teaching order; every source example
+      worked in full; at least one worked example per concept.
 - [ ] **Spine:** all steps in every concept (incl. the opening one-liner), correct callout per step,
-      ML/AI in every one.
+      a "where it's used" link in every one.
 - [ ] **Opens by doing:** the first section/chapter hands over the central skill in miniature before any
       definitions — no agenda-first opening.
 - [ ] **Easy language:** sampled paragraphs pass Section D.
@@ -237,7 +237,7 @@ and three equations overflow the page sideways on a 360px phone.
 
 ## K. Reviewer workflow (how to run this rubric in one pass)
 
-1. **Coverage sweep first.** Put the deck beside the artifact. Tick each slide → its section. A single
+1. **Coverage sweep first.** Put the concept inventory (and any source material) beside the artifact. Tick each concept → its section. A single
    missing concept or unworked example is an instant fail; stop and send it back before scoring anything
    else.
 2. **Walk one concept end to end.** Verify all 9 spine steps and the right callout per step. Read its worked

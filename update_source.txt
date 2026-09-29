@@ -7,7 +7,7 @@
 # (Any non-GitHub value is treated as a base URL serving  <base>/VERSION  and
 #  <base>/make-lecture-kit.zip , e.g. GitHub Pages or your course site.)
 #
-# Students then run:  python3 scripts/update.py     (or `git pull` if they cloned)
+# Users then run:  python3 scripts/update.py     (or `git pull` if they cloned)
 #
 # Set to your repo (rename here if you use a different repo name):
 https://github.com/saurabh1604/make-lecture-kit

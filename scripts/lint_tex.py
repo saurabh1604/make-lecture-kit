@@ -94,6 +94,14 @@ def tex_to_prose(raw):
     # Drop line comments (an unescaped %).
     s = re.sub(r"(?<!\\)%.*", " ", s)
 
+    # Headings and the \secsub one-liner are their own "sentences": a title has
+    # no full stop, so without a paragraph break it would glue onto the next
+    # sentence and trip the length check. Put each heading line in its own
+    # paragraph. The title banner's four fields are labels, not prose: drop them.
+    s = re.sub(r"^[ \t]*(\\(?:sub)*section\*?\{.*)$", r"\n\n\1\n\n", s, flags=re.M)
+    s = re.sub(r"(\\secsub\{)", r"\n\n\1", s)
+    s = re.sub(r"\\titlebanner\s*((\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\})\s*){4}", "\n\n", s)
+
     # Drop math: environments, display, and inline.
     for env in ("equation", "align", "aligned", "gather", "multline",
                 "split", "eqnarray", "array", "tabular", "tikzpicture",

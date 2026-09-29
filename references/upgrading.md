@@ -65,24 +65,24 @@ If a change would break any of these, it is not an upgrade — rework it.
 
 ---
 
-## Publish once, so every student can fetch the latest
+## Publish once, so every user can fetch the latest
 
-The point of versioning is that **all your students pull updates themselves** — you
+The point of versioning is that **all your users pull updates themselves** — you
 never re-send files. Pick whichever host you like; the kit ships an updater
 (`scripts/update.py`) that works with both.
 
 **Option A — a git repo (simplest for updates).**
 1. Put the `make-lecture-kit/` folder in a public git repo (e.g. GitHub).
-2. Students **clone it once** into their skills location, then run
+2. Users **clone it once** into their skills location, then run
    `python3 scripts/update.py` (it runs `git pull`) — or `git pull` directly.
 3. You upgrade by committing + pushing. Done.
 
-**Option B — a published zip (no git needed by students).**
+**Option B — a published zip (no git needed by users).**
 1. Host two files at one stable base URL: `VERSION` and `make-lecture-kit.zip`
    (GitHub Releases / GitHub Pages / S3 / your course site — any static host).
 2. Set that base URL in **`update_source.txt`** *before* you zip and publish, so the
    URL travels inside the kit.
-3. Students run `python3 scripts/update.py`: it compares `VERSION`, and if yours is
+3. Users run `python3 scripts/update.py`: it compares `VERSION`, and if yours is
    newer, downloads and installs the new zip (their `output/` is never touched).
 
 `update.py` understands a GitHub repo URL directly (it reads `VERSION` over *raw*
@@ -106,7 +106,7 @@ git push -u origin main
 ./publish.sh           # self-checks, commits "release vX.Y.Z", and pushes
 ```
 
-Tell students once: *"to get the latest, run `python3 scripts/update.py`"* (or
+Tell users once: *"to get the latest, run `python3 scripts/update.py`"* (or
 `git pull` if they cloned). They can preview with `python3 scripts/update.py --check`.
 
 ## Optional: a regular cadence

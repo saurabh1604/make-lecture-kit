@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""update.py — fetch the latest make-lecture-kit, so every student stays current.
+"""update.py — fetch the latest make-lecture-kit, so every user stays current.
 
-The instructor publishes new versions; each student runs this once in a while to
+The maintainer publishes new versions; each user runs this once in a while to
 pull the newest kit. It tries two ways, in order:
 
   1. git  — if this kit is a git clone, just `git pull`.
@@ -118,7 +118,7 @@ def install_zip(data):
             return False
         copied = 0
         for name in os.listdir(src):
-            if name == "output":          # never clobber the student's own work
+            if name == "output":          # never clobber the user's own work
                 continue
             s = os.path.join(src, name)
             d = kp(name)

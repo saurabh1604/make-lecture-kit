@@ -22,7 +22,7 @@ Author each concept in this fixed order. It is the skeleton for one chapter/sect
 3. **Math, built step by step** — every symbol named on first use, nothing skipped.
 4. **One fully worked example** — real numbers, every line shown, no "it can be shown".
 5. **Visual + interaction** — a picture, plus a thing the learner *moves* to feel it.
-   Then: **ML/AI connection**, **watch-out (pitfall)**, **one-line bridge** to the next.
+   Then: **where it's used** (in the topic's own field), **watch-out (pitfall)**, **one-line bridge** to the next.
 
 If a section is missing any of 1–5, it is not done.
 
@@ -173,9 +173,14 @@ palette (gradients violet, intuition teal, etc.).
 
 ---
 
-## D. ALWAYS finding the ML/AI connection
+## D. ALWAYS finding the "where it's used" connection
 
-Every math/CS idea earns its place by powering something in modern ML. Make the bridge
+Every idea earns its place by mattering somewhere real. Pick the link from **the topic's own
+field** and the learner's world: a device, a decision, a price, a news event, a moment in their
+week. For a non-technical topic, skip the ML table below and use the recipe at the end of this
+section with the field's own "task".
+
+**For math / CS / data topics**, the strongest link is usually modern ML. Make the bridge
 explicit — name the model or training step where this exact object shows up. Use this lookup;
 each row is a ready-to-paste "why this matters" paragraph seed.
 
@@ -194,7 +199,8 @@ each row is a ready-to-paste "why this matters" paragraph seed.
 | **Determinant / Jacobian** | **Normalizing flows** track volume change via \(\log\lvert\det J\rvert\); change-of-variables in density estimation. |
 | **Markov chains** | Language models as next-token transitions; **MCMC** sampling; PageRank. |
 
-**Connection recipe:** (1) name the ML task, (2) point at the exact spot the object appears,
+**Connection recipe (any field):** (1) name the real task (an ML model, a hospital test, a
+budget, a bridge design, a court ruling), (2) point at the exact spot the idea appears,
 (3) say what would *break* without it.
 
 > **Worked connection — dot product → attention.** Task: a transformer deciding which
@@ -304,9 +310,9 @@ current numeric value beside the visual. Re-typeset math after dynamic insertion
 - [ ] One fully worked example with real numbers and every step shown.
 - [ ] A visual that animates the *change*, with the live number printed.
 - [ ] 2+ interactions that reveal intuition (slider, step-through, toggle, drag, calculator).
-- [ ] Explicit ML/AI connection (task → exact spot → what breaks without it).
+- [ ] Explicit "where it's used" link (task → exact spot → what breaks without it).
 - [ ] A watch-out / common pitfall.
 - [ ] A one-line bridge to the next concept.
 - [ ] Easy language: sentences < ~20 words, terms defined on first use.
 
-*If every box is checked for every slide in the deck, the lecture is complete.*
+*If every box is checked for every concept in the inventory, the lecture is complete.*

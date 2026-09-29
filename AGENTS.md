@@ -8,8 +8,10 @@ workflow; this file is the quick map that agents which key off `AGENTS.md`
 
 ## What you do here
 
-Turn a lecture — an attached or linked slide deck (PDF/PPTX), notes, or just a
-topic — into two artifacts inside `output/<topic>/`:
+Turn any learning input — a single topic, a list of topics, notes or study
+material, PDFs, or slide decks (PPT/PPTX) — into two artifacts inside
+`output/<topic>/`. Slides are optional: with only a topic, design the syllabus
+and worked examples yourself (`references/source_modes.md`).
 
 - **`companion.pdf`** — a typeset LaTeX study companion: plain easy English,
   analogies before the math, every example worked in full. Built from
@@ -17,12 +19,14 @@ topic — into two artifacts inside `output/<topic>/`:
 - **`lecture.html`** — a complete, very interactive lecture page. Built from
   `templates/lecture.html`.
 
-Typical user triggers: *"use make-lecture-kit on this lecture"*, *"make a study
-PDF and an interactive lecture for &lt;topic&gt;"*.
+Typical user triggers: *"use make-lecture-kit on &lt;topic&gt;"*, *"make a study
+PDF and an interactive lecture for these topics"*, *"turn my notes / PDF / slides
+into a study kit"*.
 
 ## How to run it
 
-1. Read `SKILL.md` and the style guides in `references/` before writing anything.
+1. Read `SKILL.md` and the guides in `references/` before writing anything —
+   start with `references/source_modes.md` to build the concept inventory.
 2. Write the companion source + figures, then build the PDF:
    ```bash
    python3 scripts/build_pdf.py output/<topic>/companion.tex
@@ -45,15 +49,18 @@ is no TeX engine, `build_pdf.py` says so plainly and leaves the ready-to-compile
 
 ## Rules
 
-- Write in plain, easy English; explain the intuition before you formalize it;
-  work examples out in full. The linters enforce sentence length, plain words,
+- Write in plain, easy English; explain the intuition (an everyday analogy,
+  a real-life example) before you formalize it; walk every example through
+  step by step. The linters enforce sentence length, plain words,
   and reading level.
 - Explain simple things simply. Right-size every explanation (see
   `references/plain_language.md` §8): lead with the most intuitive way in, use at
   most one analogy, and never inflate an easy idea to look thorough.
 - Never let text overflow a page, box, or screen — the gates hard-fail this.
 - Generate into `output/` only. **Never edit `output/` by hand**, and never
-  overwrite a student's existing work there.
+  overwrite a learner's existing work there.
+- Keep the output unbranded (series name + topic title only) unless the user
+  asks for a name or logo.
 
 ## Staying current
 

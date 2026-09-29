@@ -64,7 +64,7 @@ REQUIRED = [
     "references/plain_language.md", "references/companion_style.md",
     "references/lecture_style.md", "references/intuition_playbook.md",
     "references/quality_rubric.md", "references/prompts.md",
-    "references/upgrading.md",
+    "references/upgrading.md", "references/source_modes.md",
     "templates/companion.tex", "templates/lecture.html",
     "scripts/figstyle.py", "scripts/build_pdf.py", "scripts/lint.py",
     "scripts/lint_tex.py", "scripts/_plain_language.py", "scripts/selfcheck.py",

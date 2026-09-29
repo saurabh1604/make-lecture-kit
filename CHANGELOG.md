@@ -6,6 +6,73 @@ every upgrade bumps `VERSION`, adds an entry here, and must pass
 
 Format follows *Keep a Changelog*; versions follow semantic versioning.
 
+## [3.1.0] — 2026-09-29
+
+A calmer look, after feedback that the old design had too many colours, cluttered
+figures and loose alignment. Tested end to end on a new kit (backpropagation).
+
+### Changed
+- **Companion PDF, the "quiet" design.** Ink plus one accent colour. The navy
+  banner becomes a typographic title block. The six tinted pill-tab callouts become
+  one shape (thin accent rule + small uppercase label), with only worked examples
+  on a faint grey wash. Palatino body (Latin Modern fallback), Helvetica headings.
+  Environment names are unchanged, so old kits still compile.
+- **Layout.** No forced page break per section (it left half-empty pages);
+  `\needspace` keeps headings with their text and `placeins` keeps figures inside
+  their section. Every figure has one standard width, with an optional smaller
+  width: `\housefig[0.55]{...}{...}`.
+- **Figures (`figstyle.py`).** One-accent palette, a single-hue colour map, thinner
+  lines, lighter grid, and no titles baked into images (`SHOW_TITLES = False`; the
+  caption carries the message). Heatmap labels now stay readable on light cells.
+- **Interactive lecture.** New quiet theme: light by default with a dark toggle,
+  serif reading text, one accent plus one highlight colour. Canvases read their
+  colours from the CSS tokens (`COL`, `refreshCOL()`, `alpha()`) and redraw when
+  the theme changes. Also adds mobile layout (sidebar becomes a top strip) and
+  stops inline math from causing sideways scroll on phones.
+- `lint_tex.py` no longer glues a section title onto the next sentence, and skips
+  the title block's label fields.
+- `references/companion_style.md` §0 and `lecture_style.md` §9 describe the new
+  contract, including the calm-figure rules. The sample companion uses the new design.
+
+## [3.0.0] — 2026-09-29
+
+The kit no longer depends on slides and no longer carries institute branding.
+Give it a topic, a list of topics, notes, PDFs or slide decks — it builds the
+same two artifacts from any of them.
+
+### Added
+- **`references/source_modes.md`** — turns any input into one **concept
+  inventory**: one topic (design the syllabus, prerequisites, concept ladder and
+  your own worked examples), a list of topics (one kit per topic in a series, or
+  one combined kit), notes / PDFs / PPTs / DOCX (extract everything, then fill
+  the gaps), or a mix. Includes the audience/level rule, the coverage rule
+  (every concept gets at least one worked example, even with no source) and an
+  accuracy rule for self-designed content.
+- Series output layout: `output/<series>/<nn>-<topic>/`.
+- New prompts for "just a topic", "a list of topics", "your own material" and
+  "set the level".
+
+### Changed
+- **Generic, unbranded output.** Removed the "WILP, BITS Pilani" wordmark,
+  footer, credit lines and the bundled logo (`templates/assets/` is gone). The
+  companion header now shows `{{SERIES_NAME}}` and `{{TOPIC_TITLE}}`; the banner
+  meta line is a free `{{META_LINE}}`. The HTML sidebar shows the series name
+  and the hero shows a `.source-line` ("Built from: …").
+- **Template placeholders renamed** (breaking): `{{COURSE_SHORT}}`,
+  `{{SESSION}}`, `{{SESSION_DATES}}`, `{{LECTURE_TITLE}}` →
+  `{{SERIES_NAME}}`, `{{TOPIC_TITLE}}`, `{{META_LINE}}`.
+- **"ML/AI connection" → "Where it's used"** in the topic's own field (ML/AI
+  for ML topics; daily life, medicine, money, law… otherwise), so the kit works
+  for any subject. Rule 4 now also covers non-math topics (walk the mechanism
+  step by step).
+- Rule 5: every concept gets at least one step-by-step worked example —
+  from the source, or designed with clean numbers and computed with code.
+- All references, README, START_HERE, AGENTS and the sample companion reworded
+  from "every slide / every slide example" to "every concept / every example".
+- `scripts/build_pdf.py` puts the kit's `scripts/` on `PYTHONPATH`, so figure
+  scripts can `import figstyle` at any output depth.
+- `scripts/selfcheck.py` requires `references/source_modes.md` (25 files).
+
 ## [2.8.1] — 2026-08-03
 
 Housekeeping release from the weekly review. No teaching content changed.

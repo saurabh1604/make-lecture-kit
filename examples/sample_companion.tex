@@ -1,169 +1,282 @@
 % =============================================================================
-%  SAMPLE COMPANION  —  SMOKE TEST & QUALITY BAR  (standalone, compilable)
+%  SAMPLE COMPANION  —  a finished example built on templates/companion.tex
 % =============================================================================
-%  This is a SHORT (~2 page) fully-filled specimen companion for ONE topic:
-%      "Poisson: counting rare events".
-%  It re-declares a MINIMAL preamble that defines the FIVE callout boxes inline,
-%  so a student can compile THIS file directly as a smoke test of the toolchain
-%  and the house design — no external PNG, no project preamble required.
+%  Works for ANY input: a topic, a list of topics, notes, a book chapter, a PDF
+%  or a slide deck. Nothing here assumes slides exist.
 %
-%  BUILD:
-%      latexmk -pdf sample_companion.tex
-%      # or twice (header/hyperref):
-%      pdflatex sample_companion.tex && pdflatex sample_companion.tex
+%  THE LOOK (v3.1 "quiet" design): one ink colour + ONE accent colour. Calm,
+%  editorial, lots of white space. No coloured fills, no rainbow of boxes.
+%    * running header: series name (left) | topic title (right), small, grey
+%    * title block: small accent label, large ink title, grey subtitle, hairline
+%    * numbered sans section headings; the number in the accent colour
+%    * SIX callouts, all the SAME shape: a thin accent rule on the left and a
+%      small uppercase label. They differ by label, not by colour. Only the
+%      worked example gets a faint grey wash, so it reads as "the work area".
+%    * \housefig{path}{caption}: every figure the same width, caption below
 %
-%  WHAT IT DEMONSTRATES (the bar every real companion must clear):
-%      * the navy full-width title banner (page 1)
-%      * the "How to use this companion." colour-code intro
-%      * a NUMBERED, ruled section heading
-%      * the five core callout boxes, each with its pill tab + glyph + tint
-%      * a FULLY worked example — every algebraic step, real numbers
-%      * one self-contained TikZ mini-figure (no external image)
-%      * easy language, short sentences, every symbol named
+%  BUILD:   python3 scripts/build_pdf.py output/<slug>/companion.tex
+%
+%  HOST AGENT: replace every {{PLACEHOLDER}}. The running header is driven by
+%  two macros in the preamble (\SeriesName / \TopicTitle).
+%  One specimen section is fully written so the template renders meaningfully.
+%  Duplicate its structure per concept, then delete it.
 % =============================================================================
+
 \documentclass[a4paper,11pt]{article}
 
 % ---- Encoding & fonts -------------------------------------------------------
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\usepackage{microtype}            % subtle protrusion -> fewer overfull boxes
+% Palatino text + matching math when available (ships with TeX Live's psnfss);
+% falls back to Latin Modern on minimal installs. Helvetica for headings.
+\IfFileExists{mathpazo.sty}{\usepackage[sc]{mathpazo}\linespread{1.06}}{\usepackage{lmodern}}
+\IfFileExists{helvet.sty}{\usepackage[scaled=0.9]{helvet}}{}
+\renewcommand{\ttdefault}{lmtt}     % Latin Modern mono: scalable, always present
+\usepackage{microtype}              % protrusion/kerning -> fewer overfull boxes
 
 % ---- Geometry ---------------------------------------------------------------
-\usepackage[a4paper,margin=1in,headheight=15pt]{geometry}
+\usepackage[a4paper,top=26mm,bottom=26mm,left=27mm,right=27mm,
+            headheight=14pt,headsep=12mm,footskip=12mm]{geometry}
 
-% ---- Math, tables, graphics -------------------------------------------------
-\usepackage{amsmath,amssymb,mathtools}
-\usepackage{booktabs}
+% ---- Math -------------------------------------------------------------------
+\usepackage{amsmath,amssymb}
+
+% ---- Graphics, tables, colour ----------------------------------------------
 \usepackage{graphicx}
-\usepackage{adjustbox}
-\usepackage[dvipsnames,svgnames,table]{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[table,svgnames]{xcolor}
+\usepackage{caption}
+\usepackage{float}
+\usepackage[section]{placeins}      % figures never drift into the next section
+\usepackage{needspace}
 
-% ---- Dingbat glyphs for the pill tabs (portable, no Unicode font needed) ----
-\usepackage{pifont}               % \ding{...} -> hand, star, pencil, cross, check
-
-% ---- Callout boxes (breakable!) ---------------------------------------------
+% ---- Callout boxes ------------------------------------------------------------
 \usepackage[most]{tcolorbox}
 \tcbuselibrary{skins,breakable}
 
-% ---- Lists, spacing ---------------------------------------------------------
+% ---- Tikz (ONLY for the specimen's inline sketch; real figs use \housefig) --
+\usepackage{tikz}
+
+% ---- Glyphs -----------------------------------------------------------------
+\usepackage{pifont}
+
+% ---- Lists & spacing --------------------------------------------------------
 \usepackage{enumitem}
 \setlist{leftmargin=1.5em,topsep=4pt,itemsep=3pt}
-\usepackage{parskip}
 
-% ---- TikZ for the mini-figure ----------------------------------------------
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta}
+% ---- Dedicated "Step 1 / Step 2 ..." list for WORKED EXAMPLES ----------------
+% Reserves label width so every "Step N" sits cleanly INSIDE the box, with the
+% step text in a neat hanging column. ALWAYS use \begin{steps}...\end{steps}.
+% NEVER write a raw \begin{enumerate}[label=\textbf{Step \arabic*.}] — it leaks.
+\newlist{steps}{enumerate}{1}
+\setlist[steps]{label={\sffamily\small\bfseries\color{accent}Step \arabic*},
+  leftmargin=4.2em, labelwidth=3.6em, labelsep=0.6em, labelindent=0pt,
+  align=left, topsep=6pt, itemsep=5pt}
+\usepackage{parskip}                % blank-line paragraph spacing, no indent
+\setlength{\parskip}{0.55em plus 0.1em}
 
 % ---- Headers / footers ------------------------------------------------------
 \usepackage{fancyhdr}
 
-% ---- Links ------------------------------------------------------------------
+% ---- Section styling --------------------------------------------------------
+\usepackage{titlesec}
+
+% ---- Links (hidden) + URL line-breaking so long URLs never overflow ---------
 \usepackage[hidelinks]{hyperref}
 \usepackage{xurl}
 \hypersetup{breaklinks=true}
 
 % =============================================================================
-%  TAXONOMY COLOURS  (the gold-standard companion palette)
+%  COLOURS — ink, grey, ONE accent. That is the whole palette.
+%  To re-theme a kit, change \definecolor{accent} only.
 % =============================================================================
-\definecolor{navy}{HTML}{21355E}        % title-banner navy
-\definecolor{cIntu}{HTML}{2C5AA0}       % blue  — The intuition
-\definecolor{cEvery}{HTML}{8A5A1E}      % amber — Everyday picture
-\definecolor{cWork}{HTML}{2E7D52}       % green — Worked example
-\definecolor{cWatch}{HTML}{B23A48}      % red   — Watch out
-\definecolor{cKey}{HTML}{6A4C93}        % purple— Key takeaway
+\definecolor{accent}{HTML}{1F4E79}      % deep blue: numbers, labels, rules
+\definecolor{inktext}{HTML}{1F2328}     % body text
+\definecolor{mutedtext}{HTML}{6B7280}   % header, captions, subtitles
+\definecolor{hairline}{HTML}{D0D5DD}    % thin rules
+\definecolor{wash}{HTML}{F5F6F8}        % the one fill (worked examples)
+% Compatibility names (older kits and the specimen use these)
+\colorlet{navy}{accent}      \colorlet{navyrule}{hairline}
+\colorlet{intuFrame}{accent} \colorlet{everyFrame}{accent} \colorlet{workFrame}{accent}
+\colorlet{watchFrame}{inktext} \colorlet{keyFrame}{accent} \colorlet{waitFrame}{accent}
 
-% Very light tint fills (the "fill blue!4 / orange!7 / ..." equivalents).
-\definecolor{cIntuBg}{HTML}{F4F7FC}
-\definecolor{cEveryBg}{HTML}{FBF1E3}
-\definecolor{cWorkBg}{HTML}{F1F8F3}
-\definecolor{cWatchBg}{HTML}{FBF1F2}
-\definecolor{cKeyBg}{HTML}{F5F1FA}
-
-\definecolor{cInk}{HTML}{1A1A1A}        % body ink
+\color{inktext}
+\hypersetup{linkcolor=accent,urlcolor=accent,citecolor=accent}
 
 % =============================================================================
-%  CALLOUT BUILDER + THE FIVE BOXES
-%  Pill tab sits on the top-left edge: boxed title attached
-%  {xshift=6mm,yshift=-3mm}, solid colour, rounded, white bold sans text.
+%  RUNNING HEADER / FOOTER  (fancyhdr)  — every page
+%  Left:  "Probability"      Right: "The Poisson Distribution"
+%  SERIES_NAME is whatever frames the kit: a course name the user gave, a
+%  series ("Study Companion"), or the subject area ("Linear Algebra").
 % =============================================================================
-\newtcolorbox{calloutbox}[3]{%
-  % #1 = accent colour (frame + pill), #2 = light tint fill, #3 = pill label
-  enhanced, breakable,
-  colback=#2, colframe=#1,
-  boxrule=0.6pt, arc=2.5pt, outer arc=2.5pt,
-  left=10pt, right=10pt, top=10pt, bottom=9pt,
-  before skip=11pt, after skip=11pt,
-  fonttitle=\bfseries\sffamily\small, coltitle=white,
-  attach boxed title to top left={xshift=6mm,yshift=-3mm},
-  boxed title style={colback=#1, colframe=#1, rounded corners,
-                     boxrule=0pt, left=5pt, right=5pt, top=2pt, bottom=2pt},
-  title={#3}%
-}
+\newcommand{\SeriesName}{Probability}          % e.g. "Study Companion"
+\newcommand{\TopicTitle}{The Poisson Distribution}          % e.g. "Probability Distributions"
 
-% \ding{43}=hand index, {72}=star, {46}=pencil, {55}=cross, {52}=check.
-\newenvironment{intuitionbox}{%
-  \begin{calloutbox}{cIntu}{cIntuBg}{\ding{43}\, The intuition}}{\end{calloutbox}}
-\newenvironment{everydaybox}{%
-  \begin{calloutbox}{cEvery}{cEveryBg}{\ding{72}\, Everyday picture}}{\end{calloutbox}}
-% Worked example takes a caption argument shown in the pill: "Worked example: ...".
-\newenvironment{workedbox}[1]{%
-  \begin{calloutbox}{cWork}{cWorkBg}{\ding{46}\, Worked example: #1}}{\end{calloutbox}}
-\newenvironment{watchoutbox}{%
-  \begin{calloutbox}{cWatch}{cWatchBg}{\ding{55}\, Watch out}}{\end{calloutbox}}
-\newenvironment{keytakebox}{%
-  \begin{calloutbox}{cKey}{cKeyBg}{\ding{52}\, Key takeaway}}{\end{calloutbox}}
-
-% ---- Worked-example step list (numbered, breakable) -------------------------
-\newlist{steps}{enumerate}{1}
-\setlist[steps]{label=\textbf{Step \arabic*.},leftmargin=2.4em,topsep=4pt,itemsep=5pt}
-
-% =============================================================================
-%  NUMBERED, RULED SECTION HEADINGS (sans, navy)
-% =============================================================================
-\usepackage{titlesec}
-\titleformat{\section}
-  {\sffamily\bfseries\large\color{navy}}{\thesection}{1em}{}[{\color{navy!35}\titlerule[0.8pt]}]
-\titlespacing*{\section}{0pt}{14pt}{6pt}
-
-% =============================================================================
-%  HEADER / FOOTER  (fancyhdr): "ISM Companion" left, session+title right.
-% =============================================================================
 \pagestyle{fancy}
 \fancyhf{}
-\renewcommand{\headrulewidth}{0.4pt}
-\lhead{\sffamily\footnotesize\color{navy}ISM Companion}
-\rhead{\sffamily\footnotesize\color{navy}Session 7 \textperiodcentered\ The Poisson Distribution}
-\cfoot{\sffamily\footnotesize\thepage}
+\fancyhead[L]{\sffamily\scriptsize\color{mutedtext}\MakeUppercase{\SeriesName}}
+\fancyhead[R]{\sffamily\scriptsize\color{mutedtext}\TopicTitle}
+\fancyfoot[C]{\sffamily\footnotesize\color{mutedtext}\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\sffamily\footnotesize\color{mutedtext}\thepage}}
 
-\color{cInk}
+% =============================================================================
+%  SECTION HEADINGS — sans, bold, ink; the number in the accent colour.
+%  No heavy rules. Sections flow on (no forced page breaks, so no half-empty
+%  pages); \needspace keeps a heading from stranding at a page bottom, and
+%  placeins keeps each section's figures inside the section.
+% =============================================================================
+\titleformat{\section}
+  {\sffamily\Large\bfseries\color{inktext}}
+  {\color{accent}\thesection}{0.7em}{}
+\titleformat{\subsection}
+  {\sffamily\large\bfseries\color{inktext}}
+  {\color{accent}\thesubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{26pt}{6pt}
+\titlespacing*{\subsection}{0pt}{14pt}{4pt}
+\newcommand{\sectionbreak}{\needspace{14\baselineskip}}
+
+% -----------------------------------------------------------------------------
+%  \secsub{...} — the ONE-LINER under a section title.
+%  Every section opens with the WHOLE idea in one or two plain sentences,
+%  right under the heading, before any body prose. Write it as the claim the
+%  section will prove, never as an agenda ("In this section we will...").
+% -----------------------------------------------------------------------------
+\newcommand{\secsub}[1]{%
+  \noindent{\large\itshape\color{mutedtext}#1}\par
+  \vspace{2pt}{\color{hairline}\rule{\linewidth}{0.4pt}}\par\medskip}
+
+% -----------------------------------------------------------------------------
+%  \flipanswer{...} — an upside-down answer for self-test questions.
+% -----------------------------------------------------------------------------
+\newcommand{\flipanswer}[1]{\par\noindent\hfill\rotatebox[origin=c]{180}{\parbox{0.9\linewidth}{\small\color{mutedtext}#1}}\par\medskip}
+
+% =============================================================================
+%  CALLOUTS — six environments, ONE shape.
+%  A thin accent rule on the left, a small uppercase sans label on top, no fill.
+%  They are told apart by the label. Only `worked` gets the faint grey wash.
+%  Environment names are unchanged from earlier versions:
+%     intuition · everyday · worked{caption} · watchout · waitwhat · keytake
+% =============================================================================
+\tcbset{
+  quiet/.style 2 args={          % #1 = rule colour, #2 = background
+    enhanced, breakable, sharp corners,
+    colback=#2, colframe=#2, boxrule=0pt,
+    borderline west={1.6pt}{0pt}{#1},
+    left=12pt, right=10pt, top=7pt, bottom=7pt,
+    before skip=12pt, after skip=12pt,
+    fontupper=\normalsize, coltitle=#1,
+    fonttitle=\sffamily\scriptsize\bfseries,
+    attach title to upper={\par\smallskip},
+  }
+}
+\newcommand{\calloutlabel}[1]{\MakeUppercase{#1}}
+
+\newtcolorbox{intuition}{quiet={accent}{white},
+  title={\calloutlabel{The intuition}}}
+\newtcolorbox{everyday}{quiet={accent}{white},
+  title={\calloutlabel{Everyday picture}}}
+%  Usage: \begin{worked}{The caption}  ...steps...  \end{worked}
+\newtcolorbox{worked}[1]{quiet={accent}{wash},
+  title={\calloutlabel{Worked example}\ \textperiodcentered\ {\normalfont\itshape\small\color{inktext}#1}}}
+\newtcolorbox{watchout}{quiet={inktext}{white},
+  title={\calloutlabel{Watch out}}}
+%  The honest surprise: one per concept AT MOST, only where a consequence is
+%  genuinely startling. Never forced; an empty slot beats a fake surprise.
+\newtcolorbox{waitwhat}{quiet={accent}{white},
+  title={\calloutlabel{Wait --- really?}}}
+\newtcolorbox{keytake}{quiet={accent}{white},
+  borderline north={0.4pt}{0pt}{hairline},
+  borderline south={0.4pt}{0pt}{hairline},
+  title={\upshape\calloutlabel{Key takeaway}}, fontupper=\normalsize\itshape}
+
+% =============================================================================
+%  TITLE BLOCK  —  \titlebanner{LABEL}{TITLE}{SUBTITLE}{META LINE}
+%  Quiet and typographic: accent label, big ink title, grey subtitle, hairline,
+%  small grey meta line. No coloured slab.
+% =============================================================================
+\newcommand{\titlebanner}[4]{%
+  \begingroup\raggedright
+  \vspace*{4mm}
+  {\sffamily\footnotesize\bfseries\color{accent}\MakeUppercase{#1}}\par
+  \vspace{7pt}
+  {\sffamily\bfseries\fontsize{30}{35}\selectfont\color{inktext}#2\par}
+  \vspace{7pt}
+  {\large\color{mutedtext}#3\par}
+  \vspace{12pt}
+  {\color{hairline}\rule{\linewidth}{0.5pt}}\par
+  \vspace{3pt}
+  {\sffamily\scriptsize\color{mutedtext}\MakeUppercase{#4}}\par
+  \vspace{10pt}
+  \endgroup
+}
+
+% =============================================================================
+%  \housefig[width]{path}{caption}  —  one standard width (0.86\linewidth),
+%  centred. Use the optional width (e.g. 0.55) only for small or tall figures
+%  such as a 2x2 heatmap or a 3-D surface. Figures float to the nearest good
+%  spot (top/bottom of the page) but never leave their section (placeins), so
+%  pages stay full and aligned. Captions: small, grey, bold "Figure n".
+% =============================================================================
+\captionsetup[figure]{font={small,color=mutedtext},labelfont={bf,sf,color=inktext},
+  labelsep=period,justification=raggedright,singlelinecheck=false,skip=6pt}
+\setlength{\textfloatsep}{16pt plus 4pt minus 4pt}
+\setlength{\intextsep}{14pt plus 4pt minus 4pt}
+\renewcommand{\topfraction}{0.8}\renewcommand{\bottomfraction}{0.6}
+\renewcommand{\textfraction}{0.15}\renewcommand{\floatpagefraction}{0.75}
+\newcommand{\housefig}[3][0.86]{%
+  \begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=#1\linewidth]{#2}%
+    \caption{#3}
+  \end{figure}%
+}
+
+% Tables: small, sans headers, a little more row air.
+\renewcommand{\arraystretch}{1.18}
+
+% A small inline-vocabulary helper: first use of a term.
+\newcommand{\vocab}[1]{\textbf{#1}}
+
+% =============================================================================
+%  OVERFLOW-SAFETY CHEAT-SHEET (read before filling)
+% =============================================================================
+%  * WIDE MATH: never one long line. Wrap with align / split / multline.
+%  * WIDE TABLE: \resizebox{\linewidth}{!}{\begin{tabular}...\end{tabular}}
+%        (or booktabs columns sized with p{..} that sum under \linewidth).
+%  * LONG URL: \url{...} (xurl lets it break anywhere).
+%  * FIGURES: always \housefig — never a raw oversized box.
+%  * WORKED-EXAMPLE STEPS: ALWAYS use \begin{steps}...\end{steps}.
+%  * CONTENT INSIDE A BOX must fit the box: a wide table or long equation in a
+%        callout still needs \resizebox / align.
+% =============================================================================
+
+% Older sample environment names, mapped onto the six template callouts.
+\newenvironment{intuitionbox}{\begin{intuition}}{\end{intuition}}
+\newenvironment{everydaybox}{\begin{everyday}}{\end{everyday}}
+\newenvironment{workedbox}[1]{\begin{worked}{#1}}{\end{worked}}
+\newenvironment{watchoutbox}{\begin{watchout}}{\end{watchout}}
+\newenvironment{keytakebox}{\begin{keytake}}{\end{keytake}}
+\colorlet{cWork}{accent}
+
 \begin{document}
 
-% ----------------------------- TITLE BANNER ---------------------------------
-\begin{tcolorbox}[enhanced, colback=navy, colframe=navy, boxrule=0pt,
-                  arc=3pt, left=16pt, right=16pt, top=14pt, bottom=14pt,
-                  coltext=white, width=\linewidth]
-  {\sffamily\footnotesize\color{white!82}%
-    \MakeUppercase{Introduction to Statistical Methods \textperiodcentered\ Companion Reader}}\\[8pt]
-  {\sffamily\bfseries\Huge Poisson: counting rare events}\\[5pt]
-  {\sffamily\large\color{white!88}%
-    The distribution of "how many happened" when each one is rare.}\\[9pt]
-  {\color{white!55}\rule{\linewidth}{0.4pt}}\\[6pt]
-  {\sffamily\footnotesize\color{white!88}%
-    Session 7 (6th--7th June 2026) \textperiodcentered\ Read alongside the lecture
-    slides \textperiodcentered\ Every slide example worked out in full}
-\end{tcolorbox}
+\thispagestyle{fancy}
+\titlebanner
+  {\SeriesName}
+  {Poisson: counting rare events}
+  {The distribution of ``how many happened'' when each one is rare.}
+  {Built from: the topic ``Poisson distribution'' \textperiodcentered\ Every example worked out in full}
 
-\medskip
 \noindent\textbf{How to use this companion.}
-The slides give you the formulas; this reader gives you the \emph{why}. Read it
-next to the deck. Five coloured boxes guide you. The blue
-\textbf{\textcolor{cIntu}{intuition}} box explains an idea in plain words. The
-amber \textbf{\textcolor{cEvery}{everyday picture}} box ties it to real life. The
-green \textbf{\textcolor{cWork}{worked example}} box solves a problem with real
-numbers, every step shown. The red \textbf{\textcolor{cWatch}{watch out}} box flags
-a common mistake. The purple \textbf{\textcolor{cKey}{key takeaway}} box is the
-one line to remember.
+This companion explains the idea from scratch, in plain English. Small labels
+mark the boxes. \textsf{\small\textbf{THE INTUITION}} explains an idea in plain
+words. \textsf{\small\textbf{EVERYDAY PICTURE}} ties it to real life.
+\textsf{\small\textbf{WORKED EXAMPLE}}, on a grey background, solves a problem
+with real numbers, every step shown. \textsf{\small\textbf{WATCH OUT}} flags a
+common mistake. \textsf{\small\textbf{KEY TAKEAWAY}} is the one line to remember.
 
 % ============================================================================
 \section{The big idea: counting rare events in a fixed window}
@@ -287,10 +400,9 @@ are actually asking about.
   \draw[->,gray!60,line width=0.5pt] (0,-0.02) -- (0,0.80) node[above,black,font=\small]{$P(X{=}k)$};
   % Poisson(3) bars, heights = probabilities, drawn to scale (max ~0.224 at k=2,3)
   \foreach \k/\p in {0/0.0498,1/0.1494,2/0.2240,3/0.2240,4/0.1680,5/0.1008,6/0.0504}{
-    \fill[cWork!75] (\k+0.20,0) rectangle (\k+0.80,\p);
+    \fill[accent!80] (\k+0.20,0) rectangle (\k+0.80,\p);
     \node[font=\scriptsize,gray!70] at (\k+0.5,-0.04) {\k};
   }
-  \node[font=\small\sffamily,navy] at (3.7,0.72) {\textbf{Poisson($\lambda=3$): bars peak near $\lambda$}};
 \end{tikzpicture}
 \end{center}
 
@@ -306,8 +418,8 @@ Always match $\lambda$ to your window, and use the "$1 - P(0)$" trick for "at
 least one".
 \end{keytakebox}
 
-% ----------------------------- ML/AI CONNECTION -----------------------------
-\noindent\textbf{Where this shows up in ML.}
+% ----------------------------- WHERE IT'S USED ------------------------------
+\noindent\textbf{Where it's used.}
 Poisson counts are the backbone of \emph{Poisson regression}, used to model
 count targets — clicks on an ad, support tickets per day, goals in a match.
 There the model predicts $\lambda = e^{\,\boldsymbol{\beta}^{\!\top}\mathbf{x}}$
